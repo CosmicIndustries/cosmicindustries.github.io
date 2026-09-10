@@ -1,64 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Industries LLC</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="darkmode.css" id="dark-mode">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cosmic Industries — technical operator practice, systems research, cybersecurity, AI, infrastructure, software, and experimental engineering.">
+  <meta name="theme-color" content="#070a12">
+  <title>Cosmic Industries — Systems, Security & Experimental Engineering</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <!-- Skip to Content Link for Accessibility -->
-    <a href="#main-content" class="skip-to-content">Skip to content</a>
-
-    <!-- Header Section with Hamburger Menu -->
-    <header>
-        <div class="header-container">
-            <h1>Cosmic Industries LLC</h1>
-            <button class="menu-toggle" aria-label="Toggle menu" onclick="toggleMenu()">&#9776;</button>
-            <nav id="navbar">
-                <a href="automotive.html">Automotive & HVAC</a>
-                <a href="cybersecurity.html">Cybersecurity & IT</a>
-                <a href="about.html">About Us</a>
-                <a href="contact.html">Contact</a>
-                <button class="toggle-mode" onclick="toggleMode()">Day/Night Mode</button>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Main Section with Blurbs and Read More Buttons -->
-    <main id="main-content">
-        <section>
-            <h2>Welcome to Cosmic Industries LLC</h2>
-            <p>Your trusted partner in automotive, HVAC, and cybersecurity services, serving both military and civilian sectors.</p>
-        </section>
-
-        <!-- Blurb Sections with 'Read More' Links -->
-        <section class="blurb">
-            <h3>Automotive & HVAC</h3>
-            <p>Certified automotive repair, HVAC services, and maintenance solutions focused on reliability and performance.</p>
-            <a href="automotive.html" class="read-more">Read More</a>
-        </section>
-
-        <section class="blurb">
-            <h3>Cybersecurity & IT</h3>
-            <p>Providing advanced cybersecurity solutions, system maintenance, and IT consulting to safeguard your digital assets.</p>
-            <a href="cybersecurity.html" class="read-more">Read More</a>
-        </section>
-
-        <section class="blurb">
-            <h3>About Us</h3>
-            <p>With a commitment to excellence and integrity, Cosmic Industries LLC proudly serves both military and civilian needs.</p>
-            <a href="about.html" class="read-more">Learn More</a>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 Cosmic Industries LLC | <a href="https://cosmicindustries.github.io/militaryLogisticsServices/" aria-label="Visit MLS site">Visit MLS</a></p>
-    </footer>
-
-    <script src="script.js"></script>
+  <div class="scanlines" aria-hidden="true"></div><div class="ambient ambient-a" aria-hidden="true"></div><div class="ambient ambient-b" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Cosmic Industries home"><span class="brand-mark">C</span><span><strong>COSMIC INDUSTRIES</strong><small>TECHNICAL OPERATOR PRACTICE</small></span></a>
+    <nav class="nav" aria-label="Primary navigation"><a href="#work">Work</a><a href="#systems">Systems</a><a href="#about">About</a><a href="https://github.com/CosmicIndustries" target="_blank" rel="noreferrer">GitHub ↗</a><button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle visual mode">◐</button></nav>
+  </header>
+  <main id="top">
+    <section class="hero shell"><div class="hero-copy"><div class="eyebrow"><span class="status-dot"></span> ONLINE / BUILDING / RESEARCHING</div><h1>Systems are the product.</h1><p class="hero-lead">I build and investigate software, security, AI, infrastructure, interfaces, and physical systems as connected systems—not isolated tasks.</p><div class="hero-actions"><a class="button primary" href="#work">Explore the work</a><a class="button secondary" href="https://github.com/CosmicIndustries" target="_blank" rel="noreferrer">Open GitHub</a></div></div>
+      <aside class="hero-console panel" aria-label="Operator profile"><div class="console-top"><span>OPERATOR PROFILE</span><span>SYS.01</span></div><div class="console-grid"><div><span>ROLE</span><strong>Technical Operator</strong></div><div><span>FOCUS</span><strong>Systems Research</strong></div><div><span>MODE</span><strong>Offensive / Defensive</strong></div><div><span>LAB</span><strong>Cosmic Industries</strong></div></div><div class="signal"><span>ACTIVE SIGNAL</span><b>████████████████░░</b></div></aside>
+    </section>
+    <section id="systems" class="shell section"><div class="section-heading"><div><span class="kicker">01 / SYSTEM MAP</span><h2>Domains of operation</h2></div><p>Cross-disciplinary work connected by the same loop: observe → model → build → measure → iterate.</p></div><div class="domain-grid">
+      <article class="domain-card"><span class="domain-index">01</span><h3>Security</h3><p>Offensive security, network analysis, OSINT, privacy infrastructure, fuzzing, diagnostics, and defensive tooling.</p><span class="domain-tags">PENTEST · NETWORKS · OSINT · LINUX</span></article>
+      <article class="domain-card"><span class="domain-index">02</span><h3>AI & Agents</h3><p>Agent architecture, retrieval, semantic memory, prompt engineering, orchestration, and human–AI workflows.</p><span class="domain-tags">LLM · RAG · AGENTS · MEMORY</span></article>
+      <article class="domain-card"><span class="domain-index">03</span><h3>Infrastructure</h3><p>Linux systems, networking, DNS, NTP, SBCs, performance tuning, automation, and resilient home-lab architecture.</p><span class="domain-tags">LINUX · NETWORKING · SBC · AUTOMATION</span></article>
+      <article class="domain-card"><span class="domain-index">04</span><h3>Engineering</h3><p>Experimental software, visualization, simulation, electronics, aviation systems, acoustics, and physical-world prototypes.</p><span class="domain-tags">PHYSICS · DSP · CAD · AVIATION</span></article>
+    </div></section>
+    <section id="work" class="shell section"><div class="section-heading"><div><span class="kicker">02 / SELECTED WORK</span><h2>Projects with a signal</h2></div><p>High-signal projects first. The complete public repository index follows automatically from GitHub.</p></div><div class="featured-grid">
+      <article class="project-feature panel feature-large"><div class="project-meta"><span>AI / MEMORY</span><span>RESEARCH</span></div><h3>Holographic Vector Database</h3><p>An experimental associative-memory system exploring holographic reduced representations, semantic retrieval, and nontraditional vector memory.</p><div class="project-footer"><span>HRR · ASSOCIATIVE MEMORY · VDB</span><a href="https://github.com/CosmicIndustries/Holographic_Vector_Datatbase" target="_blank" rel="noreferrer">Repository ↗</a></div></article>
+      <article class="project-feature panel"><div class="project-meta"><span>SECURITY</span><span>NETWORK</span></div><h3>DNSveil</h3><p>DNS privacy and control infrastructure built around practical network sovereignty and resilient name resolution.</p><div class="project-footer"><span>DNS · PRIVACY · LINUX</span><a href="https://github.com/CosmicIndustries/DNSveil" target="_blank" rel="noreferrer">Repository ↗</a></div></article>
+      <article class="project-feature panel"><div class="project-meta"><span>AI / SYSTEMS</span><span>ACTIVE</span></div><h3>KaiDesktop</h3><p>A large-scale desktop AI project exploring agentic interfaces and practical local/system integration.</p><div class="project-footer"><span>AI · DESKTOP · AGENTS</span><a href="https://github.com/CosmicIndustries/KaiDesktop" target="_blank" rel="noreferrer">Repository ↗</a></div></article>
+      <article class="project-feature panel"><div class="project-meta"><span>NETWORKING</span><span>EXPERIMENT</span></div><h3>ByeDPI</h3><p>DPI-resistance tooling and experimentation around traffic handling, proxy behavior, and network observability.</p><div class="project-footer"><span>PROXY · DPI · NETWORKS</span><a href="https://github.com/CosmicIndustries/byedpi" target="_blank" rel="noreferrer">Repository ↗</a></div></article>
+      <article class="project-feature panel"><div class="project-meta"><span>AVIATION</span><span>SIMULATION</span></div><h3>Cessna 337</h3><p>Aircraft-focused work centered on the Cessna 337 / O-2 lineage, simulation, systems knowledge, and cockpit learning.</p><div class="project-footer"><span>AVIATION · SIM · SYSTEMS</span><a href="https://github.com/CosmicIndustries/Cessna337" target="_blank" rel="noreferrer">Repository ↗</a></div></article>
+      <article class="project-feature panel"><div class="project-meta"><span>VISUALIZATION</span><span>GEOSPATIAL</span></div><h3>3D Live GIS</h3><p>Interactive three-dimensional geospatial visualization and live mapping experiments.</p><div class="project-footer"><span>3D · GIS · WEB</span><a href="https://github.com/CosmicIndustries/3dLiveGIS" target="_blank" rel="noreferrer">Repository ↗</a></div></article>
+    </div></section>
+    <section class="shell section repository-section"><div class="section-heading repository-heading"><div><span class="kicker">03 / COMPLETE INDEX</span><h2>Public repository constellation</h2></div><div class="repo-controls"><label class="search-box"><span>⌕</span><input id="repo-search" type="search" placeholder="Filter projects…" autocomplete="off"></label><select id="repo-sort" aria-label="Sort projects"><option value="updated">Recently updated</option><option value="name">Name</option><option value="stars">Stars</option></select></div></div><div id="repo-status" class="repo-status">Connecting to GitHub…</div><div id="repo-grid" class="repo-grid" aria-live="polite"></div><noscript><p class="repo-status">JavaScript is required for the live GitHub project index. <a href="https://github.com/CosmicIndustries?tab=repositories">Open the repositories directly ↗</a></p></noscript></section>
+    <section id="about" class="shell section about-section"><div class="about-panel panel"><span class="kicker">04 / ABOUT THE OPERATOR</span><h2>Build useful things. Understand why they work.</h2><p>Cosmic Industries is a technical operator practice spanning cybersecurity, software, AI, infrastructure, engineering, and experimental research. The portfolio is intentionally broad because the work is connected: networks become systems, systems become data, data becomes models, and models become better decisions.</p><div class="about-links"><a href="https://github.com/CosmicIndustries" target="_blank" rel="noreferrer">GitHub profile ↗</a><a href="militaryLogisticsServices/">Military Logistics Services ↗</a><a href="routeops/">RouteOps ↗</a></div></div></section>
+  </main>
+  <footer class="site-footer shell"><span>© <span id="year"></span> Cosmic Industries LLC</span><span class="footer-mono">OBSERVE · MODEL · BUILD · MEASURE · ITERATE</span></footer>
+  <script src="script.js"></script>
 </body>
-    </html>
+</html>
