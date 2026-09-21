@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Open pharmacognosy, ethnobotany and entheogenic research atlas — evidence, tradition, phenomenology, pharmacology and safety.">
+<title>Materia — Open Ethnobotanical Research Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="noise"></div>
+<header>
+  <a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>OPEN ETHNOBOTANICAL RESEARCH ATLAS</small></span></a>
+  <nav><a href="#atlas">Atlas</a><a href="#method">Method</a><a href="#sources">Sources</a><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io" target="_blank" rel="noreferrer">GitHub ↗</a></nav>
+</header>
+<main>
+<section class="hero">
+ <div class="eyebrow">OPEN KNOWLEDGE / PHARMACOGNOSY / ETHNOBOTANY</div>
+ <h1>Keep the strange.<br><em>Label the evidence.</em></h1>
+ <p>A research atlas for medicinal plants, fungi and entheogens. Traditional knowledge, lived phenomenology, chemistry, human research and toxicology stay visible without being falsely treated as the same kind of evidence.</p>
+ <div class="hero-actions"><a class="btn primary" href="#atlas">Enter the atlas ↓</a><a class="btn" href="#method">Read the evidence model</a></div>
+</section>
+<section class="principles">
+ <div><b>TRADITION</b><span>What people have actually used, where, and why.</span></div>
+ <div><b>EXPERIENCE</b><span>Phenomenology and community reports preserved as observations.</span></div>
+ <div><b>SCIENCE</b><span>Phytochemistry, pharmacology and human evidence with citations.</span></div>
+ <div><b>SAFETY</b><span>Interactions, toxicity and uncertainty are first-class data.</span></div>
+</section>
+<section id="atlas" class="section">
+ <div class="section-head"><div><label>01 / ATLAS</label><h2>Research records</h2></div><p>Search across the living index. Filters describe evidence; they do not rank substances.</p></div>
+ <div class="controls"><input id="search" placeholder="Search plant, compound, tradition, effect…"><select id="filter"><option value="all">All records</option><option value="entheogen">Entheogenic</option><option value="medicinal">Medicinal</option><option value="fungi">Fungi</option><option value="high-risk">High interaction / toxicity</option></select></div>
+ <div id="cards" class="cards"></div>
+</section>
+<section id="method" class="section method">
+ <div class="section-head"><div><label>02 / EPISTEMOLOGY</label><h2>Evidence without gatekeeping</h2></div><p>The atlas does not collapse different knowledge systems into one score.</p></div>
+ <div class="matrix">
+  <article><span>L0</span><h3>Primary science</h3><p>RCTs, analytical chemistry, pharmacology, toxicology and controlled human research.</p><strong>Clinical / experimental</strong></article>
+  <article><span>L1</span><h3>Reviews</h3><p>Systematic reviews, meta-analyses and evidence syntheses. Quality and heterogeneity remain explicit.</p><strong>Synthesis</strong></article>
+  <article><span>L2</span><h3>Ethnobotany</h3><p>Historical records, field studies, anthropology and documented cultural practice.</p><strong>Traditional knowledge</strong></article>
+  <article><span>L3</span><h3>Clinical observation</h3><p>Case reports, poison-center records and real-world adverse-event observations.</p><strong>Clinical signal</strong></article>
+  <article><span>L4</span><h3>Community reports</h3><p>Shroomery, Erowid/Trip Reports and other first-person accounts. Useful for hypothesis generation, not proof.</p><strong>Phenomenology</strong></article>
+  <article><span>L5</span><h3>Individual report</h3><p>One person's experience. Preserved as an observation and never silently promoted into causal evidence.</p><strong>Anecdote</strong></article>
+ </div>
+ <div class="rule"><b>Core rule:</b> “Insufficient clinical evidence” means insufficient clinical evidence. It does not erase historical use, subjective experience, or a plausible mechanism.</div>
+</section>
+<section id="sources" class="section sources">
+ <div class="section-head"><div><label>03 / SOURCE NETWORK</label><h2>Follow the receipts</h2></div></div>
+ <div class="source-grid">
+  <a href="https://www.nccih.nih.gov/" target="_blank" rel="noreferrer"><b>NCCIH</b><span>Complementary health evidence and safety</span></a>
+  <a href="https://ods.od.nih.gov/" target="_blank" rel="noreferrer"><b>NIH ODS</b><span>Supplement fact sheets and evidence reviews</span></a>
+  <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noreferrer"><b>PubMed</b><span>Biomedical literature and clinical studies</span></a>
+  <a href="https://www.erowid.org/" target="_blank" rel="noreferrer"><b>Erowid</b><span>Ethnobotanical and first-person experience archive</span></a>
+  <a href="https://www.shroomery.org/" target="_blank" rel="noreferrer"><b>Shroomery</b><span>Mycology, cultivation and community reports</span></a>
+  <a href="https://hmctest.usp.org/" target="_blank" rel="noreferrer"><b>USP HMC</b><span>Herbal identity and quality standards</span></a>
+ </div>
+</section>
+</main>
+<footer><span>Cosmic Industries / MATERIA</span><span>OBSERVE · SOURCE · DISTINGUISH · PRESERVE</span></footer>
+<script src="app.js"></script>
+</body></html>
