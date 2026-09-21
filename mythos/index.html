@@ -127,7 +127,8 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 </div>
 </section>
 </main>
-<footer>MYTHOS v0.7 · Deep time + cross-correlation + fabrication + recovered knowledge · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
+<footer>MYTHOS v0.8 · Corpus Pack 01 · Deep time + history + evidence graph · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
+<script src="corpus-pack-01.js"></script>
 <script>
 const states=[
 ["Corroborated","Strong independent evidence supports the empirical component.","#59c27c"],
@@ -244,6 +245,13 @@ function renderCorrelations(){
  const col=x.relation==="strong"?"#59c27c":x.relation==="possible"?"#d8ad55":"#64a9e8";
  return '<article class="card"><div class="meta">'+esc(x.id)+' · '+label+'</div><h3>'+esc(x.pattern)+'</h3><span class="badge"><i class="dot" style="background:'+col+'"></i>motif similarity '+x.strength+'%</span><div class="confidence"><i style="width:'+x.strength+'%;background:'+col+'"></i></div><div class="section"><b>Stories compared</b><p>'+x.stories.map(esc).join(' · ')+'</p></div><div class="section"><b>Shared motifs</b><p>'+x.motifs.map(esc).join(' · ')+'</p></div><div class="section"><b>Analysis</b><p>'+esc(x.analysis)+'</p></div><div class="section"><b>Evidence</b><p>'+esc(x.evidence)+'</p></div><div class="section sources"><b>Sources</b>'+(x.sources.length?x.sources.map(z=>'<a href="'+esc(z[1])+'" target="_blank" rel="noopener">'+esc(z[0])+'</a>').join(""):"<p class='muted'>Research sources queued for expansion.</p>")+'</div></article>';
  }).join(""):'<div class="empty">No matching cross-correlations.</div>';
+}
+if(window.MYTHOS_PACK_01){
+  entries.push(...(window.MYTHOS_PACK_01.entries||[]));
+  deepTime.push(...(window.MYTHOS_PACK_01.deepTime||[]));
+  technologies.push(...(window.MYTHOS_PACK_01.technologies||[]));
+  tricksters.push(...(window.MYTHOS_PACK_01.tricksters||[]));
+  correlations.push(...(window.MYTHOS_PACK_01.correlations||[]));
 }
 const allMotifs=[...new Set(correlations.flatMap(x=>x.motifs))].sort();
 allMotifs.forEach(v=>document.getElementById("motif").insertAdjacentHTML("beforeend",'<option>'+esc(v)+'</option>'));
