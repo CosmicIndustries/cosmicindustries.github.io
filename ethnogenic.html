@@ -16,7 +16,7 @@ section{padding:90px 0}.head{display:flex;justify-content:space-between;gap:30px
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.card{background:linear-gradient(145deg,#0d1917,#091310);border:1px solid var(--line);padding:22px;min-height:250px}.tag{font:10px ui-monospace,monospace;color:var(--accent);letter-spacing:.12em}.card h3{font-size:24px;margin:10px 0}.card p{color:var(--muted)}.card .note{border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:#c7d2cd}
 .matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.matrix article{border:1px solid var(--line);padding:22px;background:#0a1513}.matrix span{color:var(--hot);font:12px ui-monospace,monospace}.matrix h3{margin:7px 0}.matrix p{color:var(--muted)}.matrix strong{font:10px ui-monospace,monospace;color:var(--accent);text-transform:uppercase}.rule{margin-top:20px;border-left:3px solid var(--accent);padding:15px 18px;background:#0c1815;color:var(--muted)}
 .sources{border-top:1px solid var(--line)}.source-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.source-grid a{border:1px solid var(--line);padding:20px}.source-grid a:hover{border-color:var(--accent)}.source-grid b{display:block;color:var(--accent)}.source-grid span{color:var(--muted);font-size:13px}
-footer{border-top:1px solid var(--line);padding:28px 24px;display:flex;justify-content:space-between;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em}
+footer{border-top:1px solid var(--line);padding:28px 24px;display:flex;justify-content:space-between;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em}.detail{margin-top:20px;border:1px solid var(--line);background:#091512;padding:28px}.detail h3{font-size:32px;margin:6px 0}.detail h4{color:var(--accent);font:11px ui-monospace,monospace;letter-spacing:.12em;margin:24px 0 8px}.detail table{width:100%;border-collapse:collapse}.detail td,.detail th{border-top:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}.detail .chips{display:flex;gap:7px;flex-wrap:wrap}.chip{border:1px solid var(--line);padding:4px 8px;border-radius:3px;font:11px ui-monospace,monospace;color:var(--accent)}.linkbtn{cursor:pointer;color:var(--accent);background:none;border:0;padding:0;font:inherit;text-align:left}.close{float:right;border:1px solid var(--line);background:none;color:var(--muted);padding:7px 11px;cursor:pointer}
 @media(max-width:800px){nav{display:none}.principles,.cards,.matrix,.source-grid{grid-template-columns:1fr 1fr}.head{display:block}.hero{padding-top:70px}}@media(max-width:520px){.principles,.cards,.matrix,.source-grid{grid-template-columns:1fr}.controls{display:block}.controls>*{width:100%;margin-bottom:8px}}
 </style>
 </head>
@@ -25,40 +25,58 @@ footer{border-top:1px solid var(--line);padding:28px 24px;display:flex;justify-c
 <main class="wrap">
 <section class="hero"><div class="eyebrow">OPEN KNOWLEDGE / PHARMACOGNOSY / ETHNOBOTANY</div><h1>Keep the strange.<br><em>Label the evidence.</em></h1><p>A research atlas for medicinal plants, fungi and entheogens. Traditional knowledge, lived phenomenology, chemistry, human research and toxicology remain visible without pretending they are the same kind of evidence.</p><div class="buttons"><a class="btn primary" href="#atlas">Enter the atlas ↓</a><a class="btn" href="#method">Evidence model</a></div></section>
 <div class="principles"><div><b>TRADITION</b><span>Documented use, place and purpose.</span></div><div><b>EXPERIENCE</b><span>Phenomenology preserved as observation.</span></div><div><b>SCIENCE</b><span>Chemistry, pharmacology and human research.</span></div><div><b>SAFETY</b><span>Interactions, toxicity and uncertainty.</span></div></div>
-<section id="atlas"><div class="head"><div><label>01 / ATLAS</label><h2>Research records</h2></div><p>Evidence labels describe provenance. They are not rankings.</p></div><div class="controls"><input id="q" placeholder="Search plant, compound, tradition, effect…"><select id="f"><option value="">All records</option><option>Entheogenic</option><option>Medicinal</option><option>Fungi</option><option>High interaction / toxicity</option></select></div><div id="cards" class="cards"></div></section>
+<section id="atlas"><div class="head"><div><label>01 / ATLAS</label><h2>Research records</h2></div><p>Evidence labels describe provenance. They are not rankings.</p></div><div class="controls"><input id="q" placeholder="Search plant, compound, tradition, effect…"><select id="f"><option value="">All records</option><option>Entheogenic</option><option>Medicinal</option><option>Fungi</option><option>High interaction / toxicity</option></select></div><div id="stats" class="rule" style="margin-bottom:20px"></div><div id="cards" class="cards"></div><div id="detail" class="detail" hidden></div></section>
 <section id="method"><div class="head"><div><label>02 / EPISTEMOLOGY</label><h2>Evidence without gatekeeping</h2></div></div><div class="matrix"><article><span>L0</span><h3>Primary science</h3><p>RCTs, analytical chemistry, pharmacology, toxicology and controlled human research.</p><strong>Clinical / experimental</strong></article><article><span>L1</span><h3>Reviews</h3><p>Systematic reviews and meta-analyses, with heterogeneity kept visible.</p><strong>Synthesis</strong></article><article><span>L2</span><h3>Ethnobotany</h3><p>Historical records, field studies, anthropology and documented cultural practice.</p><strong>Traditional knowledge</strong></article><article><span>L3</span><h3>Clinical observation</h3><p>Case reports, poison-center records and adverse-event observations.</p><strong>Clinical signal</strong></article><article><span>L4</span><h3>Community reports</h3><p>Erowid, Shroomery and other first-person archives. Useful for phenomenology and hypothesis generation, not proof.</p><strong>Phenomenology</strong></article><article><span>L5</span><h3>Individual report</h3><p>A person's experience preserved as an observation, never silently promoted into causal evidence.</p><strong>Anecdote</strong></article></div><div class="rule"><b>Core rule:</b> insufficient clinical evidence means insufficient clinical evidence. It does not erase historical use, subjective experience or a plausible mechanism.</div></section>
 <section id="sources"><div class="head"><div><label>03 / SOURCE NETWORK</label><h2>Follow the receipts</h2></div></div><div class="source-grid"><a href="https://www.nccih.nih.gov/" target="_blank"><b>NCCIH</b><span>Complementary health evidence and safety</span></a><a href="https://ods.od.nih.gov/" target="_blank"><b>NIH ODS</b><span>Supplement evidence and fact sheets</span></a><a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank"><b>PubMed</b><span>Biomedical literature</span></a><a href="https://www.erowid.org/" target="_blank"><b>Erowid</b><span>Experience archive</span></a><a href="https://www.shroomery.org/" target="_blank"><b>Shroomery</b><span>Mycology and community reports</span></a><a href="https://hmctest.usp.org/" target="_blank"><b>USP HMC</b><span>Herbal identity and quality standards</span></a></div></section>
 </main><footer><span>Cosmic Industries / MATERIA</span><span>OBSERVE · SOURCE · DISTINGUISH · PRESERVE</span></footer>
 <script>
 let DB=null;
-const cards=document.getElementById("cards"),q=document.getElementById("q"),f=document.getElementById("f");
+const cards=document.getElementById("cards"),q=document.getElementById("q"),f=document.getElementById("f"),detail=document.getElementById("detail"),stats=document.getElementById("stats");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-function sourceLinks(ids=[]){
-  return ids.map(id=>DB.sources.find(s=>s.id===id)).filter(Boolean).map(s=>'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title)+'</a>').join(" · ");
+const source=id=>DB.sources.find(s=>s.id===id);
+const compound=id=>DB.compounds.find(c=>c.id===id);
+const record=id=>DB.records.find(r=>r.id===id);
+function sourceLinks(ids=[]){return ids.map(id=>source(id)).filter(Boolean).map(s=>'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title)+'</a>').join(" · ")}
+function chips(a=[]){return a.map(x=>'<span class="chip">'+esc(x)+'</span>').join("")}
+function openRecord(id){
+ const x=record(id); if(!x)return;
+ detail.hidden=false;
+ const chem=(x.chemistry||x.compounds||[]).map(c=>compound(c.compound_id||c.id)||{id:c.compound_id||c.id,name:c.compound_id||c.id});
+ const safety=x.safety||[], research=x.human_research||[], traditions=x.traditional_context||[];
+ detail.innerHTML='<button class="close" onclick="closeDetail()">CLOSE ×</button>'+
+ '<div class="tag">'+esc((x.categories||[]).join(" · ").toUpperCase())+'</div>'+
+ '<h3>'+esc(x.scientific_name||x.id)+'</h3><p><b>'+esc((x.common_names||[]).join(", "))+'</b> · '+esc(x.family||"")+'</p>'+
+ '<p>'+esc(x.notes||"")+'</p>'+
+ '<h4>COMPOUNDS / CONSTITUENTS</h4><div class="chips">'+chem.map(c=>'<button class="linkbtn chip" onclick="openCompound(\''+esc(c.id)+'\')">'+esc(c.name)+'</button>').join("")+'</div>'+
+ (traditions.length?'<h4>TRADITION / ETHNOBOTANY</h4>'+traditions.map(t=>'<p><b>'+esc(t.region||"")+'</b> — '+esc((t.uses||[]).join(", "))+' <span class="chip">'+esc(t.evidence_level||"")+'</span><br>'+esc(t.note||"")+'</p>').join(""):"")+
+ (research.length?'<h4>HUMAN RESEARCH</h4><table><tr><th>Endpoint</th><th>Evidence</th><th>Finding</th></tr>'+research.map(r=>'<tr><td>'+esc(r.endpoint)+'</td><td>'+esc(r.evidence_level)+'</td><td>'+esc(r.finding)+'</td></tr>').join("")+'</table>':"")+
+ (safety.length?'<h4>SAFETY SIGNALS</h4><table><tr><th>Hazard</th><th>Severity</th><th>Confidence</th><th>Notes</th></tr>'+safety.map(s=>'<tr><td>'+esc(s.hazard)+'</td><td>'+esc(s.severity)+'</td><td>'+esc(s.confidence)+'</td><td>'+esc(s.note||"")+'</td></tr>').join("")+'</table>':"")+
+ '<h4>PROVENANCE</h4><p>'+sourceLinks(x.sources||[])+'</p>';
+ detail.scrollIntoView({behavior:"smooth",block:"start"});
 }
+function openCompound(id){
+ const c=compound(id); if(!c)return;
+ detail.hidden=false;
+ const related=DB.records.filter(r=>JSON.stringify(r).includes('"'+id+'"'));
+ detail.innerHTML='<button class="close" onclick="closeDetail()">CLOSE ×</button><div class="tag">COMPOUND / CHEMISTRY</div><h3>'+esc(c.name)+'</h3><p><b>'+esc(c.class||"")+'</b></p><p>'+esc(c.notes||"")+'</p><h4>PRIMARY TARGETS</h4><div class="chips">'+chips(c.key_targets||[])+'</div><h4>FOUND IN / RELATED RECORDS</h4><div class="chips">'+related.map(r=>'<button class="linkbtn chip" onclick="openRecord(\''+esc(r.id)+'\')">'+esc(r.scientific_name||r.id)+'</button>').join("")+'</div>';
+ detail.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function closeDetail(){detail.hidden=true;detail.innerHTML=""}
 function render(){
-  if(!DB)return;
-  const s=q.value.toLowerCase(), z=f.value.toLowerCase();
-  const rows=DB.records.filter(x=>(!s||JSON.stringify(x).toLowerCase().includes(s))&&(!z||JSON.stringify(x.categories||[]).toLowerCase().includes(z)));
-  cards.innerHTML=rows.map(x=>{
-    const compounds=(x.chemistry||x.compounds||[]).map(c=>c.compound_id||c.id).slice(0,8);
-    const hazards=(x.safety||[]).length;
-    const studies=(x.human_research||[]).length;
-    return '<article class="card"><span class="tag">'+esc((x.categories||[]).join(" · ").toUpperCase())+'</span><h3>'+esc(x.scientific_name||x.id)+'</h3><p><b>'+esc((x.common_names||[]).join(", "))+'</b></p><p>'+esc(x.notes||"Research record with provenance-linked evidence.")+'</p><div class="note"><b>Compounds:</b> '+esc(compounds.join(", ")||"See record")+'<br><b>Human research:</b> '+studies+' record(s) · <b>Safety:</b> '+hazards+' signal(s)<br><b>Sources:</b> '+sourceLinks(x.sources||[])+'</div></article>'
-  }).join("")||"<p>No matching record.</p>";
+ if(!DB)return;
+ const s=q.value.toLowerCase(),z=f.value.toLowerCase();
+ const rows=DB.records.filter(x=>(!s||JSON.stringify(x).toLowerCase().includes(s))&&(!z||JSON.stringify(x.categories||[]).toLowerCase().includes(z)));
+ cards.innerHTML=rows.map(x=>{
+   const compounds=(x.chemistry||x.compounds||[]).map(c=>compound(c.compound_id||c.id)).filter(Boolean).slice(0,8);
+   return '<article class="card"><span class="tag">'+esc((x.categories||[]).join(" · ").toUpperCase())+'</span><h3><button class="linkbtn" onclick="openRecord(\''+esc(x.id)+'\')">'+esc(x.scientific_name||x.id)+'</button></h3><p><b>'+esc((x.common_names||[]).join(", "))+'</b></p><p>'+esc(x.notes||"Research record with provenance-linked evidence.")+'</p><div class="note"><b>Compounds:</b> '+compounds.map(c=>'<button class="linkbtn" onclick="openCompound(\''+esc(c.id)+'\')">'+esc(c.name)+'</button>').join(", ")+'<br><b>Human research:</b> '+(x.human_research||[]).length+' · <b>Safety:</b> '+(x.safety||[]).length+'<br><b>Sources:</b> '+sourceLinks(x.sources||[])+'</div></article>'
+ }).join("")||"<p>No matching record.</p>";
+ stats.textContent=DB.records.length+" records · "+DB.compounds.length+" compounds · "+DB.sources.length+" sources · "+DB.interactions.length+" interaction records · "+DB.evidence_levels? "":"";
+ stats.textContent=DB.records.length+" records · "+DB.compounds.length+" compounds · "+DB.sources.length+" sources · "+DB.interactions.length+" interactions. Click any record or compound to traverse the graph.";
 }
 async function boot(){
-  try{
-    const res=await fetch("ethnogenic.db.json",{cache:"no-store"});
-    DB=await res.json();
-    document.title="MATERIA — "+DB.records.length+" Research Records";
-    const atlas=document.querySelector("#atlas .head p");
-    atlas.textContent=DB.records.length+" records · "+DB.compounds.length+" compounds · "+DB.sources.length+" sources · "+DB.interactions.length+" interaction records. Evidence is provenance-labeled, not ranked.";
-    render();
-  }catch(e){
-    cards.innerHTML='<p>Database could not be loaded. The HTML shell is intact; check ethnogenic.db.json.</p>';
-  }
+ try{const res=await fetch("ethnogenic.db.json",{cache:"no-store"});DB=await res.json();document.title="MATERIA — "+DB.records.length+" Research Records";render()}
+ catch(e){cards.innerHTML='<p>Database could not be loaded. Check ethnogenic.db.json.</p>'}
 }
-q.oninput=render; f.onchange=render; boot();
+q.oninput=render;f.onchange=render;boot();
 </script>
 </body></html>
