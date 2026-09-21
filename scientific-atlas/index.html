@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Scientific Data Atlas — overlooked, changed, endangered, and debunked scientific evidence tracked with provenance.">
+<title>Scientific Data Atlas — Cosmic Industries</title>
+<style>
+:root{--bg:#070a12;--panel:#0d1220;--text:#edf2f7;--muted:#93a0b4;--line:#1d2840;--accent:#8bd3ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#17263e 0,#070a12 45%);color:var(--text);font:15px/1.55 Inter,system-ui,sans-serif}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}.shell{max-width:1200px;margin:auto;padding:24px}
+header{border-bottom:1px solid var(--line)}.brand{font:700 13px monospace;letter-spacing:.1em}
+nav{float:right}nav a{margin-left:18px;color:var(--muted);font:12px monospace}
+main{padding:42px 0}.eyebrow{font:600 11px monospace;letter-spacing:.16em;color:var(--accent)}
+h1{font-size:clamp(38px,7vw,74px);line-height:.96;margin:10px 0 18px;max-width:900px}
+.lead{font-size:19px;color:var(--muted);max-width:800px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:28px 0 38px}
+.stat,.record,.controls{background:rgba(13,18,32,.86);border:1px solid var(--line);border-radius:14px}.stat{padding:16px}.stat b{display:block;font-size:28px}.stat span{font:10px monospace;color:var(--muted)}
+.controls{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;padding:13px;margin-bottom:16px}
+input,select{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);background:#080c15;color:var(--text)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.record{padding:19px}.top{display:flex;gap:7px;flex-wrap:wrap}.tag{padding:4px 8px;border:1px solid var(--line);border-radius:99px;font:600 10px monospace;color:var(--muted)}.tag:first-child{color:var(--accent)}.priority{margin-left:auto}
+h2{font-size:26px}.record h2{font-size:20px;margin:10px 0}.record p{color:var(--muted)}.record strong{color:var(--text)}
+.meter{font:10px monospace;color:var(--muted)}.sources{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.sources a{font-size:12px}
+.note{margin:22px 0;color:var(--muted);font:11px monospace}.empty{display:none;padding:30px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
+footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:11px monospace}
+@media(max-width:850px){.stats,.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.priority{margin-left:0}}
+</style>
+</head>
+<body>
+<header><div class="shell"><a class="brand" href="../">COSMIC INDUSTRIES / SCIENTIFIC DATA ATLAS</a><nav><a href="../">Home</a><a href="README.md">Method</a><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/tree/main/scientific-atlas" target="_blank" rel="noreferrer">GitHub ↗</a></nav></div></header>
+<main><div class="shell">
+<div class="eyebrow">PUBLIC EVIDENCE GRAPH / SEED 0.1</div>
+<h1>Find what science forgot to finish.</h1>
+<p class="lead">Historical datasets, changed sources, endangered archives, overlooked observations, and failed claims — tracked with provenance instead of mystery.</p>
+<div class="stats" id="stats"></div>
+<div class="controls"><input id="q" placeholder="Search records…"><select id="domain"><option value="">All domains</option></select><select id="state"><option value="">All states</option></select></div>
+<div id="grid" class="grid"></div><div id="empty" class="empty">No records match the current filter.</div>
+<p class="note">Discovery potential is triage, not truth. Verify original sources before reuse. Absence or changed access is not, by itself, evidence of suppression.</p>
+</div></main>
+<footer><div class="shell">Cosmic Industries · Scientific Data Atlas · Snapshot 2026-09-21</div></footer>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const csvToRows=text=>{const out=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c=='"'&&q&&n=='"'){cell+='"';i++;continue}if(c=='"'){q=!q;continue}if(c==','&&!q){row.push(cell);cell='';continue}if((c=='\n'||c=='\r')&&!q){if(c=='\r'&&n=='\n')i++;row.push(cell);if(row.length>1||row[0])out.push(row);row=[];cell='';continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}const head=out.shift();return out.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])))};
+let records=[];
+function render(){const q=document.querySelector('#q').value.toLowerCase().trim(),d=document.querySelector('#domain').value,s=document.querySelector('#state').value;const grid=document.querySelector('#grid');let shown=0;grid.innerHTML='';records.filter(r=>(!q||JSON.stringify(r).toLowerCase().includes(q))&&(!d||r.domain===d)&&(!s||r.status===s)).forEach(r=>{shown++;const div=document.createElement('article');div.className='record';div.innerHTML='<div class="top"><span class="tag">'+esc(r.domain.toUpperCase())+'</span><span class="tag">'+esc(r.status.replaceAll('_',' '))+'</span><span class="tag priority">priority '+esc(r.priority)+'</span></div><h2>'+esc(r.title)+'</h2><p>'+esc(r.summary)+'</p><div class="meter">evidence: '+esc(r.evidence_class)+' · discovery: '+esc(r.discovery_potential)+' · accessibility risk: '+esc(r.accessibility_risk)+'</div><p><strong>Recover / test:</strong> '+esc(r.what_to_recover)+'</p><p><strong>Control:</strong> '+esc(r.validation_note)+'</p><div class="sources"><a href="https://www.google.com/search?q='+encodeURIComponent(r.title)+'" target="_blank" rel="noreferrer">Search source ↗</a></div>';grid.appendChild(div)});document.querySelector('#empty').style.display=shown?'none':'block'}
+fetch('./scientific-atlas-seed.csv').then(r=>r.text()).then(t=>{records=csvToRows(t);const domains=[...new Set(records.map(r=>r.domain))].sort(),states=[...new Set(records.map(r=>r.status))].sort();document.querySelector('#domain').innerHTML+='<option value="'+domains.map(esc).join('">')+'</option>';document.querySelector('#domain').innerHTML='<option value="">All domains</option>'+domains.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');document.querySelector('#state').innerHTML+='<option value="">All states</option>'+states.map(x=>'<option value="'+esc(x)+'">'+esc(x.replaceAll('_',' '))+'</option>').join('');const strong=records.filter(r=>r.evidence_class==='STRONG').length,loss=records.filter(r=>['AT_RISK','MOVED','PARTIAL','ARCHIVED','RETIRED','MIGRATING'].includes(r.status)).length,integrity=records.filter(r=>r.record_type==='failed-claim'||r.record_type==='fraud-case'||r.record_type==='meta-dataset'||r.record_type==='controversial-claim').length;document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>RECORDS</span></div><div class="stat"><b>'+strong+'</b><span>STRONG EVIDENCE</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div><div class="stat"><b>'+integrity+'</b><span>CONTROL / INTEGRITY TRACK</span></div>';render()}).catch(e=>{document.querySelector('#grid').innerHTML='<div class="empty" style="display:block">Dataset could not be loaded.</div>'});
+['q','domain','state'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+</script>
+</body></html>
