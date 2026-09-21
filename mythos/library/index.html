@@ -101,7 +101,7 @@ function encode(x){
  for(const role of roleMap){
   const rv=hv("ROLE:"+role);
   const toks=tokenize(x[role]||"");
-  if(toks.length) parts.push(bind(rv,norm(bundle(toks.slice(0,18).map(hv))));
+  if(toks.length) parts.push(bind(rv,norm(bundle(toks.slice(0,18).map(hv)))));
  }
  return norm(bundle(parts.length?parts:[hv(x.id)]));
 }
