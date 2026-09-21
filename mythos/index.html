@@ -23,7 +23,7 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <h1>MYTHOS</h1>
 <div class="subtitle">Atlas of Human Belief & Evidence.<br>Every story has a history. Every claim has an evidence trail.</div>
 </header>
-<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#correlation">Cross-Correlation</a><a href="#tricksters">Trickster Audit</a><a href="#timeline">Timeline</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
+<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#correlation">Cross-Correlation</a><a href="#tricksters">Trickster Audit</a><a href="#technology">Recovered Technology</a><a href="#timeline">Timeline</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
 <main>
 <section class="hero" id="method">
 <div class="panel">
@@ -62,6 +62,14 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <div class="controls"><input id="tq" placeholder="Search fabrication, forgery, Atlantis, Ossian…"><select id="tkind"><option value="">All mechanisms</option></select><select id="tstatus"><option value="">All evidence states</option></select></div>
 <div id="trickcards" class="grid"></div>
 <p class="muted small" style="margin-top:15px">Audit rule: first establish that the document/object/story exists; then establish provenance; then establish what the source actually claims; only then evaluate the extraordinary interpretation.</p>
+</section>
+
+<div class="rule"></div>
+<section id="technology" class="panel">
+<h2>Recovered knowledge & technology</h2>
+<p>Some historical claims look extraordinary because the surviving evidence is incomplete. MYTHOS tracks a separate class for <b>real artifacts, techniques, materials and observations whose capabilities were misunderstood, forgotten, rediscovered or reconstructed experimentally</b>.</p>
+<p class="notice"><b>Guardrail:</b> recovering an ancient capability does not validate unrelated “advanced ancient civilization” claims. The artifact, technique and exact claimed capability must each be demonstrated independently.</p>
+<div id="techcards" class="grid"></div>
 </section>
 
 <div class="rule"></div>
@@ -111,7 +119,7 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 </div>
 </section>
 </main>
-<footer>MYTHOS v0.5 · Cross-correlation + trickster/fabrication audit · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
+<footer>MYTHOS v0.6 · Cross-correlation + fabrication + recovered knowledge · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
 <script>
 const states=[
 ["Corroborated","Strong independent evidence supports the empirical component.","#59c27c"],
@@ -168,6 +176,15 @@ const a=entries.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!c
 document.getElementById("cards").innerHTML=a.length?a.map(x=>`<article class="card"><div class="meta">${esc(x.id)} · ${esc(x.culture)} · ${esc(x.category)} · ${esc(x.date)}</div><h3>${esc(x.title)}</h3><span class="badge"><i class="dot" style="background:${color(x.status)}"></i>${esc(x.status)} · ${Math.round(x.confidence*100)}% confidence</span><div class="confidence"><i style="width:${x.confidence*100}%"></i></div><div class="section"><b>Claim</b><p>${esc(x.claim)}</p></div><div class="section"><b>Evidence</b><p>${esc(x.evidence)}</p></div><div class="section"><b>Counterpoint / uncertainty</b><p>${esc(x.counter)}</p></div><div class="section"><b>Meaning</b><p>${esc(x.meaning)}</p></div><div class="section sources"><b>Sources</b>${x.sources.length?x.sources.map(z=>`<a href="${esc(z[1])}" target="_blank" rel="noopener">${esc(z[0])}</a>`).join(""):"<p class='muted'>Primary/secondary sourcing queued for expansion.</p>"}</div></article>`).join(""):`<div class="empty">No matching claims.</div>`}
 
 
+const technologies=[
+{id:"TECH-V-001",title:"Antikythera Mechanism",kind:"Recovered artifact",status:"Corroborated",confidence:.99,summary:"A geared Hellenistic device whose astronomical functions were reconstructed from surviving hardware, inscriptions and X-ray imaging.",source:"https://www.nature.com/articles/nature05357"},
+{id:"TECH-V-002",title:"Roman self-healing concrete",kind:"Recovered technique",status:"Corroborated",confidence:.90,summary:"Hot mixing and lime clasts provide a mechanistic explanation for part of Roman concrete's exceptional durability; later archaeological work directly recovered construction-stage evidence.",source:"https://www.nature.com/articles/s41578-023-00539-z"},
+{id:"TECH-V-003",title:"Damascus / wootz steel",kind:"Recovered material knowledge",status:"Corroborated",confidence:.92,summary:"Materials analysis revealed nanoscale structures in historical Damascus steel, illustrating how empirical metallurgy can generate complex microstructures without modern theory.",source:"https://www.nature.com/articles/444286a"},
+{id:"TECH-V-004",title:"Baghdad Battery",kind:"Disputed interpretation",status:"Undetermined",confidence:.45,summary:"The artifact can produce electrical potential under an inferred configuration, but historical intent and original function remain unresolved.",source:"https://www.history.com/articles/baghdad-battery"},
+{id:"TECH-V-005",title:"Greek fire",kind:"Lost technology",status:"Historically attested",confidence:.96,summary:"A documented Byzantine incendiary weapon whose exact recipe and process were not preserved.",source:"https://loreandmatter.com/en/lore/science-discovery/en-greek-fire/"},
+{id:"TECH-V-006",title:"Turin Shroud",kind:"Relic authentication",status:"Contradicted",confidence:.94,summary:"The strongest direct textile dating evidence places the linen in 1260–1390 CE; a 2026 analysis of retained 1988 radiocarbon fragments found no evidence of contamination in the analyzed samples.",source:"https://www.nature.com/articles/s40494-026-02530-7"},
+{id:"TECH-V-007",title:"Lemuria as a physical lost civilization",kind:"Myth transformed from science",status:"Contradicted",confidence:.98,summary:"Lemuria began as a 19th-century biogeographic hypothesis and was later transformed in Theosophy into an ancient human civilization. No archaeological or geological evidence supports the Theosophical civilization claim.",source:"https://academic.oup.com/jvc/article/28/2/143/6759198"}
+];
 const tricksters=[
 {id:"TRICK-ARCH-001",kind:"Constructed ancient history",title:"Atlantis — Plato",mechanism:"Invented antiquity / philosophical pseudo-history",status:"Plausible",confidence:.91,era:"Ancient",summary:"A historical-looking account is embedded inside a philosophical dialogue and may function as a constructed example rather than independently attested history.",sources:["https://www.cambridge.org/core/books/abs/platos-natural-philosophy/status-of-the-atlantis-story/2306779EF1D84DF6028498C3661DED6B","https://www.cambridge.org/core/journals/journal-of-hellenic-studies/article/abs/designer-history-platos-atlantis-story-and-fourthcentury-ideology/828B7BB540EB710BF9F9D6E3840F2456"]},
 {id:"TRICK-ARCH-002",kind:"False translation / authorship",title:"Ossian — James Macpherson",mechanism:"False provenance / ancient attribution",status:"Contradicted",confidence:.95,era:"Middle",summary:"Traditional Gaelic material was presented through a much larger body of poetry attributed to an ancient bard and framed as translation.",sources:["https://academic.oup.com/edinburgh-scholarship-online/book/38048/chapter-abstract/332622203","https://arxiv.org/abs/1610.00142"]},
@@ -175,6 +192,14 @@ const tricksters=[
 {id:"TRICK-ARCH-004",kind:"Political forgery",title:"Donation of Constantine",mechanism:"Forgery / institutional authority laundering",status:"Contradicted",confidence:.99,era:"Middle",summary:"A spurious imperial document acquired authority by being attributed to Constantine and was later exposed as false by Lorenzo Valla.",sources:["https://basilicas.vatican.va/en/podcast/riflessioni-sulla-bellezza/la-conversione.html","https://www.tandfonline.com/doi/abs/10.1080/10226486.2007.11879085"]},
 {id:"TRICK-ARCH-005",kind:"Scientific hoax",title:"Piltdown Man",mechanism:"Staged specimen / misleading evidence",status:"Contradicted",confidence:.99,era:"Present",summary:"Manipulated remains were presented as a major human-evolutionary discovery and accepted for decades before exposure as a hoax.",sources:["https://www.nhm.ac.uk/our-science/services/collections/palaeontology/palaeoanthropology.html"]}
 ];
+
+function renderTechnology(){
+ const a=technologies;
+ document.getElementById("techcards").innerHTML=a.map(x=>{
+  const col=color(x.status);
+  return '<article class="card"><div class="meta">'+esc(x.id)+' · '+esc(x.kind)+'</div><h3>'+esc(x.title)+'</h3><span class="badge"><i class="dot" style="background:'+col+'"></i>'+esc(x.status)+' · '+Math.round(x.confidence*100)+'%</span><div class="confidence"><i style="width:'+x.confidence*100+'%;background:'+col+'"></i></div><div class="section"><b>Assessment</b><p>'+esc(x.summary)+'</p></div><div class="section sources"><b>Source</b><a href="'+esc(x.source)+'" target="_blank" rel="noopener">'+esc(x.source)+'</a></div></article>';
+ }).join("");
+}
 
 function renderTricksters(){
  const q=document.getElementById("tq").value.toLowerCase(),k=document.getElementById("tkind").value,s=document.getElementById("tstatus").value;
@@ -198,6 +223,7 @@ const allMotifs=[...new Set(correlations.flatMap(x=>x.motifs))].sort();
 allMotifs.forEach(v=>document.getElementById("motif").insertAdjacentHTML("beforeend",'<option>'+esc(v)+'</option>'));
 [...new Set(tricksters.map(x=>x.kind))].sort().forEach(v=>document.getElementById("tkind").insertAdjacentHTML("beforeend",'<option>'+esc(v)+'</option>'));
 states.forEach(x=>document.getElementById("tstatus").insertAdjacentHTML("beforeend",'<option>'+esc(x[0])+'</option>'));
+renderTechnology();
 document.getElementById("tq").addEventListener("input",renderTricksters);
 document.getElementById("tkind").addEventListener("change",renderTricksters);
 document.getElementById("tstatus").addEventListener("change",renderTricksters);
