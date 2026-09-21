@@ -185,6 +185,7 @@ function renderTricksters(){
  }).join(""):'<div class="empty">No matching trickster audits.</div>';
 }
 
+function renderCorrelations(){
  const q=document.getElementById("mq").value.toLowerCase(),m=document.getElementById("motif").value,r=document.getElementById("corr").value;
  const a=correlations.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!m||x.motifs.includes(m))&&(!r||x.relation===r));
  document.getElementById("correlations").innerHTML=a.length?a.map(x=>{
