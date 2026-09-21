@@ -1,0 +1,19 @@
+{
+  "test_id":"LF-001",
+  "learner_state":"MIXED",
+  "competencies":{
+    "OBSERVATION_VS_INTERPRETATION":2,
+    "CLAIM_EVIDENCE":2,
+    "PROVENANCE":1,
+    "CORRELATION_CAUSATION":0,
+    "UNCERTAINTY":1,
+    "SEMANTIC_DRIFT":2,
+    "IDENTITY":2,
+    "PREDICTION":1
+  },
+  "weak_areas":["CORRELATION_CAUSATION"],
+  "evidence_debt":["example-claim-42"],
+  "access_policy":"OPEN",
+  "scaffolding_mode":"INLINE_RECALL_WITH_WORKED_EXAMPLES",
+  "last_reviewed":"2026-09-21"
+}
