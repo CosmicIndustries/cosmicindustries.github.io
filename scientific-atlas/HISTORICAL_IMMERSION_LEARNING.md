@@ -419,3 +419,72 @@ This is much more robust against language drift.
 **Learn the word where it was born, the problem that required it, the people who used it, and the consequences that followed.**
 
 Then the language becomes a map of human experience rather than a vocabulary test.
+
+## 21. Human-life context layer
+
+A historical learning chain should not remove ordinary life simply because the memorable contribution is intellectual.
+
+Where evidence exists, include:
+- family and relationships
+- marriage and children
+- education
+- employment
+- friendships and collaborators
+- mentors and rivals
+- health or material circumstances only when historically relevant and appropriately sourced
+- migration and residence
+- money/work constraints
+- ordinary routines
+- cultural and institutional environment
+
+These are not decorative biographical facts.
+
+They explain:
+- what opportunities existed
+- what constraints existed
+- who supplied ideas or criticism
+- how work was financed
+- where language was being used
+- how ideas moved through society
+- what the person was doing between famous events
+
+### Example: Einstein
+
+The learner should not encounter only:
+
+1905 papers -> 1907 elevator -> general relativity
+
+A fuller historical graph includes:
+
+Einstein
+  -> education
+  -> Zurich / student network
+  -> marriage and family life
+  -> Swiss Patent Office employment
+  -> correspondence and collaborators
+  -> 1905 work
+  -> 1907 equivalence insight
+  -> later scientific and institutional life
+
+The point is not to turn biography into gossip.
+
+The point is to prevent the false impression that major discoveries occur in a vacuum.
+
+## 22. Context depth should adapt to the learner
+
+Some learners can infer social context from a compact timeline.
+
+Others need explicit bridges:
+
+TECHNICAL EVENT
+  -> Who was this person?
+  -> Where were they living?
+  -> What work paid the bills?
+  -> Who were they interacting with?
+  -> What problem were they solving?
+  -> Why did this problem matter then?
+  -> What words did they use?
+  -> What happened afterward?
+
+The system should provide those bridges when needed without forcing every learner through the same amount of biography.
+
