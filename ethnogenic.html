@@ -30,19 +30,35 @@ footer{border-top:1px solid var(--line);padding:28px 24px;display:flex;justify-c
 <section id="sources"><div class="head"><div><label>03 / SOURCE NETWORK</label><h2>Follow the receipts</h2></div></div><div class="source-grid"><a href="https://www.nccih.nih.gov/" target="_blank"><b>NCCIH</b><span>Complementary health evidence and safety</span></a><a href="https://ods.od.nih.gov/" target="_blank"><b>NIH ODS</b><span>Supplement evidence and fact sheets</span></a><a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank"><b>PubMed</b><span>Biomedical literature</span></a><a href="https://www.erowid.org/" target="_blank"><b>Erowid</b><span>Experience archive</span></a><a href="https://www.shroomery.org/" target="_blank"><b>Shroomery</b><span>Mycology and community reports</span></a><a href="https://hmctest.usp.org/" target="_blank"><b>USP HMC</b><span>Herbal identity and quality standards</span></a></div></section>
 </main><footer><span>Cosmic Industries / MATERIA</span><span>OBSERVE · SOURCE · DISTINGUISH · PRESERVE</span></footer>
 <script>
-const data=[
-["Peganum harmala","Entheogenic · high interaction / toxicity","β-carboline alkaloids; ethnobotanical and pharmacological record.","MAO-A inhibition makes interaction/toxicology data essential."],
-["Banisteriopsis caapi","Entheogenic · high interaction / toxicity","Harmala alkaloids; extensive ethnobotanical documentation.","Traditional use and pharmacology should be distinguished from clinical efficacy."],
-["Psychotria viridis","Entheogenic","Leaves associated with traditional Amazonian preparations; contains tryptamine alkaloids.","Composition, preparation and interaction context matter."],
-["Nymphaea caerulea","Entheogenic · medicinal","Traditional and modern claims exist alongside limited controlled human evidence.","Separate historical use, chemistry and subjective reports."],
-["Nigella sativa","Medicinal","Thymoquinone-rich seed/oil; studied for several metabolic and inflammatory endpoints.","Evidence varies substantially by indication and preparation."],
-["Origanum species / carvacrol","Medicinal","Carvacrol has substantial in-vitro antimicrobial activity.","In-vitro activity does not establish oral systemic antimicrobial efficacy."],
-["Aged garlic extract","Medicinal","Long-aged garlic preparations have human research on cardiovascular surrogate markers.","Do not equate biomarker effects with prevention of clinical events."],
-["Psilocybe spp.","Fungi · entheogenic · high interaction / toxicity","Psilocybin/psilocin pharmacology plus extensive phenomenological literature.","Clinical research, ethnomycology and community reports are separate evidence layers."],
-["Salvia divinorum","Entheogenic · high interaction / toxicity","Salvinorin A is a potent kappa-opioid receptor agonist.","Acute effects and safety context are more established than therapeutic claims."]
-];
+let DB=null;
 const cards=document.getElementById("cards"),q=document.getElementById("q"),f=document.getElementById("f");
-function render(){let s=q.value.toLowerCase(),z=f.value.toLowerCase();cards.innerHTML=data.filter(x=>(!s||x.join(" ").toLowerCase().includes(s))&&(!z||x[1].toLowerCase().includes(z))).map(x=>'<article class="card"><span class="tag">'+x[1].toUpperCase()+'</span><h3>'+x[0]+'</h3><p>'+x[2]+'</p><div class="note">'+x[3]+'</div></article>').join("")||'<p>No matching record.</p>'}
-q.oninput=render;f.onchange=render;render();
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+function sourceLinks(ids=[]){
+  return ids.map(id=>DB.sources.find(s=>s.id===id)).filter(Boolean).map(s=>'<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.title)+'</a>').join(" · ");
+}
+function render(){
+  if(!DB)return;
+  const s=q.value.toLowerCase(), z=f.value.toLowerCase();
+  const rows=DB.records.filter(x=>(!s||JSON.stringify(x).toLowerCase().includes(s))&&(!z||JSON.stringify(x.categories||[]).toLowerCase().includes(z)));
+  cards.innerHTML=rows.map(x=>{
+    const compounds=(x.chemistry||x.compounds||[]).map(c=>c.compound_id||c.id).slice(0,8);
+    const hazards=(x.safety||[]).length;
+    const studies=(x.human_research||[]).length;
+    return '<article class="card"><span class="tag">'+esc((x.categories||[]).join(" · ").toUpperCase())+'</span><h3>'+esc(x.scientific_name||x.id)+'</h3><p><b>'+esc((x.common_names||[]).join(", "))+'</b></p><p>'+esc(x.notes||"Research record with provenance-linked evidence.")+'</p><div class="note"><b>Compounds:</b> '+esc(compounds.join(", ")||"See record")+'<br><b>Human research:</b> '+studies+' record(s) · <b>Safety:</b> '+hazards+' signal(s)<br><b>Sources:</b> '+sourceLinks(x.sources||[])+'</div></article>'
+  }).join("")||"<p>No matching record.</p>";
+}
+async function boot(){
+  try{
+    const res=await fetch("ethnogenic.db.json",{cache:"no-store"});
+    DB=await res.json();
+    document.title="MATERIA — "+DB.records.length+" Research Records";
+    const atlas=document.querySelector("#atlas .head p");
+    atlas.textContent=DB.records.length+" records · "+DB.compounds.length+" compounds · "+DB.sources.length+" sources · "+DB.interactions.length+" interaction records. Evidence is provenance-labeled, not ranked.";
+    render();
+  }catch(e){
+    cards.innerHTML='<p>Database could not be loaded. The HTML shell is intact; check ethnogenic.db.json.</p>';
+  }
+}
+q.oninput=render; f.onchange=render; boot();
 </script>
 </body></html>
