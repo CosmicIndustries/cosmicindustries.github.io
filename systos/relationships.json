@@ -1,0 +1,66 @@
+[
+  {
+    "from": "SYS-GOV-007",
+    "rel": "depends_on",
+    "to": "SYS-KNW-004",
+    "note": "Administrative systems commonly depend on records and archives.",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-ECO-006",
+    "rel": "transmits",
+    "to": "SYS-KNW-002",
+    "note": "Guilds can institutionalize apprenticeship and occupational knowledge.",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-ECO-005",
+    "rel": "governs",
+    "to": "SYS-RES-001",
+    "note": "Commons governance can structure collective forest stewardship.",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-GOV-007",
+    "rel": "can_experience",
+    "to": "SYS-COR-001",
+    "note": "Administrative discretion can create opportunities for bribery.",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-GOV-007",
+    "rel": "can_experience",
+    "to": "SYS-COR-003",
+    "note": "Regulatory institutions can become subject to capture.",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-GOV-004",
+    "rel": "can_contain",
+    "to": "SYS-GOV-007",
+    "note": "Imperial systems can incorporate administrative structures.",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-SOC-004",
+    "rel": "can_enable",
+    "to": "SYS-COR-002",
+    "note": "Patronage networks can overlap with nepotistic allocation.",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-TEC-004",
+    "rel": "depends_on",
+    "to": "SYS-GOV-007",
+    "note": "Large supply chains may depend on administrative and regulatory systems.",
+    "confidence": "seed",
+    "sources": []
+  }
+]
