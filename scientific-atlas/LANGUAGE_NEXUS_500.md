@@ -1,11 +1,11 @@
-# FORT KNOWLEDGE — 500-LANGUAGE NEXUS
+# FORT KNOWLEDGE — HUMAN LANGUAGE NEXUS
 
 Version: 0.1
 Snapshot: 2026-09-21
 
 ## Goal
 
-Create at least 500 independently identified language pathways into the same underlying knowledge graph.
+Build a well-sourced starting collection of at least 500 human languages, with their own histories, communities, places, literature, scientific vocabulary, and changing meanings represented accurately.
 
 The number 500 is a minimum cohort target, not a ranking of languages and not a claim that 500 is sufficient.
 
@@ -204,7 +204,7 @@ LANGUAGE
     ↓
 CULTURE / HISTORY
 
-English is one leaf in the tree, not the trunk.
+English is one language among many; it is not the master language or the measure of another language.
 
 ## Public access
 
