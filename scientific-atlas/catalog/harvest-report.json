@@ -1,0 +1,13 @@
+{
+  "harvested_at": "2026-09-21T21:50:49Z",
+  "records_seen": 9100,
+  "records_written": 9100,
+  "duplicates_removed": 0,
+  "errors": [],
+  "sources": [
+    "datacite-datasets",
+    "nasa-cmr-collections",
+    "noaa-ncei-search",
+    "usgs-sciencebase-data-releases"
+  ]
+}
