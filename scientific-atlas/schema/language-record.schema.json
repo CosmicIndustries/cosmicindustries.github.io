@@ -1,0 +1,34 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://cosmicindustries.github.io/scientific-atlas/schema/language-record.schema.json",
+  "title":"Fort Knowledge Language Record",
+  "type":"object",
+  "required":["language_id","name","status","rendering_status"],
+  "properties":{
+    "language_id":{"type":"string"},
+    "iso639_3":{"type":["string","null"],"pattern":"^[a-z]{3}$"},
+    "glottocode":{"type":["string","null"]},
+    "bcp47":{"type":["string","null"]},
+    "cldr_identifier":{"type":["string","null"]},
+    "name":{"type":"string"},
+    "autonym":{"type":["string","null"]},
+    "scripts":{"type":"array","items":{"type":"string"}},
+    "historical_variants":{"type":"array","items":{"type":"object"}},
+    "concept_renderings":{"type":"array","items":{"type":"object","required":["concept_id","form","status"],"properties":{
+      "concept_id":{"type":"string"},
+      "form":{"type":"string"},
+      "sense":{"type":["string","null"]},
+      "grammatical_category":{"type":["string","null"]},
+      "script":{"type":["string","null"]},
+      "pronunciation":{"type":["string","null"]},
+      "valid_during":{"type":["string","null"]},
+      "source":{"type":"array","items":{"type":"string"}},
+      "confidence":{"type":["number","null"],"minimum":0,"maximum":1},
+      "status":{"type":"string"}
+    }}},
+    "status":{"type":"string"},
+    "rendering_status":{"type":"string"},
+    "provenance":{"type":"array","items":{"type":"object"}},
+    "last_verified":{"type":["string","null"],"format":"date"}
+  }
+}
