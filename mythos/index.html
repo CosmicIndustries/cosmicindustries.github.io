@@ -23,7 +23,7 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <h1>MYTHOS</h1>
 <div class="subtitle">Atlas of Human Belief & Evidence.<br>Every story has a history. Every claim has an evidence trail.</div>
 </header>
-<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#correlation">Cross-Correlation</a><a href="#tricksters">Trickster Audit</a><a href="#technology">Recovered Technology</a><a href="#timeline">Timeline</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
+<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#correlation">Cross-Correlation</a><a href="#tricksters">Trickster Audit</a><a href="#technology">Recovered Technology</a><a href="#deep-time">Deep Time</a><a href="#timeline">Timeline</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
 <main>
 <section class="hero" id="method">
 <div class="panel">
@@ -73,6 +73,14 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 </section>
 
 <div class="rule"></div>
+<section id="deep-time" class="panel">
+<h2>Deep time & ancestral memory</h2>
+<p>Before written history, the atlas tracks what can be reconstructed from fossils, sediments, genetics, artifacts, paleoclimate and later oral traditions. A proposed “memory” is never promoted to history merely because a story resembles an ancient environmental event.</p>
+<p class="notice"><b>Memory test:</b> identify the event → date the event → date the oldest attestation of the story → establish a plausible cultural transmission chain → compare the story against independent geological/archaeological evidence.</p>
+<div id="deeptimecards" class="grid"></div>
+</section>
+
+<div class="rule"></div>
 <section id="timeline" class="panel">
 <h2>Temporal architecture</h2>
 <p class="muted">MYTHOS is being built from the two ends inward: establish the ancient evidence base and the present-day record first, then work through the intervening historical layers. This prevents modern folklore from being projected backward and prevents ancient traditions from being treated as timeless.</p>
@@ -119,7 +127,7 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 </div>
 </section>
 </main>
-<footer>MYTHOS v0.6 · Cross-correlation + fabrication + recovered knowledge · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
+<footer>MYTHOS v0.7 · Deep time + cross-correlation + fabrication + recovered knowledge · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
 <script>
 const states=[
 ["Corroborated","Strong independent evidence supports the empirical component.","#59c27c"],
@@ -176,6 +184,17 @@ const a=entries.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!c
 document.getElementById("cards").innerHTML=a.length?a.map(x=>`<article class="card"><div class="meta">${esc(x.id)} · ${esc(x.culture)} · ${esc(x.category)} · ${esc(x.date)}</div><h3>${esc(x.title)}</h3><span class="badge"><i class="dot" style="background:${color(x.status)}"></i>${esc(x.status)} · ${Math.round(x.confidence*100)}% confidence</span><div class="confidence"><i style="width:${x.confidence*100}%"></i></div><div class="section"><b>Claim</b><p>${esc(x.claim)}</p></div><div class="section"><b>Evidence</b><p>${esc(x.evidence)}</p></div><div class="section"><b>Counterpoint / uncertainty</b><p>${esc(x.counter)}</p></div><div class="section"><b>Meaning</b><p>${esc(x.meaning)}</p></div><div class="section sources"><b>Sources</b>${x.sources.length?x.sources.map(z=>`<a href="${esc(z[1])}" target="_blank" rel="noopener">${esc(z[0])}</a>`).join(""):"<p class='muted'>Primary/secondary sourcing queued for expansion.</p>"}</div></article>`).join(""):`<div class="empty">No matching claims.</div>`}
 
 
+const deepTime=[
+{id:"DEEP-001",title:"Neanderthals had socially meaningful symbolic behavior",status:"Corroborated",confidence:.91,window:"~130,000–40,000 BP",summary:"Burials, ochre, pigments, ornaments and other non-utilitarian or socially structured behaviors demonstrate that Neanderthal behavior included cultural practices that cannot be reduced to simple subsistence.",source:"https://www.nature.com/articles/s41562-025-02110-y"},
+{id:"DEEP-002",title:"Neanderthals experienced repeated severe climate shifts",status:"Corroborated",confidence:.95,window:"~350,000–40,000 BP",summary:"Pleistocene climate repeatedly altered Neanderthal habitat, with modeled refugia and contractions across western Eurasia.",source:"https://www.nature.com/articles/s41598-024-57490-4"},
+{id:"DEEP-003",title:"Neanderthals remembered a postglacial global flood",status:"Contradicted",confidence:.92,window:"Neanderthals disappear ~40,000 BP; major postglacial sea-level rise ~15,000–6,000 BP",summary:"The main postglacial sea-level rise happened thousands of years after Neanderthals disappeared. A direct Neanderthal oral memory of that event therefore fails the chronology test.",source:"https://www.nature.com/articles/s41598-024-57490-4"},
+{id:"DEEP-004",title:"Neanderthal cultural memories could survive through later humans",status:"Undetermined",confidence:.22,window:"Late Pleistocene",summary:"Neanderthals interbred with Homo sapiens and their descendants contributed genetic ancestry to later humans, but no archaeological or textual evidence demonstrates transmission of a specific Neanderthal narrative across that contact.",source:"https://www.nature.com/articles/s41586-024-08420-x"},
+{id:"DEEP-005",title:"Some Indigenous oral traditions preserve observations of postglacial coastal change",status:"Plausible",confidence:.78,window:"~11,500–5,500 BP examples",summary:"Comparative geological and ethnographic research identifies Australian and northwest European traditions whose details plausibly encode coastal submergence, land loss and isolation following postglacial sea-level rise.",source:"https://www.sciencedirect.com/science/article/pii/S1040618222002336"},
+{id:"DEEP-006",title:"A flood tradition can preserve a real regional environmental event without recording one worldwide flood",status:"Partially supported",confidence:.72,window:"Holocene",summary:"Geology documents many large regional floods and coastal submergence events. Oral traditions may preserve local environmental memory, but that does not establish a single global deluge behind all flood traditions.",source:"https://www.sciencedirect.com/science/article/pii/S1040618222002336"},
+{id:"DEEP-007",title:"Modern humans and Neanderthals overlapped in Eurasia",status:"Corroborated",confidence:.97,window:"~45,000 BP onward in current European record",summary:"Genomic and archaeological evidence indicates overlapping occupation for thousands of years, creating a plausible period for cultural interaction and gene flow.",source:"https://www.nature.com/articles/s41586-024-08420-x"},
+{id:"DEEP-008",title:"Neanderthal extinction was caused by climate alone",status:"Undetermined",confidence:.14,window:"~45,000–40,000 BP",summary:"Climate stress clearly affected Neanderthal habitats, but current evidence does not isolate climate as the sole cause; demography, interaction with Homo sapiens and regional ecological conditions remain part of the debate.",source:"https://www.nature.com/articles/s43247-026-03960-8"},
+{id:"DEEP-009",title:"The Last Glacial Maximum was directly remembered by Neanderthals",status:"Contradicted",confidence:.99,window:"LGM ~26,000–19,000 BP; Neanderthal disappearance ~40,000 BP",summary:"The Last Glacial Maximum postdates the disappearance of Neanderthals by roughly 15,000–20,000 years. Any narrative explicitly recalling the LGM cannot be a preserved Neanderthal eyewitness tradition.",source:"https://www.nature.com/articles/s41598-024-57490-4"}
+];
 const technologies=[
 {id:"TECH-V-001",title:"Antikythera Mechanism",kind:"Recovered artifact",status:"Corroborated",confidence:.99,summary:"A geared Hellenistic device whose astronomical functions were reconstructed from surviving hardware, inscriptions and X-ray imaging.",source:"https://www.nature.com/articles/nature05357"},
 {id:"TECH-V-002",title:"Roman self-healing concrete",kind:"Recovered technique",status:"Corroborated",confidence:.90,summary:"Hot mixing and lime clasts provide a mechanistic explanation for part of Roman concrete's exceptional durability; later archaeological work directly recovered construction-stage evidence.",source:"https://www.nature.com/articles/s41578-023-00539-z"},
@@ -192,6 +211,13 @@ const tricksters=[
 {id:"TRICK-ARCH-004",kind:"Political forgery",title:"Donation of Constantine",mechanism:"Forgery / institutional authority laundering",status:"Contradicted",confidence:.99,era:"Middle",summary:"A spurious imperial document acquired authority by being attributed to Constantine and was later exposed as false by Lorenzo Valla.",sources:["https://basilicas.vatican.va/en/podcast/riflessioni-sulla-bellezza/la-conversione.html","https://www.tandfonline.com/doi/abs/10.1080/10226486.2007.11879085"]},
 {id:"TRICK-ARCH-005",kind:"Scientific hoax",title:"Piltdown Man",mechanism:"Staged specimen / misleading evidence",status:"Contradicted",confidence:.99,era:"Present",summary:"Manipulated remains were presented as a major human-evolutionary discovery and accepted for decades before exposure as a hoax.",sources:["https://www.nhm.ac.uk/our-science/services/collections/palaeontology/palaeoanthropology.html"]}
 ];
+
+function renderDeepTime(){
+ document.getElementById("deeptimecards").innerHTML=deepTime.map(x=>{
+  const col=color(x.status);
+  return '<article class="card"><div class="meta">'+esc(x.id)+' · '+esc(x.window)+'</div><h3>'+esc(x.title)+'</h3><span class="badge"><i class="dot" style="background:'+col+'"></i>'+esc(x.status)+' · '+Math.round(x.confidence*100)+'%</span><div class="confidence"><i style="width:'+x.confidence*100+'%;background:'+col+'"></i></div><div class="section"><b>Assessment</b><p>'+esc(x.summary)+'</p></div><div class="section sources"><b>Source</b><a href="'+esc(x.source)+'" target="_blank" rel="noopener">'+esc(x.source)+'</a></div></article>';
+ }).join("");
+}
 
 function renderTechnology(){
  const a=technologies;
@@ -223,6 +249,7 @@ const allMotifs=[...new Set(correlations.flatMap(x=>x.motifs))].sort();
 allMotifs.forEach(v=>document.getElementById("motif").insertAdjacentHTML("beforeend",'<option>'+esc(v)+'</option>'));
 [...new Set(tricksters.map(x=>x.kind))].sort().forEach(v=>document.getElementById("tkind").insertAdjacentHTML("beforeend",'<option>'+esc(v)+'</option>'));
 states.forEach(x=>document.getElementById("tstatus").insertAdjacentHTML("beforeend",'<option>'+esc(x[0])+'</option>'));
+renderDeepTime();
 renderTechnology();
 document.getElementById("tq").addEventListener("input",renderTricksters);
 document.getElementById("tkind").addEventListener("change",renderTricksters);
