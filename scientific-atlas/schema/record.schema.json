@@ -1,0 +1,32 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Scientific Data Atlas Record",
+  "type":"object",
+  "required":["id","title","domain","record_type","evidence_class","status","summary","last_verified"],
+  "properties":{
+    "id":{"type":"string","pattern":"^[A-Z0-9][A-Z0-9._-]*$"},
+    "title":{"type":"string"},
+    "domain":{"type":"string"},
+    "record_type":{"type":"string"},
+    "evidence_class":{"type":"string"},
+    "priority":{"type":"number","minimum":0,"maximum":1},
+    "discovery_potential":{"type":"number","minimum":0,"maximum":1},
+    "accessibility_risk":{"type":"number","minimum":0,"maximum":1},
+    "status":{"type":"string"},
+    "summary":{"type":"string"},
+    "what_to_recover":{"type":"string"},
+    "validation_note":{"type":"string"},
+    "last_verified":{"type":"string","format":"date"},
+    "source_url":{"type":"string"},
+    "doi":{"type":"string"},
+    "external_ids":{"type":"array","items":{"type":"string"}},
+    "provenance":{"type":"array","items":{"type":"object"}},
+    "edges":{"type":"array","items":{"type":"object","required":["target_id","relation_type","confidence"],"properties":{
+      "target_id":{"type":"string"},
+      "relation_type":{"type":"string"},
+      "confidence":{"type":"number","minimum":0,"maximum":1},
+      "reason":{"type":"string"},
+      "evidence":{"type":"array","items":{"type":"string"}}
+    }}}
+  }
+}
