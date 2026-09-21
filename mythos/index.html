@@ -23,7 +23,7 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <h1>MYTHOS</h1>
 <div class="subtitle">Atlas of Human Belief & Evidence.<br>Every story has a history. Every claim has an evidence trail.</div>
 </header>
-<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#timeline">Timeline</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
+<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#correlation">Cross-Correlation</a><a href="#timeline">Timeline</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
 <main>
 <section class="hero" id="method">
 <div class="panel">
@@ -45,6 +45,14 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <div id="cards" class="grid"></div>
 </section>
 
+<div class="rule"></div>
+<section id="correlation" class="panel">
+<h2>Cross-correlation engine</h2>
+<p>MYTHOS does not assume that similar stories are the same story. It compares <b>motifs, event order, relationships, geography, chronology, linguistic evidence and transmission pathways</b>. Similarity is a lead for investigation, not proof of common origin.</p>
+<div class="controls"><input id="mq" placeholder="Search a motif: abandoned child, monster, flood, descent…"><select id="motif"><option value="">All motifs</option></select><select id="corr"><option value="">All relationships</option><option value="strong">Strong motif overlap</option><option value="possible">Possible relationship</option><option value="parallel">Independent parallel</option></select></div>
+<div id="correlations" class="grid"></div>
+<p class="muted small" style="margin-top:15px">Methodological warning: Campbell's “hero's journey” is influential but treating it as proof of a single universal story is too strong. Comparative mythology increasingly combines historical linguistics, archaeology and textual comparison to distinguish inheritance, diffusion and independent convergence. citeturn0search2turn0search10</p>
+</section>
 <div class="rule"></div>
 <section id="timeline" class="panel">
 <h2>Temporal architecture</h2>
@@ -92,7 +100,7 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 </div>
 </section>
 </main>
-<footer>MYTHOS v0.3 · Ancient + Present endpoint corpus · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
+<footer>MYTHOS v0.4 · Cross-correlation / motif graph · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
 <script>
 const states=[
 ["Corroborated","Strong independent evidence supports the empirical component.","#59c27c"],
@@ -122,6 +130,18 @@ entries.forEach(x=>{
   if(!x.era) x.era = (x.id.startsWith("MOD-") ? "Present" : "Ancient");
 });
 
+
+const correlations=[
+{id:"HERO-001",pattern:"Exposed / abandoned child → survival → extraordinary destiny",motifs:["abandoned child","survival","hidden identity","return","kingship"],stories:["Sargon of Akkad","Moses","Romulus and Remus","Cyrus II"],relation:"possible",strength:72,analysis:"These traditions share a striking motif cluster, but their historical dates and transmission pathways differ. The database should test whether the similarity reflects a widespread narrative solution, cultural transmission, or independent development.",evidence:"The Sargon and Moses traditions are documented in different textual and historical contexts; Romulus and Cyrus belong to other traditions. Similarity alone cannot establish a single original story.",sources:[]},
+{id:"HERO-002",pattern:"Hero leaves ordinary society → ordeal → return / restoration",motifs:["departure","quest","ordeal","transformation","return"],stories:["Gilgamesh","Odysseus","Herakles","Rama","Cú Chulainn","Sigurd"],relation:"strong",strength:83,analysis:"The sequence is widespread, but the details and functions vary substantially. It is better treated as a recurrent narrative structure than as proof that all examples descend from one story.",evidence:"Comparative scholarship documents recurring motifs and action patterns across mythic traditions; historical relationships require separate evidence.",sources:[["Cambridge — Hero as symbol","https://www.cambridge.org/core/books/abs/symbols-and-mythmaking-in-modernity/complex-transformations-of-the-self-the-hero-as-a-symbol/B920D62F07FAEF157316786E26D5221D"],["Cambridge — Mythic motifs and patterns","https://assets.cambridge.org/052183/4341/excerpt/0521834341_excerpt.htm"]]},
+{id:"HERO-003",pattern:"Hero kills / defeats serpent or dragon → restores order",motifs:["serpent","dragon","combat","water","restoration"],stories:["Indra and Vritra","Thor and Jörmungandr","Marduk and Tiamat","Apollo and Python","St George and the Dragon"],relation:"possible",strength:76,analysis:"This is a major comparative motif. Some examples occur within Indo-European traditions where linguistic and comparative evidence can test common inheritance; others belong to unrelated cultural histories and may represent convergence or later diffusion.",evidence:"Comparative Indo-European research explicitly examines recurring mythic structures alongside historical linguistics and archaeology.",sources:[["JSTOR — Indo-European myth and comparative mythology","https://www.jstor.org/stable/jj.5233095"],["JSTOR — Indo-European Interfaces","https://www.jstor.org/stable/jj.16063708"]]},
+{id:"HERO-004",pattern:"Descent into another realm → encounter with dead / supernatural beings → return",motifs:["underworld","descent","dead","threshold","return"],stories:["Inanna","Orpheus","Odysseus","Aeneas","Dante"],relation:"strong",strength:88,analysis:"The underworld journey is one of the clearest recurring mythic structures. The stories are not interchangeable: their theology, chronology and cultural function differ.",evidence:"Comparative literary scholarship distinguishes recurring motifs and action patterns from the specific stories that employ them.",sources:[["Cambridge — Myths of the Underworld Journey","https://assets.cambridge.org/052183/4341/excerpt/0521834341_excerpt.htm"]]},
+{id:"HERO-005",pattern:"Flood → survival of selected people → renewal of society",motifs:["flood","chosen survivors","boat","mountain","renewal"],stories:["Atrahasis","Utnapishtim","Noah","Deucalion","Manu"],relation:"possible",strength:81,analysis:"The motif is widespread and some ancient Near Eastern traditions are demonstrably related. A single worldwide historical event is a separate proposition requiring geological and chronological evidence.",evidence:"Regional catastrophic floods are documented, while textual relationships between some Near Eastern traditions are strong. Global common descent is not established merely by motif similarity.",sources:[]},
+{id:"HERO-006",pattern:"Beautiful / important woman abducted → spouse or champion undertakes recovery",motifs:["abduction","separation","quest","recovery","war"],stories:["Helen of Troy","Sita","Welsh abducted-wife traditions","Old Irish traditions"],relation:"strong",strength:84,analysis:"Comparative research has identified an international abducted-wife narrative pattern and investigated possible Indo-European inheritance. This is a better-supported example of a motif family than simply declaring every version the same myth.",evidence:"Lowell Edmunds compares Greek, Sanskrit, Welsh and Old Irish traditions and argues for an older Indo-European story pattern.",sources:[["JSTOR — Stealing Helen: The Myth of the Abducted Wife","https://www.jstor.org/stable/j.ctt1dr3605"]]},
+{id:"HERO-007",pattern:"Dying / dismembered / descending divine or heroic figure → restoration or renewal",motifs:["death","descent","dismemberment","return","renewal"],stories:["Osiris","Dumuzi","Dionysus traditions","Baldr"],relation:"possible",strength:64,analysis:"The broad death-and-renewal motif appears in many traditions, but the individual stories have different structures and historical contexts. The database should avoid flattening all “dying god” narratives into one category.",evidence:"The recurring motif is real as a comparative category; common ancestry among all examples is not established.",sources:[]},
+{id:"HERO-008",pattern:"Twin / paired culture heroes or founders",motifs:["twins","founders","brothers","rivalry","city"],stories:["Romulus and Remus","Castor and Pollux","Maya Hero Twins","Ashvins"],relation:"parallel",strength:55,analysis:"Twin-founder and paired-hero traditions occur across unrelated regions. Without a plausible transmission pathway, geographic and chronological evidence may favor recurrent independent narrative structures.",evidence:"Similarity is insufficient to infer diffusion; this is a test case for distinguishing convergence from historical connection.",sources:[]}
+];
+
 const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
 const color=s=>(states.find(x=>x[0]===s)||states[5])[2];
 document.getElementById("legend").innerHTML=states.map(x=>`<div class="badge"><i class="dot" style="background:${x[2]}"></i><span><b>${x[0]}</b><br><span class="muted">${x[1]}</span></span></div>`).join("");
@@ -129,7 +149,23 @@ for(const [id,vals] of [["culture",[...new Set(entries.map(x=>x.culture))].sort(
 function render(){const q=document.getElementById("q").value.toLowerCase(),c=document.getElementById("culture").value,s=document.getElementById("status").value,e=document.getElementById("era").value;
 const a=entries.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!c||x.culture===c)&&(!s||x.status===s)&&(!e||x.era===e));
 document.getElementById("cards").innerHTML=a.length?a.map(x=>`<article class="card"><div class="meta">${esc(x.id)} · ${esc(x.culture)} · ${esc(x.category)} · ${esc(x.date)}</div><h3>${esc(x.title)}</h3><span class="badge"><i class="dot" style="background:${color(x.status)}"></i>${esc(x.status)} · ${Math.round(x.confidence*100)}% confidence</span><div class="confidence"><i style="width:${x.confidence*100}%"></i></div><div class="section"><b>Claim</b><p>${esc(x.claim)}</p></div><div class="section"><b>Evidence</b><p>${esc(x.evidence)}</p></div><div class="section"><b>Counterpoint / uncertainty</b><p>${esc(x.counter)}</p></div><div class="section"><b>Meaning</b><p>${esc(x.meaning)}</p></div><div class="section sources"><b>Sources</b>${x.sources.length?x.sources.map(z=>`<a href="${esc(z[1])}" target="_blank" rel="noopener">${esc(z[0])}</a>`).join(""):"<p class='muted'>Primary/secondary sourcing queued for expansion.</p>"}</div></article>`).join(""):`<div class="empty">No matching claims.</div>`}
-document.getElementById("q").addEventListener("input",render);document.getElementById("culture").addEventListener("change",render);document.getElementById("status").addEventListener("change",render);document.getElementById("era").addEventListener("change",render);render();
+
+function renderCorrelations(){
+ const q=document.getElementById("mq").value.toLowerCase(),m=document.getElementById("motif").value,r=document.getElementById("corr").value;
+ const a=correlations.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!m||x.motifs.includes(m))&&(!r||x.relation===r));
+ document.getElementById("correlations").innerHTML=a.length?a.map(x=>{
+ const label=x.relation==="strong"?"Strong motif overlap":x.relation==="possible"?"Possible relationship":"Independent parallel";
+ const col=x.relation==="strong"?"#59c27c":x.relation==="possible"?"#d8ad55":"#64a9e8";
+ return '<article class="card"><div class="meta">'+esc(x.id)+' · '+label+'</div><h3>'+esc(x.pattern)+'</h3><span class="badge"><i class="dot" style="background:'+col+'"></i>motif similarity '+x.strength+'%</span><div class="confidence"><i style="width:'+x.strength+'%;background:'+col+'"></i></div><div class="section"><b>Stories compared</b><p>'+x.stories.map(esc).join(' · ')+'</p></div><div class="section"><b>Shared motifs</b><p>'+x.motifs.map(esc).join(' · ')+'</p></div><div class="section"><b>Analysis</b><p>'+esc(x.analysis)+'</p></div><div class="section"><b>Evidence</b><p>'+esc(x.evidence)+'</p></div><div class="section sources"><b>Sources</b>'+(x.sources.length?x.sources.map(z=>'<a href="'+esc(z[1])+'" target="_blank" rel="noopener">'+esc(z[0])+'</a>').join(""):"<p class='muted'>Research sources queued for expansion.</p>")+'</div></article>';
+ }).join(""):'<div class="empty">No matching cross-correlations.</div>';
+}
+const allMotifs=[...new Set(correlations.flatMap(x=>x.motifs))].sort();
+allMotifs.forEach(v=>document.getElementById("motif").insertAdjacentHTML("beforeend",'<option>'+esc(v)+'</option>'));
+document.getElementById("mq").addEventListener("input",renderCorrelations);
+document.getElementById("motif").addEventListener("change",renderCorrelations);
+document.getElementById("corr").addEventListener("change",renderCorrelations);
+
+document.getElementById("q").addEventListener("input",render);document.getElementById("culture").addEventListener("change",render);document.getElementById("status").addEventListener("change",render);document.getElementById("era").addEventListener("change",render);render();renderCorrelations();
 </script>
 </body>
 </html>
