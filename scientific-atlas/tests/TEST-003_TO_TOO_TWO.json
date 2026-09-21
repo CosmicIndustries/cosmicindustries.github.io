@@ -1,0 +1,18 @@
+{
+  "test_id":"TEST-003",
+  "title":"TO TOO TWO Semantic Disambiguation",
+  "status":"FOUNDATIONAL_PASS_CONDITION",
+  "targets":[
+    {"form":"to","roles":["preposition","infinitival_marker"]},
+    {"form":"too","roles":["additive","excess"]},
+    {"form":"two","roles":["cardinal_numeral"],"grounded_concept":2}
+  ],
+  "requires":{
+    "orthography":"distinguish forms",
+    "syntax":"distinguish grammatical role",
+    "semantics":"distinguish meaning",
+    "external_grounding":"ground numeral two independently of English",
+    "language_neutrality":"do not treat English forms as universal concepts"
+  },
+  "pass_condition":"correctly distinguish all three forms and explain why sound alone is insufficient"
+}
