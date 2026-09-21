@@ -1,0 +1,17 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://cosmicindustries.github.io/scientific-atlas/schema/litmus-test.schema.json",
+  "title":"Fort Knowledge Evidence Fluency Diagnostic",
+  "type":"object",
+  "required":["test_id","learner_state","competencies","access_policy"],
+  "properties":{
+    "test_id":{"type":"string"},
+    "learner_state":{"type":"string","enum":["INITIAL","STABLE","MIXED","FOUNDATIONAL_SCAFFOLDING"]},
+    "competencies":{"type":"object","additionalProperties":{"type":"integer","minimum":0,"maximum":2}},
+    "weak_areas":{"type":"array","items":{"type":"string"}},
+    "evidence_debt":{"type":"array","items":{"type":"string"}},
+    "access_policy":{"type":"string","const":"OPEN"},
+    "scaffolding_mode":{"type":"string"},
+    "last_reviewed":{"type":"string","format":"date"}
+  }
+}
