@@ -1,0 +1,67 @@
+{
+  "schema_version": "0.4.0",
+  "project": "MATERIA — Open Ethnobotanical Research Atlas",
+  "architecture": "API-backed global corpus + curated local evidence graph",
+  "generated_at": "2026-09-21",
+  "canonical_taxonomy": {
+    "provider": "Catalogue of Life / ChecklistBank",
+    "release": "COL26.9",
+    "dataset_key": 316321,
+    "issued": "2026-09-11",
+    "totals": {
+      "taxa": 2709610,
+      "synonyms": 2722834,
+      "usages": 5432444,
+      "references": 1627636,
+      "vernacular_names": 190001,
+      "distributions": 2231249
+    },
+    "query_api": "https://api.checklistbank.org/dataset/3LR",
+    "scope": [
+      "Plantae",
+      "Fungi"
+    ],
+    "notes": "MATERIA uses the live 3LR endpoint for browsing/search and keeps release metadata for reproducibility. COL release identifiers can churn between monthly releases; stable annual snapshots should be archived for publication-grade analyses."
+  },
+  "natural_products": [
+    {
+      "provider": "Natural Products Atlas",
+      "version": "2024_09",
+      "access": "download + REST API",
+      "url": "https://www.npatlas.org/download",
+      "license": "CC BY-NC 4.0"
+    },
+    {
+      "provider": "LOTUS",
+      "version": "February 2021 public download",
+      "access": "SDF/MongoDB/SMILES + API",
+      "url": "https://lotus.naturalproducts.net/download",
+      "license": "open data / CC-BY-SA data portal"
+    }
+  ],
+  "planned_chemistry": [
+    "NP Atlas",
+    "LOTUS",
+    "COCONUT",
+    "PubChem cross-references"
+  ],
+  "evidence_sources": [
+    "PubMed",
+    "NCCIH",
+    "LiverTox",
+    "systematic reviews",
+    "primary chemistry",
+    "case reports",
+    "Erowid",
+    "Shroomery"
+  ],
+  "local_seed_db": "ethnogenic.db.json",
+  "live_frontend": "ethnogenic.html",
+  "data_policy": {
+    "taxonomy": "Include accepted taxa and preserve synonym relationships.",
+    "chemistry": "Only attach a compound to an organism when a source explicitly supports the relationship.",
+    "evidence": "Traditional use, community phenomenology and clinical evidence remain separate provenance layers.",
+    "safety": "Interactions, adverse events, toxicity and uncertainty are first-class relationships.",
+    "completeness": "Global taxonomy is browsable through the live provider rather than copied into a single GitHub Pages JSON payload."
+  }
+}
