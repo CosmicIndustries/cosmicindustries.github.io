@@ -1,0 +1,28 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://cosmicindustries.github.io/scientific-atlas/schema/harvest-record.schema.json",
+  "title":"Fort Knowledge Scientific Atlas Harvest Record",
+  "type":"object",
+  "required":["id","title","domain","record_type","evidence_class","status","source_registry","source_identifier","harvested_at"],
+  "properties":{
+    "id":{"type":"string"},
+    "title":{"type":"string"},
+    "domain":{"type":"string"},
+    "record_type":{"type":"string"},
+    "evidence_class":{"type":"string"},
+    "priority":{"type":"number"},
+    "discovery_potential":{"type":"number"},
+    "accessibility_risk":{"type":"number"},
+    "status":{"type":"string"},
+    "summary":{"type":"string"},
+    "what_to_recover":{"type":"string"},
+    "validation_note":{"type":"string"},
+    "last_verified":{"type":"string"},
+    "source_registry":{"type":"string"},
+    "source_identifier":{"type":"string"},
+    "source_url":{"type":"string"},
+    "content_identifier":{"type":"string"},
+    "harvested_at":{"type":"string"}
+  },
+  "additionalProperties":true
+}
