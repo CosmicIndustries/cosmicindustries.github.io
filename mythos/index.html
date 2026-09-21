@@ -23,7 +23,7 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <h1>MYTHOS</h1>
 <div class="subtitle">Atlas of Human Belief & Evidence.<br>Every story has a history. Every claim has an evidence trail.</div>
 </header>
-<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
+<nav><a href="#method">Method</a><a href="#atlas">Atlas</a><a href="#timeline">Timeline</a><a href="#egypt">Egypt</a><a href="#archives">Archives</a><a href="#roadmap">Roadmap</a></nav>
 <main>
 <section class="hero" id="method">
 <div class="panel">
@@ -41,10 +41,20 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <section id="atlas">
 <h2>Claim atlas</h2>
 <p class="muted">The first corpus deliberately starts with Egypt and expands outward. Search across culture, category, or evidence state.</p>
-<div class="controls"><input id="q" placeholder="Search claims, evidence, gods, places…"><select id="culture"><option value="">All cultures</option></select><select id="status"><option value="">All evidence states</option></select></div>
+<div class="controls"><input id="q" placeholder="Search claims, evidence, gods, places…"><select id="culture"><option value="">All cultures</option></select><select id="status"><option value="">All evidence states</option></select><select id="era"><option value="">All eras</option><option value="Ancient">Ancient</option><option value="Present">Present</option><option value="Middle">Middle / bridge corpus</option></select></div>
 <div id="cards" class="grid"></div>
 </section>
 
+<div class="rule"></div>
+<section id="timeline" class="panel">
+<h2>Temporal architecture</h2>
+<p class="muted">MYTHOS is being built from the two ends inward: establish the ancient evidence base and the present-day record first, then work through the intervening historical layers. This prevents modern folklore from being projected backward and prevents ancient traditions from being treated as timeless.</p>
+<div class="grid small">
+<div><b>ANCIENT · deep time → c. 500 CE</b><br><span class="muted">Prehistory, first cities, writing, early states, ancient religions, oral traditions, archaeology, paleoclimate and early science.</span></div>
+<div><b>PRESENT · c. 1900 CE → now</b><br><span class="muted">Modern folklore, religions, paranormal claims, UAP, cryptids, conspiracy traditions, scientific anomalies, intelligence records, FOIA and declassification.</span></div>
+<div><b>MIDDLE · bridge corpus</b><br><span class="muted">Once the endpoints are mapped, reconstruct transmission, transformation and disappearance across Late Antiquity, medieval, early-modern and industrial periods.</span></div>
+</div>
+</section>
 <div class="rule"></div>
 <section id="egypt" class="panel">
 <h2>Egypt: starting point, not automatic winner</h2>
@@ -73,16 +83,16 @@ footer{border-top:1px solid var(--line);padding:35px 7vw;color:var(--muted)}
 <section id="roadmap" class="panel">
 <h2>Expansion roadmap</h2>
 <div class="grid small">
-<div><b>01 · Egypt</b><br><span class="muted">Cosmology, afterlife, medicine, astronomy, flood, gods, writing.</span></div>
-<div><b>02 · Mesopotamia</b><br><span class="muted">Sumerian, Akkadian, Babylonian and Assyrian traditions.</span></div>
-<div><b>03 · Comparative antiquity</b><br><span class="muted">Indus, China, Minoan/Mycenaean, Levant, Anatolia and Iran.</span></div>
-<div><b>04 · Global traditions</b><br><span class="muted">Africa, Americas, Polynesia, Australia, Europe and Central Asia.</span></div>
-<div><b>05 · Natural evidence</b><br><span class="muted">Geology, paleoclimate, archaeology, genetics, zoology and astronomy.</span></div>
-<div><b>06 · Modern anomalies</b><br><span class="muted">UAP, cryptids, lost-civilization claims, paranormal research and declassified records.</span></div>
+<div><b>01 · Ancient world</b><br><span class="muted">Egypt, Mesopotamia, Levant, Anatolia, Iran, Indus, China, Africa, Europe, Oceania and the Americas; prehistoric evidence where recoverable.</span></div>
+<div><b>02 · Ancient knowledge</b><br><span class="muted">Astronomy, medicine, mathematics, metallurgy, navigation, agriculture, architecture and environmental observation.</span></div>
+<div><b>03 · Present world</b><br><span class="muted">1900–present: living religions, folklore, paranormal traditions, UAP, cryptids, conspiracy traditions and scientific anomalies.</span></div>
+<div><b>04 · State & archival record</b><br><span class="muted">Declassified files, FOIA releases, intelligence records, military investigations, court records and newly digitized archives.</span></div>
+<div><b>05 · Evidence graph</b><br><span class="muted">Every claim links to sources, dates, locations, artifacts, observations, counterevidence and revision history.</span></div>
+<div><b>06 · Middle reconstruction</b><br><span class="muted">Late Antiquity → medieval → early modern → industrial era; trace how ancient motifs became modern beliefs.</span></div>
 </div>
 </section>
 </main>
-<footer>MYTHOS v0.2 · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
+<footer>MYTHOS v0.3 · Ancient + Present endpoint corpus · Cosmic Industries · Evidence states are provisional and revisable. Last corpus revision: 2026-09-21.</footer>
 <script>
 const states=[
 ["Corroborated","Strong independent evidence supports the empirical component.","#59c27c"],
@@ -107,14 +117,19 @@ const entries=[
 {id:"NOR-001",culture:"Norse",category:"Cosmology",title:"Ragnarök describes a literal future event",status:"Undetermined",confidence:.08,date:"medieval sources",claim:"The Norse Ragnarök account predicts a physically occurring future apocalypse.",evidence:"The event is documented in medieval literary sources as part of Norse mythic cosmology.",counter:"A mythic prophecy is not a testable physical forecast without independent predictive evidence.",meaning:"Historical attestation and theological interpretation should remain separate fields.",sources:[]},
 {id:"MOD-001",culture:"Modern / archival",category:"UAP",title:"A declassified document proves extraterrestrial craft",status:"Undetermined",confidence:.02,date:"modern archival record",claim:"Government release of a document establishes that an anomalous object was extraterrestrial technology.",evidence:"Government archives contain genuine records of unidentified or unexplained observations and investigations.",counter:"Authenticity of a document does not establish the truth of every interpretation attached to it; provenance, context and corroboration must be evaluated case by case.",meaning:"MYTHOS treats the document as evidence of what an institution recorded, then separately evaluates the extraordinary interpretation.",sources:[["U.S. National Archives — UAP records","https://www.archives.gov/research/topics/uaps"],["U.S. National Archives — Air Force UFO records","https://www.archives.gov/research/military/air-force/ufos"]]}
 ];
+
+entries.forEach(x=>{
+  if(!x.era) x.era = (x.id.startsWith("MOD-") ? "Present" : "Ancient");
+});
+
 const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
 const color=s=>(states.find(x=>x[0]===s)||states[5])[2];
 document.getElementById("legend").innerHTML=states.map(x=>`<div class="badge"><i class="dot" style="background:${x[2]}"></i><span><b>${x[0]}</b><br><span class="muted">${x[1]}</span></span></div>`).join("");
 for(const [id,vals] of [["culture",[...new Set(entries.map(x=>x.culture))].sort()],["status",states.map(x=>x[0])]]) vals.forEach(v=>document.getElementById(id).insertAdjacentHTML("beforeend",`<option>${esc(v)}</option>`));
-function render(){const q=document.getElementById("q").value.toLowerCase(),c=document.getElementById("culture").value,s=document.getElementById("status").value;
-const a=entries.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!c||x.culture===c)&&(!s||x.status===s));
+function render(){const q=document.getElementById("q").value.toLowerCase(),c=document.getElementById("culture").value,s=document.getElementById("status").value,e=document.getElementById("era").value;
+const a=entries.filter(x=>(!q||JSON.stringify(x).toLowerCase().includes(q))&&(!c||x.culture===c)&&(!s||x.status===s)&&(!e||x.era===e));
 document.getElementById("cards").innerHTML=a.length?a.map(x=>`<article class="card"><div class="meta">${esc(x.id)} · ${esc(x.culture)} · ${esc(x.category)} · ${esc(x.date)}</div><h3>${esc(x.title)}</h3><span class="badge"><i class="dot" style="background:${color(x.status)}"></i>${esc(x.status)} · ${Math.round(x.confidence*100)}% confidence</span><div class="confidence"><i style="width:${x.confidence*100}%"></i></div><div class="section"><b>Claim</b><p>${esc(x.claim)}</p></div><div class="section"><b>Evidence</b><p>${esc(x.evidence)}</p></div><div class="section"><b>Counterpoint / uncertainty</b><p>${esc(x.counter)}</p></div><div class="section"><b>Meaning</b><p>${esc(x.meaning)}</p></div><div class="section sources"><b>Sources</b>${x.sources.length?x.sources.map(z=>`<a href="${esc(z[1])}" target="_blank" rel="noopener">${esc(z[0])}</a>`).join(""):"<p class='muted'>Primary/secondary sourcing queued for expansion.</p>"}</div></article>`).join(""):`<div class="empty">No matching claims.</div>`}
-document.getElementById("q").addEventListener("input",render);document.getElementById("culture").addEventListener("change",render);document.getElementById("status").addEventListener("change",render);render();
+document.getElementById("q").addEventListener("input",render);document.getElementById("culture").addEventListener("change",render);document.getElementById("status").addEventListener("change",render);document.getElementById("era").addEventListener("change",render);render();
 </script>
 </body>
 </html>
