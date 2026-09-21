@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fort Knowledge — Epistemic Litmus</title>
+<style>
+body{margin:0;background:#070a12;color:#edf2f7;font:16px/1.5 system-ui,sans-serif}main{max-width:820px;margin:auto;padding:32px 20px}
+h1{font-size:42px;line-height:1.05}.muted{color:#9aa7bb}.panel{background:#0d1321;border:1px solid #22304a;border-radius:14px;padding:20px;margin:18px 0}
+.q{font:700 11px monospace;letter-spacing:.12em;color:#8bd3ff}.choice{display:block;width:100%;margin:9px 0;padding:12px 14px;border-radius:10px;border:1px solid #2a3956;background:#0a0f19;color:#edf2f7;text-align:left;cursor:pointer}.choice:hover{border-color:#8bd3ff}.choice.selected{border-color:#8bd3ff;outline:2px solid #274a68}.controls{display:flex;gap:10px;margin-top:16px}.btn{padding:11px 15px;border:0;border-radius:9px;cursor:pointer}.primary{background:#8bd3ff;color:#07101a}.result{display:none}.bar{height:10px;background:#162136;border-radius:99px;overflow:hidden}.fill{height:100%;width:0;background:#8bd3ff}.small{font-size:13px}
+</style>
+<main>
+<div class="q">FORT KNOWLEDGE / EPISTEMIC LITMUS</div>
+<h1>Can the evidence keep pace?</h1>
+<p class="muted">This is not an entrance exam. It measures whether the current concept needs a tiny detour before you continue. Read anything you like regardless of the result.</p>
+<div class="panel"><strong>Rule:</strong> a claim is not promoted because it sounds persuasive. It needs evidence appropriate to the claim.</div>
+<div id="stage"></div>
+<div class="controls"><button id="back" class="btn" onclick="move(-1)">Back</button><button id="next" class="btn primary" onclick="move(1)">Next</button></div>
+<div id="result" class="panel result"></div>
+</main>
+<script>
+const qs=[
+{t:"01 / OBSERVATION",q:"An instrument recorded a temperature of 12.4 °C at 14:00 UTC. Which statement is directly established?",a:[
+["The instrument recorded 12.4 °C at that timestamp.","good"],
+["The surrounding air mass caused the reading.","bad"],
+["The climate is becoming colder.","bad"],
+["The instrument was perfectly calibrated.","bad"]
+]},
+{t:"02 / SOURCE",q:"A respected author says a historical event happened, but the original records are unavailable and no independent source is located. What should the Atlas do?",a:[
+["Delete the claim.","bad"],
+["Promote it as established because the author is respected.","bad"],
+["Preserve the claim with limited evidentiary status and record what evidence is missing.","good"],
+["Assume the event probably happened.","bad"]
+]},
+{t:"03 / CAUSATION",q:"Variable A rises whenever variable B rises in a dataset. What is the strongest next move?",a:[
+["Declare that B causes A.","bad"],
+["Look for confounders, mechanism, temporal order, and a design capable of testing causality.","good"],
+["Ignore the relationship because correlation is useless.","bad"],
+["Choose the explanation that sounds most intuitive.","bad"]
+]},
+{t:"04 / REVISION",q:"A later controlled experiment contradicts an older result. What should happen to the old result?",a:[
+["Erase it from history.","bad"],
+["Keep it as historical evidence, link the newer contradiction, and revise its evidentiary status.","good"],
+["Keep both as equally established regardless of evidence.","bad"],
+["Assume the newer study must be wrong because the old one came first.","bad"]
+]}];
+let i=0,score=0,answered=0;
+function render(){const x=qs[i];document.getElementById('stage').innerHTML='<div class="panel"><div class="q">'+x.t+'</div><h2>'+x.q+'</h2>'+x.a.map((v,k)=>'<button class="choice" onclick="pick('+k+',this)">'+v[0]+'</button>').join('')+'<div id="feedback" class="small muted" style="margin-top:12px"></div></div><div class="panel"><div class="small muted">Progress '+(i+1)+' / '+qs.length+'</div><div class="bar"><div class="fill" style="width:'+((i)/qs.length*100)+'%"></div></div></div>';}
+function pick(k,el){document.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');const good=qs[i].a[k][1]==="good";document.getElementById('feedback').textContent=good?'Good: you separated the claim from what the evidence establishes.':'Not quite. Ask what the available evidence actually establishes, then match the strength of the claim to the strength of the evidence.';if(!el.dataset.counted){el.dataset.counted=1;answered++;if(good)score++;}}
+function move(d){if(d>0 && i<qs.length-1){i++;render();return}if(d<0&&i>0){i--;render();return}if(d>0&&i===qs.length-1){showResult();}}
+function showResult(){document.getElementById('stage').style.display='none';document.getElementById('back').style.display='none';document.getElementById('next').style.display='none';const pct=Math.round(score/qs.length*100);let state=pct===100?'GREEN':pct>=75?'AMBER':pct>=50?'BLUE':'RED';let lesson=state==='GREEN'?'Continue at the current pace.':state==='AMBER'?'One repeatable evidence distinction appeared. Add a micro-lesson, then continue.':state==='BLUE'?'Reasoning may be sound; vocabulary or framing likely needs translation.':'Pause for a tiny evidence-handling lesson, then retest with a new domain.';const r=document.getElementById('result');r.style.display='block';r.innerHTML='<div class="q">RESULT</div><h2>'+state+' / '+score+' of '+qs.length+'</h2><p>'+lesson+'</p><p class="muted small">This state is local and temporary. It is never a measure of intelligence or permission to access knowledge.</p>';}
+render();
+</script></html>
