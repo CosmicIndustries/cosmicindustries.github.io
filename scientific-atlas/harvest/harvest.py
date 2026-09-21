@@ -56,7 +56,8 @@ def make_record(source_id, title, domain, identifier, url, summary):
     title = str(title or "").strip()
     identifier = str(identifier or "").strip()
     url = canon(url)
-    rid = hashlib.sha256(f"{source_id}|{identifier}|{url}|{title}".encode()).hexdigest()[:20]
+    identity = f"{source_id}|{identifier}" if identifier else f"{source_id}|{url}|{norm_title(title)}"
+    rid = hashlib.sha256(identity.encode()).hexdigest()[:20]
     return {
         "id": rid,
         "title": title or identifier or url or "Untitled catalog record",
@@ -235,6 +236,26 @@ def main():
         key = (rec.get("source_registry"),rec.get("source_identifier") or rec.get("source_url") or norm_title(rec.get("title")))
         if key not in deduped:
             deduped[key] = rec
+
+    existing = {}
+    if OUT.exists():
+        for line in OUT.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                old = json.loads(line)
+                key = (old.get("source_registry"),old.get("source_identifier") or old.get("source_url") or norm_title(old.get("title")))
+                existing[key] = old
+            except json.JSONDecodeError:
+                pass
+
+    for key, rec in deduped.items():
+        old = existing.get(key)
+        if old:
+            rec["id"] = old.get("id",rec["id"])
+            rec["harvested_at"] = old.get("harvested_at",rec["harvested_at"])
+            if json.dumps({k:v for k,v in old.items() if k not in ("last_verified","harvested_at")},sort_keys=True,ensure_ascii=False) == json.dumps({k:v for k,v in rec.items() if k not in ("last_verified","harvested_at")},sort_keys=True,ensure_ascii=False):
+                rec["last_verified"] = old.get("last_verified",rec["last_verified"])
 
     OUT.parent.mkdir(parents=True,exist_ok=True)
     with OUT.open("w",encoding="utf-8") as fh:
