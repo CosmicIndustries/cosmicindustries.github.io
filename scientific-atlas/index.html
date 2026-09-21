@@ -2,46 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Scientific Data Atlas — overlooked, changed, endangered, and debunked scientific evidence tracked with provenance.">
-<title>Scientific Data Atlas — Cosmic Industries</title>
+<meta name="description" content="Fort Knowledge / Scientific Data Atlas — scientific evidence, provenance, preservation, language, uncertainty, and recovery.">
+<title>Scientific Data Atlas — Fort Knowledge — Cosmic Industries</title>
 <style>
-:root{--bg:#070a12;--panel:#0d1220;--text:#edf2f7;--muted:#93a0b4;--line:#1d2840;--accent:#8bd3ff}
+:root{--bg:#070a12;--panel:#0d1220;--panel2:#10182a;--text:#edf2f7;--muted:#93a0b4;--line:#1d2840;--accent:#8bd3ff;--accent2:#b8f2d8}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#17263e 0,#070a12 45%);color:var(--text);font:15px/1.55 Inter,system-ui,sans-serif}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}.shell{max-width:1200px;margin:auto;padding:24px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}.shell{max-width:1240px;margin:auto;padding:24px}
 header{border-bottom:1px solid var(--line)}.brand{font:700 13px monospace;letter-spacing:.1em}
 nav{float:right}nav a{margin-left:18px;color:var(--muted);font:12px monospace}
-main{padding:42px 0}.eyebrow{font:600 11px monospace;letter-spacing:.16em;color:var(--accent)}
-h1{font-size:clamp(38px,7vw,74px);line-height:.96;margin:10px 0 18px;max-width:900px}
-.lead{font-size:19px;color:var(--muted);max-width:800px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:28px 0 38px}
-.stat,.record,.controls{background:rgba(13,18,32,.86);border:1px solid var(--line);border-radius:14px}.stat{padding:16px}.stat b{display:block;font-size:28px}.stat span{font:10px monospace;color:var(--muted)}
-.controls{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;padding:13px;margin-bottom:16px}
+main{padding:38px 0}.eyebrow{font:600 11px monospace;letter-spacing:.16em;color:var(--accent)}
+h1{font-size:clamp(38px,7vw,74px);line-height:.96;margin:10px 0 18px;max-width:960px}
+.lead{font-size:19px;color:var(--muted);max-width:900px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:28px 0 34px}
+.stat,.record,.controls,.module,.principle{background:rgba(13,18,32,.88);border:1px solid var(--line);border-radius:14px}.stat{padding:16px}.stat b{display:block;font-size:28px}.stat span{font:10px monospace;color:var(--muted)}
+.controls{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;padding:13px;margin:26px 0 16px}
 input,select{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);background:#080c15;color:var(--text)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.record{padding:19px}.top{display:flex;gap:7px;flex-wrap:wrap}.tag{padding:4px 8px;border:1px solid var(--line);border-radius:99px;font:600 10px monospace;color:var(--muted)}.tag:first-child{color:var(--accent)}.priority{margin-left:auto}
-h2{font-size:26px}.record h2{font-size:20px;margin:10px 0}.record p{color:var(--muted)}.record strong{color:var(--text)}
+.section-title{margin:42px 0 12px;font-size:28px}.sub{color:var(--muted);max-width:850px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.record{padding:19px}.top{display:flex;gap:7px;flex-wrap:wrap}
+.tag{padding:4px 8px;border:1px solid var(--line);border-radius:99px;font:600 10px monospace;color:var(--muted)}.tag:first-child{color:var(--accent)}.priority{margin-left:auto}
+.record h2{font-size:20px;margin:10px 0}.record p{color:var(--muted)}.record strong{color:var(--text)}
 .meter{font:10px monospace;color:var(--muted)}.sources{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.sources a{font-size:12px}
+.modules{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.module{padding:18px}.module h3{margin:0 0 8px}.module p{color:var(--muted);margin:0 0 12px}.module a{font:11px monospace}
+.principles{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.principle{padding:18px}.principle b{display:block;margin-bottom:6px}.principle span{color:var(--muted)}
 .note{margin:22px 0;color:var(--muted);font:11px monospace}.empty{display:none;padding:30px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
 footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:11px monospace}
-@media(max-width:850px){.stats,.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.priority{margin-left:0}}
+@media(max-width:900px){.stats,.modules,.principles,.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.priority{margin-left:0}nav{float:none;margin-top:10px}nav a{margin:0 14px 0 0}}
 </style>
 </head>
 <body>
-<header><div class="shell"><a class="brand" href="../">COSMIC INDUSTRIES / SCIENTIFIC DATA ATLAS</a><nav><a href="../">Home</a><a href="README.md">Method</a><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/tree/main/scientific-atlas" target="_blank" rel="noreferrer">GitHub ↗</a></nav></div></header>
+<header><div class="shell">
+<a class="brand" href="../">COSMIC INDUSTRIES / FORT KNOWLEDGE / SCIENTIFIC DATA ATLAS</a>
+<nav><a href="../">Home</a><a href="languages.html">Languages</a><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/tree/main/scientific-atlas" target="_blank" rel="noreferrer">Source ↗</a></nav>
+</div></header>
+
 <main><div class="shell">
-<div class="eyebrow">PUBLIC EVIDENCE GRAPH / SEED 0.1</div>
+<div class="eyebrow">FORT KNOWLEDGE / PUBLIC EVIDENCE SYSTEM</div>
 <h1>Find what science forgot to finish.</h1>
-<p class="lead">Historical datasets, changed sources, endangered archives, overlooked observations, and failed claims — tracked with provenance instead of mystery.</p>
+<p class="lead">A living evidence atlas for overlooked observations, changed sources, endangered archives, failed claims, language drift, provenance, and the history of what we know. The website is a view; the preserved evidence package is the thing meant to survive.</p>
+
 <div class="stats" id="stats"></div>
+
+<h2 class="section-title">Atlas</h2>
+<p class="sub">Search the current seed corpus. Discovery potential is triage, not truth; original sources remain authoritative and every record keeps its provenance and uncertainty.</p>
 <div class="controls"><input id="q" placeholder="Search records…"><select id="domain"><option value="">All domains</option></select><select id="state"><option value="">All states</option></select></div>
 <div id="grid" class="grid"></div><div id="empty" class="empty">No records match the current filter.</div>
-<p class="note">Discovery potential is triage, not truth. Verify original sources before reuse. Absence or changed access is not, by itself, evidence of suppression.</p>
+
+<h2 class="section-title">Preservation system</h2>
+<p class="sub">The Atlas is one layer of Fort Knowledge. These are the current architecture, semantic, language, temporal, and physical-preservation layers.</p>
+<div class="modules">
+<div class="module"><h3>Longevity</h3><p>Long-horizon custody, fixity, replication, succession, restore testing, and technology migration.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/LONGEVITY_PROTOCOL.md" target="_blank">LONGEVITY_PROTOCOL.md ↗</a></div>
+<div class="module"><h3>Nexus</h3><p>Evidence packages, provenance, semantics, correlations, and discovery layers.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/NEXUS_ARCHITECTURE.md" target="_blank">NEXUS_ARCHITECTURE.md ↗</a></div>
+<div class="module"><h3>Language</h3><p>Preserve original language, historical senses, semantic drift, identifiers, and source-backed renderings.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/LANGUAGE_DRIFT_PROTOCOL.md" target="_blank">LANGUAGE_DRIFT_PROTOCOL.md ↗</a></div>
+<div class="module"><h3>Human languages</h3><p>500-language first cohort, grounded in human linguistic history, place, work, community, and evidence.</p><a href="languages.html">Language explorer ↗</a></div>
+<div class="module"><h3>Invariant anchors</h3><p>Mathematical, physical, astronomical, temporal, and geodetic anchors for future reconstruction.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/INVARIANT_ANCHOR_PROTOCOL.md" target="_blank">INVARIANT_ANCHOR_PROTOCOL.md ↗</a></div>
+<div class="module"><h3>You are here</h3><p>Reference frames, epochs, time scales, coordinates, realizations, uncertainty, and source identity.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/YOU_ARE_HERE_ANCHORS.md" target="_blank">YOU_ARE_HERE_ANCHORS.md ↗</a></div>
+<div class="module"><h3>Arrival forecasts</h3><p>Versioned observations and predictions without collapsing detectability, arrival, recognition, or intention.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/ARRIVAL_FORECAST_PROTOCOL.md" target="_blank">ARRIVAL_FORECAST_PROTOCOL.md ↗</a></div>
+<div class="module"><h3>Physical media</h3><p>Independent preservation media and engineering controls for long-duration custody.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/PHYSICAL_LONGEVITY_MEDIA.md" target="_blank">PHYSICAL_LONGEVITY_MEDIA.md ↗</a></div>
+<div class="module"><h3>Semantic integrity</h3><p>Keep claims, people, narratives, evidence, corrections, uncertainty, and moral context distinct.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/SEMANTIC_INTEGRITY_AND_ACCESS.md" target="_blank">SEMANTIC_INTEGRITY_AND_ACCESS.md ↗</a></div>
+</div>
+
+<h2 class="section-title">Tests and learning</h2>
+<div class="modules">
+<div class="module"><h3>Evidence fluency</h3><p>Diagnostic competencies for provenance, uncertainty, contradiction, causation, identity, and reproducibility.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/LITMUS_TEST_EVIDENCE_FLUENCY.md" target="_blank">LITMUS_TEST_EVIDENCE_FLUENCY.md ↗</a></div>
+<div class="module"><h3>Historical immersion</h3><p>People, place, life, problems, actions, words, concepts, consequences, and modern form.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/HISTORICAL_IMMERSION_LEARNING.md" target="_blank">HISTORICAL_IMMERSION_LEARNING.md ↗</a></div>
+<div class="module"><h3>Voyager test</h3><p>End-to-end preservation test spanning physical media, anchors, language, provenance, and interpretation.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/tests/TEST-001_VOYAGER_GOLDEN_RECORD.md" target="_blank">TEST-001 ↗</a></div>
+<div class="module"><h3>TO / TOO / TWO</h3><p>Adversarial semantic test showing why sound and orthography alone cannot be the knowledge layer.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/tests/TEST-003_TO_TOO_TWO.md" target="_blank">TEST-003 ↗</a></div>
+</div>
+
+<h2 class="section-title">Core principles</h2>
+<div class="principles">
+<div class="principle"><b>Evidence is not interpretation.</b><span>Preserve the object, its provenance, its claims, and later interpretations as separate layers.</span></div>
+<div class="principle"><b>A dead URL is not proof of suppression.</b><span>Track moved, retired, archived, partial, inaccessible, migrated, and genuinely lost sources separately.</span></div>
+<div class="principle"><b>Never overwrite the historical object.</b><span>Migrations and modern interpretations are new derivatives linked to the original.</span></div>
+<div class="principle"><b>Language is a rendering layer.</b><span>Words change. Meaning is anchored through relationships, observations, symbols, context, and provenance.</span></div>
+<div class="principle"><b>The guardian is temporary.</b><span>The preservation package must remain recoverable even when this website, organization, or technology does not.</span></div>
+<div class="principle"><b>Access is not a moral score.</b><span>Ordinary knowledge is discoverable by default; explicit rights, privacy, safety, and integrity constraints are handled separately.</span></div>
+</div>
+
+<p class="note">Snapshot: 2026-09-21 · Fort Knowledge is a preservation architecture in development. OAIS, PREMIS, BagIt, WARC, PROV, and related standards are design references, not certification claims.</p>
 </div></main>
-<footer><div class="shell">Cosmic Industries · Scientific Data Atlas · Snapshot 2026-09-21</div></footer>
+
+<footer><div class="shell">Cosmic Industries · Fort Knowledge · Scientific Data Atlas</div></footer>
+
 <script>
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const csvToRows=text=>{const out=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c=='"'&&q&&n=='"'){cell+='"';i++;continue}if(c=='"'){q=!q;continue}if(c==','&&!q){row.push(cell);cell='';continue}if((c=='\n'||c=='\r')&&!q){if(c=='\r'&&n=='\n')i++;row.push(cell);if(row.length>1||row[0])out.push(row);row=[];cell='';continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}const head=out.shift();return out.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])))};
+const csvToRows=text=>{const out=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c=='"'&&q&&n=='"'){cell+='"';i++;continue}if(c=='"'){q=!q;continue}if(c==','&&!q){row.push(cell);cell='';continue}if((c=='\n'||c=='\r')&&!q){if(c=='\r'&&n=='\n')i++;row.push(cell);if(row.length>1||row[0])out.push(row);row=[];cell='';continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}const head=out.shift();return out.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])))}; 
 let records=[];
 function render(){const q=document.querySelector('#q').value.toLowerCase().trim(),d=document.querySelector('#domain').value,s=document.querySelector('#state').value;const grid=document.querySelector('#grid');let shown=0;grid.innerHTML='';records.filter(r=>(!q||JSON.stringify(r).toLowerCase().includes(q))&&(!d||r.domain===d)&&(!s||r.status===s)).forEach(r=>{shown++;const div=document.createElement('article');div.className='record';div.innerHTML='<div class="top"><span class="tag">'+esc(r.domain.toUpperCase())+'</span><span class="tag">'+esc(r.status.replaceAll('_',' '))+'</span><span class="tag priority">priority '+esc(r.priority)+'</span></div><h2>'+esc(r.title)+'</h2><p>'+esc(r.summary)+'</p><div class="meter">evidence: '+esc(r.evidence_class)+' · discovery: '+esc(r.discovery_potential)+' · accessibility risk: '+esc(r.accessibility_risk)+'</div><p><strong>Recover / test:</strong> '+esc(r.what_to_recover)+'</p><p><strong>Control:</strong> '+esc(r.validation_note)+'</p><div class="sources"><a href="https://www.google.com/search?q='+encodeURIComponent(r.title)+'" target="_blank" rel="noreferrer">Search source ↗</a></div>';grid.appendChild(div)});document.querySelector('#empty').style.display=shown?'none':'block'}
-fetch('./scientific-atlas-seed.csv').then(r=>r.text()).then(t=>{records=csvToRows(t);const domains=[...new Set(records.map(r=>r.domain))].sort(),states=[...new Set(records.map(r=>r.status))].sort();document.querySelector('#domain').innerHTML+='<option value="'+domains.map(esc).join('">')+'</option>';document.querySelector('#domain').innerHTML='<option value="">All domains</option>'+domains.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');document.querySelector('#state').innerHTML+='<option value="">All states</option>'+states.map(x=>'<option value="'+esc(x)+'">'+esc(x.replaceAll('_',' '))+'</option>').join('');const strong=records.filter(r=>r.evidence_class==='STRONG').length,loss=records.filter(r=>['AT_RISK','MOVED','PARTIAL','ARCHIVED','RETIRED','MIGRATING'].includes(r.status)).length,integrity=records.filter(r=>r.record_type==='failed-claim'||r.record_type==='fraud-case'||r.record_type==='meta-dataset'||r.record_type==='controversial-claim').length;document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>RECORDS</span></div><div class="stat"><b>'+strong+'</b><span>STRONG EVIDENCE</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div><div class="stat"><b>'+integrity+'</b><span>CONTROL / INTEGRITY TRACK</span></div>';render()}).catch(e=>{document.querySelector('#grid').innerHTML='<div class="empty" style="display:block">Dataset could not be loaded.</div>'});
+fetch('./scientific-atlas-seed.csv?v=20260921').then(r=>{if(!r.ok)throw new Error('dataset '+r.status);return r.text()}).then(t=>{records=csvToRows(t);const domains=[...new Set(records.map(r=>r.domain))].sort(),states=[...new Set(records.map(r=>r.status))].sort();document.querySelector('#domain').innerHTML='<option value="">All domains</option>'+domains.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');document.querySelector('#state').innerHTML='<option value="">All states</option>'+states.map(x=>'<option value="'+esc(x)+'">'+esc(x.replaceAll('_',' '))+'</option>').join('');const strong=records.filter(r=>r.evidence_class==='STRONG').length,loss=records.filter(r=>['AT_RISK','MOVED','PARTIAL','ARCHIVED','RETIRED','MIGRATING'].includes(r.status)).length,integrity=records.filter(r=>['failed-claim','fraud-case','meta-dataset','controversial-claim'].includes(r.record_type)).length;document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>RECORDS</span></div><div class="stat"><b>'+strong+'</b><span>STRONG EVIDENCE</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div><div class="stat"><b>'+integrity+'</b><span>CONTROL / INTEGRITY TRACK</span></div>';render()}).catch(e=>{document.querySelector('#grid').innerHTML='<div class="empty" style="display:block">Dataset could not be loaded.</div>'});
 ['q','domain','state'].forEach(id=>document.getElementById(id).addEventListener('input',render));
 </script>
 </body></html>
