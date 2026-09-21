@@ -1,0 +1,470 @@
+[
+  {
+    "id": "SYS-GOV-001",
+    "name": "Chiefdom",
+    "type": "governance",
+    "description": "Political system organized around ranked leadership, kinship, tribute, redistribution, and chiefly authority.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-002",
+    "name": "City-state",
+    "type": "governance",
+    "description": "Urban-centered polity exercising authority over a city and associated territory.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-003",
+    "name": "Kingdom",
+    "type": "governance",
+    "description": "Polity organized around monarchical sovereignty, succession, court structures, and territorial authority.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-004",
+    "name": "Empire",
+    "type": "governance",
+    "description": "Multi-territorial political system incorporating or subordinating distinct populations under an imperial structure.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-005",
+    "name": "Republic",
+    "type": "governance",
+    "description": "Political system in which public authority is institutionally distinct from hereditary personal sovereignty.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-006",
+    "name": "Democratic system",
+    "type": "governance",
+    "description": "Family of systems structuring collective authorization and participation in public decision-making.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-007",
+    "name": "Bureaucratic administration",
+    "type": "governance",
+    "description": "Administrative system using specialized offices, records, procedures, delegated authority, and continuity.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-008",
+    "name": "Federation",
+    "type": "governance",
+    "description": "Political system distributing authority between a central government and constituent polities.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-001",
+    "name": "Customary law",
+    "type": "law",
+    "description": "Normative system maintained through established practice, precedent, social memory, recognition, and sanction.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-002",
+    "name": "Religious law",
+    "type": "law",
+    "description": "Legal or normative system deriving rules and interpretive authority from religious traditions and institutions.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-003",
+    "name": "Common-law system",
+    "type": "law",
+    "description": "Legal tradition substantially structured through judicial decisions, precedent, interpretation, and enacted law.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-004",
+    "name": "Civil-law system",
+    "type": "law",
+    "description": "Legal tradition substantially organized through codified statutes and systematic legal doctrine.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-005",
+    "name": "Restorative justice",
+    "type": "law",
+    "description": "Justice practices emphasizing repair of harm, affected-party participation, accountability, and restoration.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-001",
+    "name": "Gift economy",
+    "type": "economy",
+    "description": "Exchange system in which transfers can create obligation, reciprocity, prestige, alliance, or relationship.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-002",
+    "name": "Tribute system",
+    "type": "economy",
+    "description": "Resource-transfer system in which subordinate persons or communities provide goods, labor, or wealth to dominant authority.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-003",
+    "name": "Market economy",
+    "type": "economy",
+    "description": "Economic system in which exchange and allocation are substantially coordinated through markets and price signals.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-004",
+    "name": "Planned economy",
+    "type": "economy",
+    "description": "Economic system in which significant production and allocation decisions are coordinated through deliberate planning institutions.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-005",
+    "name": "Commons governance",
+    "type": "resource",
+    "description": "Collective resource-management system using rules for access, stewardship, monitoring, sanction, and distribution.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-006",
+    "name": "Guild system",
+    "type": "economy",
+    "description": "Occupational system organizing membership, training, standards, mutual obligations, market access, and political influence.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-001",
+    "name": "Kinship system",
+    "type": "social",
+    "description": "System organizing descent, household membership, marriage, inheritance, obligation, identity, and social relationship.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-002",
+    "name": "Clan system",
+    "type": "social",
+    "description": "Social organization based on recognized descent, ancestry, alliance, shared identity, or related obligations.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-003",
+    "name": "Caste system",
+    "type": "social",
+    "description": "Hereditary or strongly bounded stratification governing status, occupation, marriage, interaction, and access.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-004",
+    "name": "Patronage network",
+    "type": "social",
+    "description": "Relationship system exchanging protection, access, office, resources, or status through personal or factional ties.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-005",
+    "name": "Mutual-aid system",
+    "type": "social",
+    "description": "Cooperative system through which participants pool resources, labor, risk, or support for shared benefit.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-001",
+    "name": "Oral tradition",
+    "type": "knowledge",
+    "description": "Knowledge-transmission system relying substantially on memory, performance, repetition, apprenticeship, and narrative.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-002",
+    "name": "Apprenticeship system",
+    "type": "knowledge",
+    "description": "Learning system transmitting practical knowledge through guided participation under experienced practitioners.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-003",
+    "name": "University system",
+    "type": "knowledge",
+    "description": "Institutional system combining advanced teaching, credentialing, knowledge production, preservation, and professional formation.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-004",
+    "name": "Archive system",
+    "type": "knowledge",
+    "description": "Preservation and retrieval system organizing records, metadata, custody, access, and historical memory.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-005",
+    "name": "Scientific peer review",
+    "type": "knowledge",
+    "description": "Validation and communication mechanism in which research claims are evaluated by knowledgeable peers under defined norms.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-001",
+    "name": "Temple system",
+    "type": "religious",
+    "description": "Institutional system organizing sacred space, ritual activity, personnel, offerings, resources, and participation.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-002",
+    "name": "Monastic system",
+    "type": "religious",
+    "description": "Religious institutional system organized around disciplined communal or solitary practice, rules, property, education, and ritual.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-001",
+    "name": "Levy system",
+    "type": "military",
+    "description": "Military recruitment system drawing personnel from a population under political, customary, or contractual obligation.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-002",
+    "name": "Professional army",
+    "type": "military",
+    "description": "Military system based substantially on continuously organized personnel, training, command, logistics, and institutional service.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-003",
+    "name": "Mercenary system",
+    "type": "military",
+    "description": "Military labor system in which armed personnel or units serve primarily through contractual compensation.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-004",
+    "name": "Fortification network",
+    "type": "military",
+    "description": "Defensive system linking fortified places through geography, logistics, surveillance, communication, and strategy.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-001",
+    "name": "Irrigation system",
+    "type": "technical",
+    "description": "Water-control system coordinating physical infrastructure, labor, allocation, maintenance, property, and governance.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-002",
+    "name": "Road network",
+    "type": "technical",
+    "description": "Infrastructure system connecting places through engineered routes, maintenance, rights, logistics, and movement.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-003",
+    "name": "Telecommunications system",
+    "type": "technical",
+    "description": "Technical network enabling information transfer through interoperating physical, protocol, organizational, and service components.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-004",
+    "name": "Supply chain system",
+    "type": "technical",
+    "description": "Interdependent system of production, transport, storage, financing, information, procurement, and distribution.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-001",
+    "name": "Hospital system",
+    "type": "health",
+    "description": "Organized health-care system combining facilities, personnel, procedures, resources, records, and patient flows.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-002",
+    "name": "Public-health system",
+    "type": "health",
+    "description": "Population-level system for surveillance, prevention, sanitation, health promotion, intervention, and coordination.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-001",
+    "name": "Forest stewardship system",
+    "type": "resource",
+    "description": "Resource-management system governing access, harvesting, regeneration, protection, and social obligations around forests.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-001",
+    "name": "Festival system",
+    "type": "cultural",
+    "description": "Recurring cultural system coordinating ritual, performance, exchange, identity, scheduling, and communal participation.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-001",
+    "name": "Organized-crime network",
+    "type": "illicit",
+    "description": "Clandestine system coordinating illicit markets, enforcement, finance, information, recruitment, and territorial or relational control.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-002",
+    "name": "Smuggling network",
+    "type": "illicit",
+    "description": "Covert movement system transferring people or goods across regulated boundaries through concealed logistics and intermediaries.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-003",
+    "name": "Black-market system",
+    "type": "illicit",
+    "description": "Exchange system operating outside or against formal legal restrictions, with its own prices, trust mechanisms, risks, and enforcement.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-001",
+    "name": "Bribery mechanism",
+    "type": "failure",
+    "description": "Corruption mechanism in which value is transferred to influence the exercise of entrusted authority.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-002",
+    "name": "Nepotism mechanism",
+    "type": "failure",
+    "description": "Preferential allocation mechanism in which kinship improperly influences access to office, resources, or opportunity.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-003",
+    "name": "Regulatory capture",
+    "type": "failure",
+    "description": "Governance failure in which a regulated interest substantially redirects regulatory institutions toward its own interests.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-004",
+    "name": "State capture",
+    "type": "failure",
+    "description": "Systemic corruption pattern in which private or factional interests substantially reshape public institutions, rules, or enforcement for their benefit.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-005",
+    "name": "Embezzlement mechanism",
+    "type": "failure",
+    "description": "Diversion mechanism in which entrusted resources are appropriated contrary to their authorized purpose.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-006",
+    "name": "Information suppression",
+    "type": "failure",
+    "description": "Mechanism through which relevant information is withheld, distorted, destroyed, or restricted to alter system behavior or accountability.",
+    "evidence_level": "E2",
+    "confidence": "seed",
+    "sources": []
+  }
+]
