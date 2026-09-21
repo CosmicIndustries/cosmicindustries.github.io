@@ -1,0 +1,25 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Physical Archive Media Record",
+  "type":"object",
+  "required":["id","material_class","encoding_class","status"],
+  "properties":{
+    "id":{"type":"string"},
+    "material_class":{"type":"string"},
+    "encoding_class":{"type":"string"},
+    "substrate":{"type":"string"},
+    "coating":{"type":"string"},
+    "fabrication_method":{"type":"string"},
+    "environment":{"type":"string"},
+    "capacity":{"type":"string"},
+    "read_method":{"type":"string"},
+    "write_method":{"type":"string"},
+    "longevity_claim":{"type":"object"},
+    "aging_evidence":{"type":"array","items":{"type":"string"}},
+    "independence_class":{"type":"string"},
+    "status":{"type":"string"},
+    "provenance":{"type":"array","items":{"type":"string"}},
+    "checksum":{"type":"string"},
+    "recovery_instructions":{"type":"string"}
+  }
+}
