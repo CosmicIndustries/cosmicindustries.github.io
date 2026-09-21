@@ -1,0 +1,22 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://cosmicindustries.github.io/scientific-atlas/schema/epistemic-litmus.schema.json",
+  "title":"Fort Knowledge Epistemic Litmus Result",
+  "type":"object",
+  "required":["reader_state","concept_frontier","claim_dispositions"],
+  "properties":{
+    "reader_state":{"enum":["GREEN","AMBER","BLUE","RED"]},
+    "concept_frontier":{"type":"array","items":{"type":"object","required":["concept","state"],"properties":{
+      "concept":{"type":"string"},
+      "state":{"enum":["READY","NEEDS_CONTEXT","NEEDS_EVIDENCE_TRAINING","REQUIRES_RETRY"]}
+    }}},
+    "claim_dispositions":{"type":"array","items":{"type":"object","required":["claim","status"],"properties":{
+      "claim":{"type":"string"},
+      "status":{"enum":["ASSERTION","UNCORROBORATED","UNDER_EVIDENCED","SUPPORTED","WELL_SUPPORTED","DISPUTED","CONTRADICTED","DISCONFIRMED","UNKNOWN"]},
+      "evidence_ids":{"type":"array","items":{"type":"string"}},
+      "missing_evidence":{"type":"array","items":{"type":"string"}}
+    }}},
+    "next_micro_lesson":{"type":"string"},
+    "retest_after":{"type":"string"}
+  }
+}
