@@ -1,0 +1,53 @@
+name: Sync natural-products corpus
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 5 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  npatlas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download NP Atlas JSON
+        run: |
+          set -euo pipefail
+          mkdir -p materia/chemistry
+          curl -L --fail --retry 4 --retry-delay 5 "https://www.npatlas.org/static/downloads/NPAtlas_download.json" -o /tmp/npatlas.json
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path("/tmp/npatlas.json")
+          data=json.loads(p.read_text())
+          print("NP Atlas top-level:", type(data).__name__, "items:", len(data) if hasattr(data,"__len__") else "n/a")
+          pathlib.Path("materia/chemistry/npatlas.json").write_text(json.dumps(data, separators=(",",":")))
+          PY
+
+      - name: Write provenance
+        run: |
+          cat > materia/chemistry/README.md <<'EOF'
+          # Natural Products Atlas mirror
+
+          Source: Natural Products Atlas v2024_09.
+          Download: https://www.npatlas.org/download
+          License: CC BY-NC 4.0.
+
+          This file is synchronized by GitHub Actions. The upstream Atlas contains compound names, structures, origins and associated metadata, including ClassyFire and NP Classifier annotations.
+          EOF
+
+      - name: Commit if changed
+        run: |
+          git config user.name "MATERIA Sync"
+          git config user.email "actions@users.noreply.github.com"
+          git add materia/chemistry/npatlas.json materia/chemistry/README.md
+          if git diff --cached --quiet; then
+            echo "No NP Atlas changes."
+            exit 0
+          fi
+          git commit -m "Sync Natural Products Atlas corpus"
+          git push
