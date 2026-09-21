@@ -1,0 +1,37 @@
+{
+  "test_id":"TEST-001",
+  "subject":"Voyager Golden Record",
+  "status":"PASS_WITH_OPEN_GAPS",
+  "dimensions":{
+    "physical_preservation":true,
+    "semantic_integrity":true,
+    "language_bootstrap":true,
+    "invariant_anchor":true,
+    "you_are_here":true,
+    "cross_correlation":true,
+    "arrival_forecast_ready":true,
+    "public_access":true
+  },
+  "object_identity":{
+    "artifact":"Voyager Golden Record",
+    "spacecraft":["Voyager 1","Voyager 2"],
+    "medium":"gold-plated copper phonograph record",
+    "era":"1977"
+  },
+  "relations":[
+    ["uses_invariant_anchor","hydrogen_transition"],
+    ["uses_celestial_locator","pulsar_references"],
+    ["demonstrates_physical_preservation","gold_plated_record"],
+    ["demonstrates_language_bridge","multilingual_greetings"],
+    ["relates_to","YOU_ARE_HERE"],
+    ["relates_to","PHYSICAL_LONGEVITY_MEDIA"],
+    ["relates_to","LANGUAGE_DRIFT"],
+    ["relates_to","ARRIVAL_FORECAST"]
+  ],
+  "source_urls":[
+    "https://www.nasa.gov/image-article/voyagers-special-cargo-golden-record/",
+    "https://science.nasa.gov/mission/voyager/voyager-1/",
+    "https://www.iers.org/iers/en/dataproducts/icrf/icrf",
+    "https://www.nist.gov/si-redefinition/meet-constants"
+  ]
+}
