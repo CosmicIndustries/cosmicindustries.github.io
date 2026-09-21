@@ -6,7 +6,12 @@
     "do_not_copy_source_payloads": true,
     "preserve_source_identifier": true,
     "preserve_source_url": true,
-    "dedupe_keys": ["doi", "source_identifier", "canonical_url", "normalized_title"],
+    "dedupe_keys": [
+      "doi",
+      "source_identifier",
+      "canonical_url",
+      "normalized_title"
+    ],
     "status_default": "DISCOVERED",
     "evidence_default": "CATALOG_METADATA"
   },
@@ -17,7 +22,11 @@
       "publisher": "DataCite",
       "type": "doi_registry",
       "endpoint": "https://api.datacite.org/dois",
-      "query": {"resource-type-id": "dataset", "page[size]": 1000, "sort": "-updated"},
+      "query": {
+        "resource-type-id": "dataset",
+        "page[size]": 1000,
+        "sort": "-updated"
+      },
       "pagination": "datacite_cursor",
       "max_records": 3000,
       "rate_delay_seconds": 0.2,
@@ -29,7 +38,10 @@
       "publisher": "NASA Earthdata",
       "type": "dataset_catalog",
       "endpoint": "https://cmr.earthdata.nasa.gov/search/collections.umm_json",
-      "query": {"has_granules_or_opensearch": "true", "page_size": 2000},
+      "query": {
+        "has_granules_or_opensearch": "true",
+        "page_size": 2000
+      },
       "pagination": "page_num",
       "max_records": 3000,
       "rate_delay_seconds": 0.2,
@@ -41,7 +53,14 @@
       "publisher": "U.S. Geological Survey",
       "type": "dataset_catalog",
       "endpoint": "https://www.sciencebase.gov/catalog/items",
-      "query": {"q": "", "filter": ["systemType=Data Release"], "format": "json", "max": 1000},
+      "query": {
+        "q": "",
+        "filter": [
+          "systemType=Data Release"
+        ],
+        "format": "json",
+        "max": 1000
+      },
       "pagination": "offset",
       "max_records": 3000,
       "rate_delay_seconds": 0.2,
@@ -53,11 +72,15 @@
       "publisher": "NOAA National Centers for Environmental Information",
       "type": "dataset_catalog",
       "endpoint": "https://www.ncei.noaa.gov/access/services/search/v1/datasets",
-      "query": {"limit": 1000, "offset": 0},
+      "query": {
+        "limit": 1000,
+        "offset": 0
+      },
       "pagination": "offset",
       "max_records": 2000,
       "rate_delay_seconds": 0.2,
       "authority_class": "government_catalog"
     }
-  ]
+  ],
+  "revision_note": "Initial four-source harvest architecture committed 2026-09-21."
 }
