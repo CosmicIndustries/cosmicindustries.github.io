@@ -1,0 +1,39 @@
+{
+  "name": "SYSTOS",
+  "version": "0.1.0",
+  "definition": "Semantic atlas and database of human systems.",
+  "core_entity": "system",
+  "entities": [
+    "system","system_type","actor","organization","institution","community","role",
+    "rule","law","norm","custom","resource","flow","event","transformation",
+    "conflict","reform","corruption_event","failure_mode","claim","evidence",
+    "place","culture","language","time_period","relationship","source","document",
+    "semantic_concept"
+  ],
+  "evidence_levels": {
+    "E0": "unknown",
+    "E1": "hypothesized",
+    "E2": "attested",
+    "E3": "corroborated",
+    "E4": "strongly established",
+    "E5": "directly evidenced where applicable"
+  },
+  "required_system_fields": [
+    "id","name","aliases","system_type","description","time_start","time_end",
+    "region","actors","roles","institutions","rules","norms","resources",
+    "authority","incentives","constraints","information","inputs","processes",
+    "outputs","feedback","dependencies","relationships","predecessors","successors",
+    "transformations","conflicts","reforms","failure_modes","corruption_events",
+    "sources","evidence_level","confidence","contested_fields","last_verified"
+  ],
+  "principles": [
+    "Do not equate a system with an institution.",
+    "Model formal rules separately from observed practice.",
+    "Model corruption and abuse as first-class phenomena.",
+    "Preserve disputed claims and counterclaims.",
+    "Attach provenance to entities and relationships.",
+    "Represent systems as time-varying rather than static.",
+    "Do not sanitize systems because they are prestigious, sacred, ancient, modern, legal, or socially accepted.",
+    "Do not convert allegations into facts merely because they are repeated."
+  ]
+}
