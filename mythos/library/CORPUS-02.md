@@ -1,12 +1,12 @@
 # MYTHOS Corpus Pack 02
 
 **Imported:** 2026-09-22  
-**Records:** 24  
+**Records:** 27  
 **Focus:** deep time, underrepresented regions, environmental adaptation, trade, medicine, authentication, mortuary archaeology, and cross-cultural methodology.
 
 ## Record families
 
-- 16 evidence records across Natufian communities, Denisovans, Lower Rhine–Meuse foragers, Chimú, Chachapoya, Thailand, Aksum, Kush/Meroe, Sarazm, Dholavira, Parthians, Ming China, Iron Age Vietnam, Norwegian ice archaeology, archaeological authentication, and chronological method.
+- 19 evidence records across Natufian communities, Denisovans, Lower Rhine–Meuse foragers, Chimú, Chachapoya, Thailand, Aksum, Kush/Meroe, Sarazm, Dholavira, Parthians, Ming China, Iron Age Vietnam, Norwegian ice archaeology, archaeological authentication, environmental memory, and chronological method.
 - 2 deep-time index records.
 - 2 recovered-technology records.
 - 1 fabrication/chronology audit record.
@@ -26,6 +26,7 @@ Fresh reports are not treated as settled history merely because they are new. Ea
 - Archaeology Magazine
 - Smithsonian Institution / Smithsonian Magazine
 - The Art Newspaper
+- Hebrew University of Jerusalem / Science Advances reporting
 
 ## Important limitation
-The current browser library loads Corpus Pack 01 directly. Pack 02 is stored separately and its transcript/manifest layer is committed, but the browser loader still needs an explicit pack-loader update before all 24 records appear in the existing library UI. This is intentional rather than silently merging the machine layer into the archival pack.
+The current browser library loads Corpus Pack 01 directly. Pack 02 is stored separately with its own visible browser and transcript layer. The existing library index still needs an explicit pack-loader update before Pack 02 appears inside its unified search. This separation keeps the new machine/archive pack auditable rather than silently merging it.
