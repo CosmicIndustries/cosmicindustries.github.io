@@ -1,106 +1,102 @@
 {
-  "version": "0.2.0",
-  "name": "SYSTOS",
-  "core_entity": "system",
-  "entity_types": [
-    "system",
-    "institution",
-    "organization",
-    "community",
-    "network",
-    "actor",
-    "role",
-    "rule",
-    "law",
-    "norm",
-    "custom",
-    "resource",
-    "flow",
-    "event",
-    "transformation",
-    "conflict",
-    "reform",
-    "failure_mode",
-    "corruption_event",
-    "claim",
-    "evidence",
-    "source",
-    "place",
-    "culture",
-    "language",
-    "period",
-    "concept"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SYSTOS 4D Semantic HRR Database",
+  "version": "0.3.0",
+  "description": "Four-dimensional semantic database architecture using direct numerical identity, indirect numerical semantic coordinates, HRR vector representations, and temporal/contextual state.",
+  "dimensions": {
+    "D1_direct": "Stable numerical identity and explicit ontology position.",
+    "D2_indirect": "Distributed semantic coordinates derived from related concepts and weighted relationships.",
+    "D3_hrr": "High-dimensional holographic reduced representation used for associative retrieval and similarity.",
+    "D4_temporal_context": "Time, place, state, provenance, and situational context."
+  },
+  "principles": [
+    "Numerical taxonomy is a projection, not the underlying ontology.",
+    "A record may occupy multiple semantic regions without duplication.",
+    "Direct numbers identify; indirect numbers associate; HRR vectors retrieve; temporal/contextual coordinates situate.",
+    "Relationships are first-class data with weights, provenance, confidence, and temporal scope.",
+    "Formal rules and observed practice remain distinct.",
+    "Claims, counterclaims, evidence, and uncertainty remain distinct.",
+    "Corruption, failure, abuse, resistance, and reform are first-class system phenomena.",
+    "Historical systems may have multiple simultaneous geographic or institutional variants.",
+    "Semantic proximity must never be treated as proof of historical causation."
   ],
-  "relations": [
-    "contains",
-    "part_of",
-    "governs",
-    "administers",
-    "enforces",
-    "funds",
-    "owns",
-    "controls",
-    "depends_on",
-    "supplies",
-    "exchanges_with",
-    "influences",
-    "copies",
-    "adapts",
-    "opposes",
-    "absorbs",
-    "replaces",
-    "coexists_with",
-    "transforms_into",
-    "precedes",
-    "succeeds",
-    "corrupts",
-    "captures",
-    "resists",
-    "legitimizes",
-    "delegitimizes",
-    "produces",
-    "preserves",
-    "transmits",
-    "restricts",
-    "destroys"
-  ],
+  "record": {
+    "id": "string",
+    "name": "string",
+    "direct_number": "string",
+    "classification": [
+      "string"
+    ],
+    "type": "string",
+    "description": "string",
+    "semantic_terms": [
+      "string"
+    ],
+    "indirect_coordinates": [
+      {
+        "target": "string",
+        "weight": "number",
+        "relation": "string"
+      }
+    ],
+    "hrr": {
+      "dimension": "integer",
+      "encoding": "string",
+      "vector": "array<number>",
+      "seed": "string"
+    },
+    "temporal": [
+      {
+        "start": "string",
+        "end": "string",
+        "state": "string"
+      }
+    ],
+    "context": {
+      "places": [
+        "string"
+      ],
+      "cultures": [
+        "string"
+      ],
+      "languages": [
+        "string"
+      ],
+      "domains": [
+        "string"
+      ]
+    },
+    "evidence_level": "E0|E1|E2|E3|E4|E5",
+    "confidence": "string",
+    "sources": [
+      "string"
+    ]
+  },
+  "relationship": {
+    "from": "string",
+    "to": "string",
+    "rel": "string",
+    "weight": "number",
+    "direct": "boolean",
+    "semantic_distance": "number",
+    "temporal_scope": {
+      "start": "string",
+      "end": "string"
+    },
+    "context": [
+      "string"
+    ],
+    "confidence": "string",
+    "sources": [
+      "string"
+    ]
+  },
   "evidence_levels": {
     "E0": "unknown",
-    "E1": "hypothesized",
+    "E1": "hypothesized or ontology seed",
     "E2": "attested",
     "E3": "corroborated",
-    "E4": "strongly_established",
-    "E5": "directly_evidenced_where_applicable"
-  },
-  "corruption_types": [
-    "bribery",
-    "nepotism",
-    "cronyism",
-    "embezzlement",
-    "fraud",
-    "extortion",
-    "patronage",
-    "regulatory_capture",
-    "state_capture",
-    "conflict_of_interest",
-    "rent_seeking",
-    "clientelism",
-    "coercive_extraction",
-    "information_suppression",
-    "abuse_of_office",
-    "judicial_corruption",
-    "electoral_manipulation",
-    "procurement_fraud",
-    "resource_diversion",
-    "false_accusation"
-  ],
-  "principles": [
-    "formal rule is distinct from observed practice",
-    "institution is distinct from system",
-    "claim is distinct from fact",
-    "corruption is first-class",
-    "relationships require provenance",
-    "systems are temporal",
-    "contested interpretations remain visible"
-  ]
+    "E4": "strongly established",
+    "E5": "directly evidenced where applicable"
+  }
 }
