@@ -64,30 +64,22 @@
 <footer class="footer"><div class="shell">SYSTOS · Semantic Atlas of Human Systems · Cosmic Industries · Evidence before certainty.</div></footer>
 <script>
 let seed=[];
+const $=id=>document.getElementById(id);
 async function loadData(){
-  try{
-    const r=await fetch("systems.json",{cache:"no-store"});
-    if(!r.ok) throw new Error("systems.json "+r.status);
-    seed=await r.json();
-  }catch(e){
-    document.getElementById("count").textContent="Database load error: "+e.message;
-    document.getElementById("records").innerHTML="<div class='status'>The semantic corpus could not be loaded.</div>";
-    return;
-  }
-  const types=[...new Set(seed.map(x=>x.type))].sort();
-  const typeEl=document.getElementById("type");
-  typeEl.innerHTML="<option value=''>All types</option>";
-  types.forEach(t=>typeEl.add(new Option(t,t)));
+ try{
+  const [s,r]=await Promise.all([fetch("systems.json",{cache:"no-store"}),fetch("relationships.json",{cache:"no-store"})]);
+  if(!s.ok||!r.ok)throw new Error("semantic corpus unavailable");
+  seed=await s.json(); const relationships=await r.json();
+  const types=[...new Set(seed.map(x=>x.type))].sort(), typeEl=$("type");
+  typeEl.innerHTML="<option value=''>All types</option>"; types.forEach(t=>typeEl.add(new Option(t,t)));
   function render(){
-    const q=document.getElementById("q").value.toLowerCase();
-    const t=typeEl.value;
-    const rows=seed.filter(x=>(!t||x.type===t)&&(!q||JSON.stringify(x).toLowerCase().includes(q)));
-    document.getElementById("count").textContent=rows.length+" visible records · "+seed.length+" total in corpus";
-    document.getElementById("records").innerHTML=rows.map(x=>"<article class='card record'><div class='id'>"+x.id+" · "+x.type.toUpperCase()+"</div><h3>"+x.name+"</h3><p>"+x.description+"</p><div class='meta'><span>"+x.evidence_level+"</span><span>"+x.confidence+"</span></div></article>").join("")||"<div class='status'>No matching records.</div>";
+   const q=$("q").value.toLowerCase(),t=typeEl.value;
+   const rows=seed.filter(x=>(!t||x.type===t)&&(!q||JSON.stringify(x).toLowerCase().includes(q)));
+   $("count").textContent=rows.length+" visible · "+seed.length+" records · "+relationships.length+" graph edges · 4D HRR";
+   $("records").innerHTML=rows.map(x=>"<article class='card record'><div class='id'>"+x.id+" · DIRECT "+x.direct_number+"</div><h3>"+x.name+"</h3><p>"+x.description+"</p><div class='meta'><span>D1 "+x.direct_number+"</span><span>D2 "+(x.indirect_coordinates||[]).length+" semantic links</span><span>D3 HRR "+(x.hrr?.dimension||0)+"D</span><span>D4 temporal/contextual</span></div></article>").join("")||"<div class='status'>No matching records.</div>";
   }
-  document.getElementById("q").oninput=render;
-  typeEl.onchange=render;
-  render();
+  $("q").oninput=render;typeEl.onchange=render;render();
+ }catch(e){$("count").textContent=e.message;$("records").innerHTML="<div class='status'>"+e.message+"</div>";}
 }
 loadData();
 </script>
