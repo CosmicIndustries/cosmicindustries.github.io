@@ -63,20 +63,33 @@
 
 <footer class="footer"><div class="shell">SYSTOS · Semantic Atlas of Human Systems · Cosmic Industries · Evidence before certainty.</div></footer>
 <script>
-const seed=[
-{id:"SYS-0001",name:"Kinship system",type:"social",era:"Deep history → present",desc:"Systems organizing descent, household membership, inheritance, marriage, obligation, and social identity.",tags:["kinship","community","inheritance"]},
-{id:"SYS-0002",name:"Gift economy",type:"economic",era:"Prehistory → present",desc:"Reciprocal exchange systems in which social obligation, prestige, relationship, or ritual can structure resource movement.",tags:["exchange","reciprocity","resource flow"]},
-{id:"SYS-0003",name:"Customary law",type:"legal",era:"Deep history → present",desc:"Normative systems maintained through community practice, precedent, memory, sanction, and social legitimacy.",tags:["law","norm","enforcement"]},
-{id:"SYS-0004",name:"Bureaucratic administration",type:"governance",era:"Ancient → present",desc:"Administrative systems organized through offices, records, procedures, delegated authority, and specialized roles.",tags:["bureaucracy","records","authority"]},
-{id:"SYS-0005",name:"Guild system",type:"economic/social",era:"Ancient → modern",desc:"Occupational systems regulating craft membership, training, standards, market access, mutual obligations, and sometimes political influence.",tags:["guild","apprenticeship","standards"]},
-{id:"SYS-0006",name:"Commons governance",type:"resource",era:"Ancient → present",desc:"Collective resource-management arrangements using rules for access, stewardship, monitoring, sanction, and distribution.",tags:["commons","resource","stewardship"]},
-{id:"SYS-0007",name:"Patronage network",type:"power",era:"Ancient → present",desc:"Relationship systems exchanging protection, access, office, resources, or status through personal or factional ties.",tags:["patronage","power","network"]},
-{id:"SYS-0008",name:"Corruption mechanism",type:"failure",era:"Ancient → present",desc:"A class of system-internal deviations in which authority, information, resources, or discretion are diverted toward improper private or factional benefit.",tags:["corruption","capture","deviation"]},
-{id:"SYS-0009",name:"Scientific institution",type:"knowledge",era:"Early modern → present",desc:"Organizations and norms for producing, testing, preserving, communicating, and validating knowledge.",tags:["science","evidence","peer review"]},
-{id:"SYS-0010",name:"Supply chain",type:"technical/economic",era:"Ancient → present",desc:"Interdependent production, transport, storage, financing, information, and distribution networks.",tags:["logistics","dependency","flow"]}
-];
-const types=[...new Set(seed.map(x=>x.type))].sort();const typeEl=document.getElementById('type');types.forEach(t=>typeEl.add(new Option(t,t)));
-function render(){const q=document.getElementById('q').value.toLowerCase();const t=typeEl.value;const rows=seed.filter(x=>(!t||x.type===t)&&(!q||JSON.stringify(x).toLowerCase().includes(q)));document.getElementById('count').textContent=rows.length+" visible seed records · schema designed for continuous expansion";document.getElementById('records').innerHTML=rows.map(x=>'<article class="card record"><div class="id">'+x.id+' · '+x.type.toUpperCase()+'</div><h3>'+x.name+'</h3><p>'+x.desc+'</p><div class="meta"><span>'+x.era+'</span><span>'+x.tags.join(' · ')+'</span></div></article>').join('')||'<div class="status">No matching records.</div>'}document.getElementById('q').oninput=render;typeEl.onchange=render;render();
+let seed=[];
+async function loadData(){
+  try{
+    const r=await fetch("systems.json",{cache:"no-store"});
+    if(!r.ok) throw new Error("systems.json "+r.status);
+    seed=await r.json();
+  }catch(e){
+    document.getElementById("count").textContent="Database load error: "+e.message;
+    document.getElementById("records").innerHTML="<div class='status'>The semantic corpus could not be loaded.</div>";
+    return;
+  }
+  const types=[...new Set(seed.map(x=>x.type))].sort();
+  const typeEl=document.getElementById("type");
+  typeEl.innerHTML="<option value=''>All types</option>";
+  types.forEach(t=>typeEl.add(new Option(t,t)));
+  function render(){
+    const q=document.getElementById("q").value.toLowerCase();
+    const t=typeEl.value;
+    const rows=seed.filter(x=>(!t||x.type===t)&&(!q||JSON.stringify(x).toLowerCase().includes(q)));
+    document.getElementById("count").textContent=rows.length+" visible records · "+seed.length+" total in corpus";
+    document.getElementById("records").innerHTML=rows.map(x=>"<article class='card record'><div class='id'>"+x.id+" · "+x.type.toUpperCase()+"</div><h3>"+x.name+"</h3><p>"+x.description+"</p><div class='meta'><span>"+x.evidence_level+"</span><span>"+x.confidence+"</span></div></article>").join("")||"<div class='status'>No matching records.</div>";
+  }
+  document.getElementById("q").oninput=render;
+  typeEl.onchange=render;
+  render();
+}
+loadData();
 </script>
 </body>
 </html>
