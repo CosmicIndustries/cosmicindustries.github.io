@@ -5,7 +5,15 @@
     "to": "SYS-KNW-004",
     "note": "Administrative systems commonly depend on records and archives.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-ECO-006",
@@ -13,7 +21,15 @@
     "to": "SYS-KNW-002",
     "note": "Guilds can institutionalize apprenticeship and occupational knowledge.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-ECO-005",
@@ -21,7 +37,15 @@
     "to": "SYS-RES-001",
     "note": "Commons governance can structure collective forest stewardship.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-GOV-007",
@@ -29,7 +53,15 @@
     "to": "SYS-COR-001",
     "note": "Administrative discretion can create opportunities for bribery.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-GOV-007",
@@ -37,7 +69,15 @@
     "to": "SYS-COR-003",
     "note": "Regulatory institutions can become subject to capture.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-GOV-004",
@@ -45,7 +85,15 @@
     "to": "SYS-GOV-007",
     "note": "Imperial systems can incorporate administrative structures.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-SOC-004",
@@ -53,7 +101,15 @@
     "to": "SYS-COR-002",
     "note": "Patronage networks can overlap with nepotistic allocation.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-TEC-004",
@@ -61,7 +117,15 @@
     "to": "SYS-GOV-007",
     "note": "Large supply chains may depend on administrative and regulatory systems.",
     "confidence": "seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-GOV-114",
@@ -69,7 +133,15 @@
     "to": "SYS-GOV-007",
     "note": "Civil service systems organize specialized administrative roles.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-GOV-112",
@@ -77,7 +149,15 @@
     "to": "SYS-GOV-007",
     "note": "Unitary governance can use bureaucratic administration.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-LAW-116",
@@ -85,7 +165,15 @@
     "to": "SYS-GOV-006",
     "note": "Constitutional law can structure democratic institutions.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-LAW-117",
@@ -93,7 +181,15 @@
     "to": "SYS-LAW-003",
     "note": "Criminal justice operates within broader legal traditions.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-ECO-139",
@@ -101,7 +197,15 @@
     "to": "SYS-TEC-003",
     "note": "Complex credit systems can depend on communication infrastructure.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-ECO-140",
@@ -109,7 +213,15 @@
     "to": "SYS-ECO-003",
     "note": "Banking can support market exchange.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-ECO-141",
@@ -117,7 +229,15 @@
     "to": "SYS-ECO-003",
     "note": "Monetary systems can facilitate market exchange.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-SOC-148",
@@ -125,7 +245,15 @@
     "to": "SYS-SOC-001",
     "note": "Households are a common organizational unit within kinship systems.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-SOC-154",
@@ -133,7 +261,15 @@
     "to": "SYS-SOC-004",
     "note": "Diaspora networks can connect patronage and exchange relationships.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-KNW-161",
@@ -141,7 +277,15 @@
     "to": "SYS-KNW-004",
     "note": "Libraries support preservation and access to recorded knowledge.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-KNW-172",
@@ -149,7 +293,15 @@
     "to": "SYS-KNW-005",
     "note": "Scientific societies can support peer review and scholarly communication.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-KNW-165",
@@ -157,7 +309,15 @@
     "to": "SYS-KNW-003",
     "note": "Credentialing systems can certify educational attainment.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-REL-176",
@@ -165,7 +325,15 @@
     "to": "SYS-REL-182",
     "note": "Specialized religious personnel can support ritual systems.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-REL-177",
@@ -173,7 +341,15 @@
     "to": "SYS-REL-176",
     "note": "Some church structures contain specialized religious offices.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-MIL-187",
@@ -181,7 +357,15 @@
     "to": "SYS-MIL-002",
     "note": "Military logistics supports organized armed forces.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-MIL-188",
@@ -189,7 +373,15 @@
     "to": "SYS-MIL-187",
     "note": "Military intelligence can support logistical and operational decisions.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-TEC-202",
@@ -197,7 +389,15 @@
     "to": "SYS-GOV-007",
     "note": "Large infrastructure systems commonly require administrative coordination.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-HLT-212",
@@ -205,7 +405,15 @@
     "to": "SYS-HLT-002",
     "note": "Sanitation infrastructure can support population health.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-HLT-209",
@@ -213,7 +421,15 @@
     "to": "SYS-HLT-001",
     "note": "Medical licensing regulates participation in professional medical practice.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-RES-217",
@@ -221,7 +437,15 @@
     "to": "SYS-TEC-200",
     "note": "Water-rights systems govern access and allocation of water.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-RES-222",
@@ -229,7 +453,15 @@
     "to": "SYS-ECO-003",
     "note": "Resource extraction interacts with market systems.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-CUL-225",
@@ -237,7 +469,15 @@
     "to": "SYS-KNW-001",
     "note": "Language communities transmit knowledge through shared language.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-CUL-230",
@@ -245,7 +485,15 @@
     "to": "SYS-CUL-229",
     "note": "Media systems distribute cultural and informational content.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-ILC-236",
@@ -253,7 +501,15 @@
     "to": "SYS-ILC-240",
     "note": "Illicit networks can intersect with concealed financial systems.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-COR-242",
@@ -261,7 +517,15 @@
     "to": "SYS-GOV-007",
     "note": "Cronyism can alter administrative allocation and appointments.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-COR-243",
@@ -269,7 +533,15 @@
     "to": "SYS-GOV-007",
     "note": "Embezzlement can divert entrusted administrative resources.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-COR-244",
@@ -277,7 +549,15 @@
     "to": "SYS-LAW-124",
     "note": "Fraud can enter contractual and commercial processes.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-COR-252",
@@ -285,7 +565,15 @@
     "to": "SYS-GOV-113",
     "note": "Electoral manipulation can alter defined components of an electoral process.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   },
   {
     "from": "SYS-COR-247",
@@ -293,6 +581,14 @@
     "to": "SYS-ECO-003",
     "note": "Rent seeking can alter allocation of economic privileges.",
     "confidence": "ontology_seed",
-    "sources": []
+    "sources": [],
+    "weight": 1,
+    "direct": true,
+    "semantic_distance": 1,
+    "temporal_scope": {
+      "start": "",
+      "end": ""
+    },
+    "context": []
   }
 ]
