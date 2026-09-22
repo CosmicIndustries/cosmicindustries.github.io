@@ -62,5 +62,245 @@
     "note": "Large supply chains may depend on administrative and regulatory systems.",
     "confidence": "seed",
     "sources": []
+  },
+  {
+    "from": "SYS-GOV-015",
+    "rel": "depends_on",
+    "to": "SYS-KNW-014",
+    "note": "Electoral systems depend on administrative procedures and records.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-GOV-016",
+    "rel": "organizes",
+    "to": "SYS-GOV-007",
+    "note": "Civil service systems organize specialized administrative roles.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-GOV-017",
+    "rel": "can_overlap",
+    "to": "SYS-GOV-007",
+    "note": "Unitary governance can use bureaucratic administration.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-LAW-006",
+    "rel": "structures",
+    "to": "SYS-GOV-006",
+    "note": "Constitutional law can structure democratic institutions.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-LAW-007",
+    "rel": "interacts_with",
+    "to": "SYS-LAW-003",
+    "note": "Criminal justice operates within broader legal traditions.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-ECO-010",
+    "rel": "depends_on",
+    "to": "SYS-TEC-004",
+    "note": "Complex credit systems can depend on communication and settlement infrastructure.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-ECO-011",
+    "rel": "supports",
+    "to": "SYS-ECO-003",
+    "note": "Banking can support market exchange.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-ECO-012",
+    "rel": "supports",
+    "to": "SYS-ECO-003",
+    "note": "Monetary systems can facilitate market exchange.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-SOC-006",
+    "rel": "contains",
+    "to": "SYS-SOC-001",
+    "note": "Households are a common organizational unit within kinship systems.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-SOC-007",
+    "rel": "connects",
+    "to": "SYS-SOC-004",
+    "note": "Diaspora networks can connect patronage and exchange relationships.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-KNW-006",
+    "rel": "supports",
+    "to": "SYS-KNW-004",
+    "note": "Libraries support archival preservation and access.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-KNW-007",
+    "rel": "produces",
+    "to": "SYS-KNW-005",
+    "note": "Scientific societies can support peer review and scholarly communication.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-KNW-008",
+    "rel": "certifies",
+    "to": "SYS-KNW-003",
+    "note": "Credentialing systems can certify educational attainment.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-REL-003",
+    "rel": "supports",
+    "to": "SYS-REL-004",
+    "note": "Religious communities can support specialized ritual personnel.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-REL-004",
+    "rel": "transmits",
+    "to": "SYS-REL-009",
+    "note": "Religious personnel can transmit ritual knowledge.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-MIL-006",
+    "rel": "supplies",
+    "to": "SYS-MIL-002",
+    "note": "Military logistics supports organized armed forces.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-MIL-005",
+    "rel": "supports",
+    "to": "SYS-MIL-006",
+    "note": "Military intelligence supports logistical and operational decisions.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-TEC-005",
+    "rel": "depends_on",
+    "to": "SYS-GOV-007",
+    "note": "Large infrastructure systems commonly require administrative coordination.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-TEC-006",
+    "rel": "supports",
+    "to": "SYS-HLT-002",
+    "note": "Sanitation infrastructure can support population health.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-HLT-004",
+    "rel": "regulates",
+    "to": "SYS-HLT-001",
+    "note": "Medical licensing regulates participation in professional medical practice.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-RES-002",
+    "rel": "governs",
+    "to": "SYS-RES-003",
+    "note": "Water-rights systems govern access to water resources.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-RES-006",
+    "rel": "interacts_with",
+    "to": "SYS-ECO-003",
+    "note": "Resource extraction interacts with market systems.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-CUL-001",
+    "rel": "transmits",
+    "to": "SYS-KNW-001",
+    "note": "Language communities transmit knowledge through shared language.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-CUL-006",
+    "rel": "distributes",
+    "to": "SYS-CUL-007",
+    "note": "Media systems distribute cultural and informational content.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-ILC-003",
+    "rel": "can_intersect",
+    "to": "SYS-ILC-002",
+    "note": "Trafficking networks can intersect with illicit financial systems.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-COR-107",
+    "rel": "can_affect",
+    "to": "SYS-GOV-007",
+    "note": "Cronyism can alter administrative allocation and appointments.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-COR-108",
+    "rel": "can_affect",
+    "to": "SYS-GOV-007",
+    "note": "Embezzlement can divert administrative resources.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-COR-109",
+    "rel": "can_affect",
+    "to": "SYS-LAW-007",
+    "note": "Fraud can enter legal, commercial, and administrative processes.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-COR-110",
+    "rel": "can_affect",
+    "to": "SYS-GOV-015",
+    "note": "Electoral manipulation can affect electoral system operation.",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "from": "SYS-COR-111",
+    "rel": "can_affect",
+    "to": "SYS-ECO-013",
+    "note": "Rent seeking can alter allocation of economic privileges.",
+    "confidence": "ontology_seed",
+    "sources": []
   }
 ]
