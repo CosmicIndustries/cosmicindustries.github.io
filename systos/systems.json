@@ -466,5 +466,1418 @@
     "evidence_level": "E2",
     "confidence": "seed",
     "sources": []
+  },
+  {
+    "id": "SYS-GOV-100",
+    "name": "Council governance",
+    "type": "governance",
+    "description": "Collective decision system in which authority is exercised through a council, assembly, or deliberative body.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-101",
+    "name": "Assembly governance",
+    "type": "governance",
+    "description": "Governance system centered on collective deliberation, attendance, voting, consensus, or public participation.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-102",
+    "name": "Confederation",
+    "type": "governance",
+    "description": "Association of constituent polities retaining substantial autonomy while coordinating through agreed institutions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-103",
+    "name": "Constitutional monarchy",
+    "type": "governance",
+    "description": "Monarchical system constrained and structured by constitutional rules and representative or administrative institutions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-104",
+    "name": "Absolute monarchy",
+    "type": "governance",
+    "description": "Monarchical system in which sovereign authority is concentrated in a ruler, subject to historically variable institutional constraints.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-105",
+    "name": "Theocratic governance",
+    "type": "governance",
+    "description": "Governance system in which religious authority, law, office, or doctrine substantially structures political rule.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-106",
+    "name": "Military government",
+    "type": "governance",
+    "description": "Governance arrangement in which armed forces or military authorities exercise substantial governmental authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-107",
+    "name": "Colonial administration",
+    "type": "governance",
+    "description": "Administrative system through which an external power governs a dependent territory and its population.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-108",
+    "name": "Occupation administration",
+    "type": "governance",
+    "description": "Temporary or contested governance system imposed by an occupying power over territory under military control.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-109",
+    "name": "Stateless governance",
+    "type": "governance",
+    "description": "Governance arrangements operating without a centralized sovereign state, using customary, communal, kinship, or network institutions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-110",
+    "name": "City council system",
+    "type": "governance",
+    "description": "Municipal governance system organizing local authority through councils, offices, procedures, and delegated administration.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-111",
+    "name": "Federal system",
+    "type": "governance",
+    "description": "Constitutional system distributing public authority between national and constituent territorial governments.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-112",
+    "name": "Unitary state administration",
+    "type": "governance",
+    "description": "Governance system in which ultimate constitutional authority is concentrated at the national level while administration may be decentralized.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-113",
+    "name": "Electoral system",
+    "type": "governance",
+    "description": "Institutional system translating eligible participation into public offices or representative mandates through defined procedures.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-114",
+    "name": "Civil service system",
+    "type": "governance",
+    "description": "Professional administrative system organizing public employment, recruitment, hierarchy, duties, and continuity.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-GOV-115",
+    "name": "Tax administration",
+    "type": "governance",
+    "description": "System for assessing, collecting, recording, enforcing, and allocating public revenue.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-116",
+    "name": "Constitutional law",
+    "type": "law",
+    "description": "Body and institutional system governing the structure, powers, limits, and relationships of public authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-117",
+    "name": "Criminal justice system",
+    "type": "law",
+    "description": "System for defining prohibited conduct and investigating, adjudicating, sanctioning, and supervising responses to it.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-118",
+    "name": "Civil justice system",
+    "type": "law",
+    "description": "System for resolving disputes among persons or organizations through recognized legal procedures and remedies.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-119",
+    "name": "Administrative law",
+    "type": "law",
+    "description": "Rules and institutions governing public administration, delegated authority, procedure, review, and accountability.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-120",
+    "name": "International law",
+    "type": "law",
+    "description": "Normative and institutional system governing relations among states and other recognized international actors.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-121",
+    "name": "Maritime law",
+    "type": "law",
+    "description": "Legal system governing navigation, shipping, vessels, maritime commerce, and related jurisdiction.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-122",
+    "name": "Military law",
+    "type": "law",
+    "description": "Specialized legal system regulating armed forces, service obligations, discipline, offenses, and command.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-123",
+    "name": "Property law system",
+    "type": "law",
+    "description": "Rules and institutions defining rights, duties, transfer, possession, use, and control of resources and things.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-124",
+    "name": "Contract system",
+    "type": "law",
+    "description": "Rules and institutions governing voluntary agreements, obligations, performance, breach, and remedies.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-125",
+    "name": "Inheritance system",
+    "type": "law",
+    "description": "Rules and practices determining transfer of property, status, duties, or offices after death.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-126",
+    "name": "Restitution system",
+    "type": "law",
+    "description": "Legal or customary mechanism seeking restoration of improperly taken resources or compensation for loss.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-127",
+    "name": "Arbitration system",
+    "type": "law",
+    "description": "Dispute-resolution system in which parties submit conflicts to designated decision-makers outside ordinary court proceedings.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-LAW-128",
+    "name": "Mediation system",
+    "type": "law",
+    "description": "Dispute-resolution system using a neutral intermediary to facilitate negotiated settlement without imposing a binding judgment.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-129",
+    "name": "Barter economy",
+    "type": "economy",
+    "description": "Exchange arrangement in which goods or services are directly traded without requiring money as the primary medium.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-130",
+    "name": "Reciprocity system",
+    "type": "economy",
+    "description": "Resource-exchange system organized around expected return, mutual obligation, relationship, or repeated interaction.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-131",
+    "name": "Redistributive economy",
+    "type": "economy",
+    "description": "Economic system in which resources are collected by a central or coordinating authority and subsequently allocated.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-132",
+    "name": "Subsistence economy",
+    "type": "economy",
+    "description": "Economic system primarily organized around direct production or acquisition of resources for household or community consumption.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-133",
+    "name": "Taxation system",
+    "type": "economy",
+    "description": "Public-revenue system that transfers resources from persons or entities to governing authorities under defined rules.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-134",
+    "name": "Feudal economy",
+    "type": "economy",
+    "description": "Historically variable agrarian arrangements combining landholding, labor obligations, rents, protection, and layered rights.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-135",
+    "name": "Mercantilist system",
+    "type": "economy",
+    "description": "Early-modern policy system emphasizing state-directed commerce, strategic trade, accumulation, and regulation.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-136",
+    "name": "Capitalist economy",
+    "type": "economy",
+    "description": "Economic system characterized by substantial private ownership, market exchange, wage labor, and capital accumulation.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-137",
+    "name": "Socialist economy",
+    "type": "economy",
+    "description": "Family of economic arrangements emphasizing social or collective ownership and deliberate coordination of production and distribution.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-138",
+    "name": "Cooperative economy",
+    "type": "economy",
+    "description": "Economic system in which member-owned organizations jointly own, govern, and operate productive or service enterprises.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-139",
+    "name": "Credit system",
+    "type": "economy",
+    "description": "Institutional system for extending, recording, pricing, securing, and settling obligations over time.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-140",
+    "name": "Banking system",
+    "type": "economy",
+    "description": "Financial system organizing deposits, lending, payments, liquidity, risk, and related institutions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-141",
+    "name": "Monetary system",
+    "type": "economy",
+    "description": "System defining money, issuance, denomination, circulation, settlement, and institutional monetary authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-142",
+    "name": "Insurance system",
+    "type": "economy",
+    "description": "Risk-pooling system transferring defined financial risks among participants through contracts, reserves, and claims processes.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-143",
+    "name": "Labor market system",
+    "type": "economy",
+    "description": "Institutional and social system coordinating the exchange of labor time and skills for compensation and related rights.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-144",
+    "name": "Tax-farming system",
+    "type": "economy",
+    "description": "Revenue-collection arrangement in which private or delegated collectors obtain fiscal revenue under contractual or administrative authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-145",
+    "name": "Slave-labor economy",
+    "type": "economy",
+    "description": "Economic system in which coerced unfree labor is systematically incorporated into production, extraction, or service.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-146",
+    "name": "Informal economy",
+    "type": "economy",
+    "description": "Economic activity occurring partly outside formal registration, taxation, labor regulation, or institutional accounting.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ECO-147",
+    "name": "Rentier system",
+    "type": "economy",
+    "description": "Economic arrangement in which significant income derives from control of scarce assets, resources, rights, or financial claims.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-148",
+    "name": "Household system",
+    "type": "social",
+    "description": "Social and economic unit organizing residence, reproduction, care, consumption, labor, and resource sharing.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-149",
+    "name": "Lineage system",
+    "type": "social",
+    "description": "Descent-based system organizing identity, inheritance, obligation, membership, and social continuity.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-150",
+    "name": "Moiety system",
+    "type": "social",
+    "description": "Social organization dividing a community into complementary descent or affiliation groups with defined relationships.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-151",
+    "name": "Age-grade system",
+    "type": "social",
+    "description": "Social system grouping people by age cohorts with differentiated duties, status, education, or ritual roles.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-152",
+    "name": "Estate system",
+    "type": "social",
+    "description": "Stratification system organizing society into legally or customarily distinct ranked estates with differentiated rights and duties.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-153",
+    "name": "Class system",
+    "type": "social",
+    "description": "Social stratification system in which socioeconomic position is associated with resources, occupation, power, and life chances.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-154",
+    "name": "Diaspora network",
+    "type": "social",
+    "description": "Translocal social system connecting dispersed populations through identity, kinship, exchange, communication, and institutions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-155",
+    "name": "Intentional community",
+    "type": "social",
+    "description": "Community deliberately formed around shared values, practices, governance arrangements, or resource commitments.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-156",
+    "name": "Fraternal organization",
+    "type": "social",
+    "description": "Voluntary association organized around membership, mutual support, ritual, identity, or shared institutional purposes.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-157",
+    "name": "Secret society",
+    "type": "social",
+    "description": "Restricted-membership association using controlled knowledge, initiation, secrecy, or concealed organization.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-158",
+    "name": "Mutual insurance society",
+    "type": "social",
+    "description": "Member-based institution pooling risks and contributions to provide benefits to participants.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-SOC-159",
+    "name": "Volunteer association",
+    "type": "social",
+    "description": "Voluntary organization coordinating members around shared service, civic, cultural, recreational, or charitable purposes.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-160",
+    "name": "Scriptorium system",
+    "type": "knowledge",
+    "description": "Manuscript-production system organizing copying, preservation, annotation, and transmission of written knowledge.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-161",
+    "name": "Library system",
+    "type": "knowledge",
+    "description": "Institutional system for acquiring, organizing, preserving, describing, and providing access to recorded knowledge.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-162",
+    "name": "Academy system",
+    "type": "knowledge",
+    "description": "Institutional system for advanced learning, scholarly association, research, patronage, and knowledge exchange.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-163",
+    "name": "School system",
+    "type": "knowledge",
+    "description": "Organized educational system structuring instruction, curriculum, teachers, learners, assessment, and credentials.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-164",
+    "name": "Apprentice guild school",
+    "type": "knowledge",
+    "description": "Occupational education system combining supervised practice, standards, membership, and staged competence.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-165",
+    "name": "Credentialing system",
+    "type": "knowledge",
+    "description": "Institutional mechanism for certifying demonstrated education, skill, authority, or professional standing.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-166",
+    "name": "Standards system",
+    "type": "knowledge",
+    "description": "System for defining, documenting, testing, and maintaining shared technical or procedural specifications.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-167",
+    "name": "Classification system",
+    "type": "knowledge",
+    "description": "Knowledge system that organizes entities or observations into categories according to explicit or implicit criteria.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-168",
+    "name": "Censorship system",
+    "type": "knowledge",
+    "description": "Institutional mechanism restricting, removing, labeling, or controlling access to information or expression.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-169",
+    "name": "Propaganda system",
+    "type": "knowledge",
+    "description": "Coordinated communication system designed to shape public beliefs, attitudes, identities, or behavior.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-170",
+    "name": "Intelligence system",
+    "type": "knowledge",
+    "description": "Organizational system for collecting, evaluating, protecting, analyzing, and disseminating information for decision-making.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-171",
+    "name": "Patent system",
+    "type": "knowledge",
+    "description": "Legal and administrative system granting defined exclusive rights in exchange for disclosure of qualifying inventions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-172",
+    "name": "Scientific society",
+    "type": "knowledge",
+    "description": "Scholarly association supporting research communication, standards, meetings, publication, and professional community.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-KNW-173",
+    "name": "Museum system",
+    "type": "knowledge",
+    "description": "Institutional system for collecting, preserving, interpreting, documenting, and exhibiting material or cultural objects.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-174",
+    "name": "Shrine system",
+    "type": "religious",
+    "description": "Religious system organized around a sacred place, object, person, event, pilgrimage, offering, or devotional practice.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-175",
+    "name": "Pilgrimage network",
+    "type": "religious",
+    "description": "Translocal religious system connecting sacred destinations, routes, hospitality, ritual, exchange, and community.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-176",
+    "name": "Priesthood system",
+    "type": "religious",
+    "description": "Specialized religious role system organizing ritual authority, training, succession, duties, and institutional status.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-177",
+    "name": "Church system",
+    "type": "religious",
+    "description": "Religious institutional system organizing congregations, clergy, doctrine, ritual, property, education, and governance.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-178",
+    "name": "Mosque-centered community system",
+    "type": "religious",
+    "description": "Religious community system organized around communal worship, education, charity, social ties, and local institutions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-179",
+    "name": "Synagogue-centered community system",
+    "type": "religious",
+    "description": "Religious community system organizing worship, learning, communal governance, charity, and shared identity.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-180",
+    "name": "Missionary system",
+    "type": "religious",
+    "description": "Institutional network for transmitting religious teachings across geographic or cultural boundaries.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-181",
+    "name": "Tithing system",
+    "type": "religious",
+    "description": "Resource-transfer system in which members or adherents contribute defined shares or offerings to religious purposes.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-182",
+    "name": "Ritual system",
+    "type": "religious",
+    "description": "Structured set of repeated symbolic actions, roles, objects, spaces, timings, and meanings.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-REL-183",
+    "name": "Initiation system",
+    "type": "religious",
+    "description": "Ritual and social mechanism marking transition into a religious community, role, status, or stage of life.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-184",
+    "name": "Militia system",
+    "type": "military",
+    "description": "Armed organization drawing personnel from a civilian population under defined local, political, or communal obligations.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-185",
+    "name": "Conscription system",
+    "type": "military",
+    "description": "Recruitment system requiring eligible persons to perform defined periods of military service.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-186",
+    "name": "Naval system",
+    "type": "military",
+    "description": "Military maritime system integrating vessels, bases, personnel, logistics, command, intelligence, and doctrine.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-187",
+    "name": "Military logistics system",
+    "type": "military",
+    "description": "System for supplying personnel and equipment with food, fuel, ammunition, transport, maintenance, and information.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-188",
+    "name": "Military intelligence system",
+    "type": "military",
+    "description": "Information system supporting military decisions through collection, analysis, dissemination, and protection.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-189",
+    "name": "Resistance network",
+    "type": "military",
+    "description": "Decentralized or organized system through which actors oppose an occupying, coercive, or dominant authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-190",
+    "name": "Insurgency system",
+    "type": "military",
+    "description": "Conflict system in which organized non-state actors use political, social, and military methods against an established authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-191",
+    "name": "Occupation system",
+    "type": "military",
+    "description": "Military-political system governing territory and population under foreign or external armed control.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-192",
+    "name": "Mercenary company",
+    "type": "military",
+    "description": "Contract-based military organization supplying armed personnel or capabilities to paying clients.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-MIL-193",
+    "name": "Fortress system",
+    "type": "military",
+    "description": "Defensive system centered on fortified positions, garrisons, logistics, surveillance, and controlled access.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-194",
+    "name": "Writing system",
+    "type": "technical",
+    "description": "Symbolic technology for encoding, storing, transmitting, and retrieving language or other structured information.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-195",
+    "name": "Numeral system",
+    "type": "technical",
+    "description": "Representational system for expressing quantities, arithmetic operations, and numerical relationships.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-196",
+    "name": "Calendar system",
+    "type": "technical",
+    "description": "Timekeeping system defining recurring units, cycles, dates, seasons, and synchronization conventions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-197",
+    "name": "Measurement system",
+    "type": "technical",
+    "description": "Standards and practices for representing physical quantities using defined units, instruments, and procedures.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-198",
+    "name": "Irrigation canal network",
+    "type": "technical",
+    "description": "Engineered water-distribution network connecting sources, channels, controls, fields, maintenance, and allocation rules.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-199",
+    "name": "Sewerage system",
+    "type": "technical",
+    "description": "Infrastructure and institutional system for collecting, transporting, treating, and disposing of wastewater.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-200",
+    "name": "Water-supply system",
+    "type": "technical",
+    "description": "Infrastructure system for sourcing, treating, storing, distributing, and governing potable or usable water.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-201",
+    "name": "Electrical grid",
+    "type": "technical",
+    "description": "Interconnected system for generating, transmitting, distributing, balancing, and regulating electrical power.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-202",
+    "name": "Railway system",
+    "type": "technical",
+    "description": "Transport infrastructure system linking tracks, stations, vehicles, signaling, scheduling, maintenance, and operations.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-203",
+    "name": "Port system",
+    "type": "technical",
+    "description": "Maritime infrastructure and institutional system organizing vessels, cargo, navigation, customs, labor, and logistics.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-204",
+    "name": "Postal system",
+    "type": "technical",
+    "description": "Communication and logistics system for collecting, sorting, transporting, and delivering physical messages and parcels.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-205",
+    "name": "Internet",
+    "type": "technical",
+    "description": "Global interoperable network system based on packet-switched communication, addressing, routing, protocols, and autonomous networks.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-206",
+    "name": "Domain-name system",
+    "type": "technical",
+    "description": "Hierarchical naming system translating human-readable domain names into network-addressing and service records.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-207",
+    "name": "Computer operating system",
+    "type": "technical",
+    "description": "Software system managing hardware resources, processes, files, devices, security, and application interfaces.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-TEC-208",
+    "name": "Blockchain system",
+    "type": "technical",
+    "description": "Distributed ledger architecture coordinating replicated state, transaction ordering, validation, and programmable or rule-bound ownership records.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-209",
+    "name": "Medical licensing system",
+    "type": "health",
+    "description": "Regulatory system defining qualifications, authorization, scope of practice, discipline, and professional accountability in medicine.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-210",
+    "name": "Medical education system",
+    "type": "health",
+    "description": "Educational system preparing practitioners through instruction, supervised practice, assessment, and credentialing.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-211",
+    "name": "Quarantine system",
+    "type": "health",
+    "description": "Public-health control system restricting movement or contact to reduce transmission of specified hazards.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-212",
+    "name": "Sanitation system",
+    "type": "health",
+    "description": "Population-level infrastructure and practices for managing human waste, contamination, hygiene, and environmental health.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-213",
+    "name": "Pharmaceutical system",
+    "type": "health",
+    "description": "System connecting drug discovery, development, manufacturing, regulation, distribution, prescribing, and use.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-214",
+    "name": "Health insurance system",
+    "type": "health",
+    "description": "Financial and institutional system pooling health risks and paying or reimbursing defined health services.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-215",
+    "name": "Emergency medical system",
+    "type": "health",
+    "description": "Rapid-response health system coordinating dispatch, prehospital care, transport, emergency facilities, and handoff.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-HLT-216",
+    "name": "Traditional healing system",
+    "type": "health",
+    "description": "Culturally embedded system of healing knowledge, practitioners, materials, rituals, diagnosis, and care practices.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-217",
+    "name": "Water-rights system",
+    "type": "resource",
+    "description": "Rules and institutions governing access, allocation, use, transfer, priority, and conflict over water.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-218",
+    "name": "Pastoral system",
+    "type": "resource",
+    "description": "Livelihood and resource-management system organized around mobile or semi-mobile livestock production and grazing.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-219",
+    "name": "Fisheries management system",
+    "type": "resource",
+    "description": "Resource-governance system regulating access, harvest, seasons, gear, monitoring, and conservation in fisheries.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-220",
+    "name": "Hunting-territory system",
+    "type": "resource",
+    "description": "Resource-access system defining hunting areas, rights, seasons, obligations, and stewardship practices.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-221",
+    "name": "Land-tenure system",
+    "type": "resource",
+    "description": "Institutional arrangement defining rights and obligations concerning land possession, use, inheritance, transfer, and access.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-222",
+    "name": "Mining system",
+    "type": "resource",
+    "description": "Extraction system connecting geological resources, property rights, labor, technology, finance, transport, regulation, and environmental effects.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-223",
+    "name": "Waste-management system",
+    "type": "resource",
+    "description": "System for collection, transport, processing, disposal, reuse, recycling, and governance of discarded materials.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-RES-224",
+    "name": "Conservation system",
+    "type": "resource",
+    "description": "Institutional and ecological management system aimed at maintaining specified species, habitats, resources, or ecosystem functions.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-225",
+    "name": "Language community",
+    "type": "cultural",
+    "description": "Social system organized around shared language practices, transmission, identity, norms, and communication.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-226",
+    "name": "Oral performance system",
+    "type": "cultural",
+    "description": "Cultural transmission system using performed narrative, song, poetry, recitation, memory, and audience interaction.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-227",
+    "name": "Theater system",
+    "type": "cultural",
+    "description": "Institutional and social system organizing performance, venues, performers, production, audiences, financing, and repertoire.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-228",
+    "name": "Music institution",
+    "type": "cultural",
+    "description": "System organizing musical production, training, performance, preservation, patronage, and transmission.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-229",
+    "name": "Publishing system",
+    "type": "cultural",
+    "description": "Production and distribution system for transforming authored material into reproducible public or private publications.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-230",
+    "name": "Media system",
+    "type": "cultural",
+    "description": "Communication system connecting content production, distribution, audiences, financing, technology, and regulation.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-231",
+    "name": "Sports organization system",
+    "type": "cultural",
+    "description": "Institutional system organizing competition, rules, clubs, leagues, officials, training, venues, and audiences.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-232",
+    "name": "Craft tradition",
+    "type": "cultural",
+    "description": "Knowledge and production system transmitting skilled making practices, standards, materials, tools, and cultural meanings.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-CUL-233",
+    "name": "Festival calendar system",
+    "type": "cultural",
+    "description": "Cultural scheduling system organizing recurring communal events, ritual timing, performance, exchange, and collective identity.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-234",
+    "name": "Piracy network",
+    "type": "illicit",
+    "description": "Illicit maritime system involving unauthorized seizure, transport, exchange, concealment, and organization at sea.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-235",
+    "name": "Protection racket",
+    "type": "illicit",
+    "description": "Coercive illicit system extracting recurring payments in exchange for claimed protection or non-interference.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-236",
+    "name": "Trafficking network",
+    "type": "illicit",
+    "description": "Criminal network organizing prohibited movement or exploitation of persons or controlled goods through intermediaries.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-237",
+    "name": "Counterfeit economy",
+    "type": "illicit",
+    "description": "Illicit production and exchange system based on unauthorized imitation of goods, currency, documents, or marks.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-238",
+    "name": "Prison economy",
+    "type": "illicit",
+    "description": "Resource-exchange system emerging within or around incarceration, involving formal restrictions and informal markets or obligations.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-239",
+    "name": "Tax-evasion network",
+    "type": "illicit",
+    "description": "Coordinated system for concealing taxable activity, assets, income, or transactions from authorities.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-ILC-240",
+    "name": "Clandestine finance network",
+    "type": "illicit",
+    "description": "Concealed financial system used to move, store, obscure, or transfer funds outside ordinary oversight.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-241",
+    "name": "Nepotism",
+    "type": "failure",
+    "description": "Preferential allocation of office, contracts, resources, or opportunity based substantially on kinship rather than stated criteria.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-242",
+    "name": "Cronyism",
+    "type": "failure",
+    "description": "Preferential allocation of public or organizational benefits through personal, political, or factional relationships.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-243",
+    "name": "Embezzlement",
+    "type": "failure",
+    "description": "Unauthorized appropriation or diversion of entrusted resources by a person or organization controlling them.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-244",
+    "name": "Fraud mechanism",
+    "type": "failure",
+    "description": "Deceptive system behavior that induces another party to transfer resources, rights, or authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-245",
+    "name": "Extortion mechanism",
+    "type": "failure",
+    "description": "Coercive extraction of value through threats, force, exposure, or threatened harm.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-246",
+    "name": "Conflict-of-interest mechanism",
+    "type": "failure",
+    "description": "Decision-making condition in which private interests overlap with entrusted duties and may distort impartial exercise of authority.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-247",
+    "name": "Rent seeking",
+    "type": "failure",
+    "description": "Resource-allocation behavior aimed at obtaining income through control, privilege, or political restriction rather than productive exchange.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-248",
+    "name": "Clientelism",
+    "type": "failure",
+    "description": "Political exchange system linking targeted benefits or access to support, loyalty, or reciprocal political obligations.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-249",
+    "name": "Procurement fraud",
+    "type": "failure",
+    "description": "Manipulation or deception in purchasing processes to redirect contracts, prices, specifications, or payments.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-250",
+    "name": "Resource diversion",
+    "type": "failure",
+    "description": "Mechanism through which resources intended for one system purpose are redirected to another actor or purpose.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-251",
+    "name": "Judicial corruption",
+    "type": "failure",
+    "description": "Improper influence, inducement, coercion, or diversion affecting adjudication or judicial administration.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-252",
+    "name": "Electoral manipulation",
+    "type": "failure",
+    "description": "Improper interference with electoral administration, access, counting, campaigning, or other components of a defined electoral process.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-253",
+    "name": "Abuse of office",
+    "type": "failure",
+    "description": "Use of entrusted authority outside authorized purposes to obtain improper benefit or impose improper harm.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-254",
+    "name": "Coercive extraction",
+    "type": "failure",
+    "description": "Systematic acquisition of labor, resources, or compliance through force, threat, or domination.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-255",
+    "name": "Information distortion",
+    "type": "failure",
+    "description": "Systematic alteration, selective presentation, or fabrication of information affecting decision-making or accountability.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
+  },
+  {
+    "id": "SYS-COR-256",
+    "name": "Institutional self-dealing",
+    "type": "failure",
+    "description": "Use of institutional authority or resources to benefit the institution's controlling actors beyond authorized purposes.",
+    "evidence_level": "E1",
+    "confidence": "ontology_seed",
+    "sources": []
   }
 ]
