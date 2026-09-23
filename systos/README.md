@@ -53,3 +53,23 @@ The boundaries are semantic projections, not walls.
 ## Status
 
 v0.1 — ontology and web interface established; seed dataset is intentionally small and designed for continuous expansion.
+
+## Governance + learning comparative framework
+
+SYSTOS now applies a structured datasheet model to governance arrangements and learning systems.
+
+Each comparative record can preserve:
+- what the system is
+- strengths
+- limits / failure modes
+- modern use
+- evidence / interpretation
+- primary reference
+
+Governance records additionally model actors, rules, resources, flows, authority, incentives, accountability, feedback, failure modes, reforms, and temporal variants.
+
+Learning records additionally model methods, roles, resources, outcomes, contexts, failure modes, and adaptations.
+
+The framework explicitly avoids treating a named governance form or learning method as proof of a universally preferred outcome. Comparative claims remain contextual and evidence-linked.
+
+Machine-readable framework: `governance-learning.json`
