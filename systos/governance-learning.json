@@ -1,1 +1,69 @@
-PASTE
+{
+  "id": "SYSTOS-FRAMEWORK-GOV-LEARN-001",
+  "title": "Governance and Learning Systems Datasheet",
+  "version": "1.0.0",
+  "source_file": "governance_and_learning_systems_datasheet.xlsx",
+  "purpose": "Comparative framework for representing governance arrangements and learning systems as SYSTOS system objects. A named form is not treated as proof of a desired outcome.",
+  "governance_systems": [
+    "Constitutional democracy / republic",
+    "Federal / multilevel governance",
+    "Polycentric governance",
+    "Deliberative democracy",
+    "Confederal governance",
+    "Evidence-informed governance",
+    "Indigenous / customary governance traditions"
+  ],
+  "learning_systems": [
+    "Apprenticeship / situated learning",
+    "Socratic / inquiry-based learning",
+    "Project-based learning",
+    "Retrieval practice",
+    "Spaced practice",
+    "Interdisciplinary learning",
+    "Open / networked learning"
+  ],
+  "datasheet_fields": [
+    "System",
+    "What it is",
+    "Strengths",
+    "Limits / failure modes",
+    "Modern use",
+    "Evidence / interpretation",
+    "Primary reference"
+  ],
+  "comparison_dimensions": [
+    {
+      "dimension": "Primary question",
+      "governance": "Who decides, by what rules, with what accountability and feedback?",
+      "learning": "How does a person or group acquire, retain, apply, and revise knowledge or skill?"
+    },
+    {
+      "dimension": "Core evidence",
+      "governance": "Institutional performance, accountability, service delivery, participation, rights, conflict resolution, policy outcomes.",
+      "learning": "Retention, transfer, performance, engagement, skill acquisition, delayed recall, quality of application."
+    },
+    {
+      "dimension": "Do not assume",
+      "governance": "A named constitutional form automatically produces good governance.",
+      "learning": "A popular teaching method automatically produces durable learning."
+    },
+    {
+      "dimension": "Best practice",
+      "governance": "Compare mechanisms and outcomes in context; separate formal rules from actual practice.",
+      "learning": "Combine methods; match method to task, learner, time horizon, and desired outcome."
+    }
+  ],
+  "systos_integration": {
+    "governance": "Represent each governance arrangement as a system with actors, rules, resources, flows, failure modes, reforms, and temporal variants.",
+    "learning": "Represent each learning system as an institution/practice with methods, roles, resources, outcomes, evidence, and contexts.",
+    "shared_fields": [
+      "strengths",
+      "limits_or_failure_modes",
+      "modern_use",
+      "evidence_interpretation",
+      "primary_reference"
+    ],
+    "epistemic_rule": "Separate descriptive mechanism, observed outcome, evidence, interpretation, and normative judgment.",
+    "relationship_rule": "Governance and learning systems may connect to other SYSTOS records through first-class relationships carrying provenance, confidence, temporal scope, context, and evidence."
+  }
+}
