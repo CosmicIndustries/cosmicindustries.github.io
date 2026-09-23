@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "SYSTOS 4D Semantic HRR Database",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Four-dimensional semantic database architecture using direct numerical identity, indirect numerical semantic coordinates, HRR vector representations, and temporal/contextual state.",
   "dimensions": {
     "D1_direct": "Stable numerical identity and explicit ontology position.",
@@ -18,7 +18,10 @@
     "Claims, counterclaims, evidence, and uncertainty remain distinct.",
     "Corruption, failure, abuse, resistance, and reform are first-class system phenomena.",
     "Historical systems may have multiple simultaneous geographic or institutional variants.",
-    "Semantic proximity must never be treated as proof of historical causation."
+    "Semantic proximity must never be treated as proof of historical causation.",
+    "Comparative datasheets may describe strengths, limits, modern use, and evidence interpretation without converting them into an overall ranking.",
+    "Governance records distinguish formal rules from actual practice and institutional outcomes.",
+    "Learning records distinguish method description from evidence about retention, transfer, performance, and context."
   ],
   "record": {
     "id": "string",
@@ -70,7 +73,36 @@
     "confidence": "string",
     "sources": [
       "string"
-    ]
+    ],
+    "evaluation": {
+      "strengths": "array<string>",
+      "limits_or_failure_modes": "array<string>",
+      "modern_use": "array<string>",
+      "evidence_interpretation": "string",
+      "primary_reference": "string"
+    },
+    "governance": {
+      "actors": "array<string>",
+      "rules": "array<string>",
+      "resources": "array<string>",
+      "flows": "array<string>",
+      "authority": "array<string>",
+      "incentives": "array<string>",
+      "accountability": "array<string>",
+      "feedback": "array<string>",
+      "failure_modes": "array<string>",
+      "reforms": "array<string>",
+      "temporal_variants": "array<string>"
+    },
+    "learning": {
+      "methods": "array<string>",
+      "roles": "array<string>",
+      "resources": "array<string>",
+      "outcomes": "array<string>",
+      "contexts": "array<string>",
+      "failure_modes": "array<string>",
+      "adaptations": "array<string>"
+    }
   },
   "relationship": {
     "from": "string",
