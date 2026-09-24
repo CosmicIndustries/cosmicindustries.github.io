@@ -1,5 +1,5 @@
 {
-  "harvested_at": "2026-09-23T11:50:01Z",
+  "harvested_at": "2026-09-24T11:57:56Z",
   "records_seen": 6100,
   "records_written": 6100,
   "duplicates_removed": 0,
@@ -7,7 +7,7 @@
     {
       "source": "usgs-sciencebase-data-releases",
       "error": "<HTTPError 500: 'Internal Server Error'>",
-      "time": "2026-09-23T11:49:59Z"
+      "time": "2026-09-24T11:57:55Z"
     }
   ],
   "sources": [
