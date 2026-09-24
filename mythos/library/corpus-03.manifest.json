@@ -1,0 +1,10 @@
+{
+  "id":"MYTHOS-CORPUS-03",
+  "date":"2026-09-24",
+  "status":"published",
+  "packs":["corpus-pack-03a.js","corpus-pack-03b.js","corpus-pack-03c.js"],
+  "transcripts":["transcripts/DENISOVAN-SW-CHINA-2026.md","transcripts/MELSONBY-HOARDS-2026.md"],
+  "focus":["deep time","underrepresented archaeology","environmental archives","ancient disease","experimental archaeology","methodological audits","associative correlations"],
+  "provenance_rule":"Primary evidence and strong scholarly sources outrank interpretation; associative similarity never constitutes proof.",
+  "record_separation":"Human-readable transcripts remain distinct from machine/HRR representations."
+}
