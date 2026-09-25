@@ -1,0 +1,15 @@
+{
+  "date": "2026-09-25",
+  "new_records": 10,
+  "new_edges": 12,
+  "harvest_index": 6100,
+  "usgs_status": "HTTP 500 on latest completed harvest; source not treated as empty",
+  "language_promotions": 0,
+  "next_frontier": [
+    "endangered field notebooks",
+    "museum imaging and specimen records",
+    "legacy observatory archives",
+    "historical environmental measurements",
+    "original language recordings and manuscripts"
+  ]
+}
