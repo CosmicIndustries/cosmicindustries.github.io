@@ -73,6 +73,7 @@ footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);fon
 </section>
 
 <section id="correlated"><div class="head"><div><div class="eyebrow">06 / CORRELATED DATA</div><h2>Cross-domain evidence map</h2></div><p>MATERIA does not stop at the species name. These bridges expose lineage, occurrences, traits, images, plant/fungal uses, chemistry and natural-product records at the appropriate taxonomic level.</p></div>
+<div id="lineageBox" class="panel" style="margin-bottom:12px"><div class="loading">Resolving cross-taxonomic lineage…</div></div>
 <div id="correlatedGrid" class="cards"></div>
 <div class="rule" style="margin-top:12px"><b>Correlation rule:</b> a relationship is navigable because a source provides a join key, name, identifier or taxonomic placement. Navigation is not treated as proof of causation, efficacy, safety or shared specimen identity.</div>
 </section>
@@ -178,7 +179,23 @@ morph.innerHTML='<h3>Documented morphology</h3>'+p.morphology.map(x=>'<div class
 dev.innerHTML='<h3>Development / architecture</h3>'+p.development.map(x=>'<div class="card" style="margin:6px 0"><p>'+esc(x)+'</p></div>').join("");
 uses.innerHTML=p.uses.map(x=>'<article class="card"><span class="tag">'+esc(x.layer)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.text)+'</p></article>').join("");
 }
-renderExpanded();function renderCorrelated(){
+renderExpanded();async function loadCrossTaxonomy(){
+ const box=document.getElementById("lineageBox");
+ try{
+   const d=await getJSON("https://api.gbif.org/v1/species/match?name="+encodeURIComponent(target)+"&verbose=true");
+   const chain=d.classification||[];
+   const order=["domain","kingdom","phylum","class","order","family","genus","species"];
+   const rows=order.map(rank=>{
+     const hit=chain.find(x=>String(x.rank||"").toLowerCase()===rank);
+     return hit?'<b>'+esc(rank.toUpperCase())+'</b><span>'+esc(hit.name||"—")+(hit.key?' · '+esc(hit.key):"")+'</span>':"";
+   }).filter(Boolean).join("");
+   const count=await getJSON("https://api.gbif.org/v1/occurrence/search?scientificName="+encodeURIComponent(target)+"&limit=0");
+   box.innerHTML='<div class="head" style="margin-bottom:12px"><div><div class="eyebrow">LIVE TAXONOMIC GRAPH</div><h3 style="margin:6px 0">Lineage + occurrence pivot</h3></div><p style="margin:0">The lineage is resolved from the GBIF taxonomic service; occurrence count is a live indexed-record count, not a population estimate.</p></div><div class="kv">'+rows+'<b>OCCURRENCES</b><span>'+esc(count.count??"—")+' indexed records</span></div>';
+ }catch(e){
+   box.innerHTML='<div class="rule"><b>Cross-taxonomy service unavailable.</b> MATERIA keeps the external bridge visible and does not fabricate lineage or occurrence values.</div>';
+ }
+}
+async function renderCorrelated(){
  const box=document.getElementById("correlatedGrid");
  const q=encodeURIComponent(target);
  const cards=[
@@ -198,6 +215,7 @@ renderExpanded();function renderCorrelated(){
  box.innerHTML=cards.map(x=>'<article class="card"><span class="tag">'+esc(x[0])+'</span><h3>'+esc(x[1])+'</h3><p>'+esc(x[2])+'</p><a class="source" href="'+x[3]+'" target="_blank" rel="noopener">OPEN DATA BRIDGE ↗</a></article>').join("");
 }
 renderCorrelated();
+loadCrossTaxonomy();
 function renderCoverage(){
 const grid=document.getElementById("coverageGrid"),ledger=document.getElementById("sourceLedger"),p=profiles[target];
 const names=["Taxonomy","Phyllotaxis","Morphology","Development","Phenology","Environment","Tissue","Preparation","Chemistry","Bioactivity","Toxicology","Ethnobotany","Authenticity"];
