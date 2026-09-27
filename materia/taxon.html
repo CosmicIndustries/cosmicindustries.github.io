@@ -279,7 +279,7 @@ sources:[
 ["Traditional-use review","https://agris.fao.org/search/en/providers/126183/records/68cd8312f61e5b80b5e94ff5"],
 ["Wild grape ethnobotany","https://rjb.revistas.csic.es/index.php/rjb/article/view/517"],
 ["Phenology genetics","https://pubmed.ncbi.nlm.nih.gov/18419811/"]
-]}};const target=name||"Unknown taxon";
+]}};let target=name||"Unknown taxon";
 renderMorphologySources();
 document.getElementById("title").innerHTML=esc(target).replace(/^(.+)$/,"<em>$1</em>");
 document.getElementById("subtitle").textContent=id?"Taxon identifier "+id+" · assembling live and local evidence.":"Name-based record · resolving the current taxonomic identity before attaching downstream evidence.";
@@ -380,10 +380,17 @@ async function loadTaxonImage(){
    cap.textContent="No source-attributed image was resolved. The taxon record remains usable without inventing an image.";
  }
 }
-async function getJSON(url){
- const r=await fetch(url,{headers:{"Accept":"application/json"}});
- if(!r.ok)throw new Error("HTTP "+r.status);
- return await r.json();
+async function getJSON(url,timeoutMs=8000){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),timeoutMs);
+ try{
+  const r=await fetch(url,{headers:{"Accept":"application/json"},signal:controller.signal,cache:"no-store"});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  return await r.json();
+ }catch(e){
+  if(e?.name==="AbortError")throw new Error("TIMEOUT after "+timeoutMs+" ms");
+  throw e;
+ }finally{clearTimeout(timer);}
 }
 function flatten(x){if(!x)return{};if(x.result&&typeof x.result==="object")return x.result;if(x.data&&typeof x.data==="object"&&!Array.isArray(x.data))return x.data;return x}
 async function loadCOL(){
@@ -391,12 +398,17 @@ async function loadCOL(){
  try{
    let d=null;
    if(id)d=await getJSON("https://api.checklistbank.org/dataset/3LR/taxon/"+encodeURIComponent(id)+"/info");
-   if(!d)d=await getJSON("https://api.checklistbank.org/dataset/3LR/nameusage/search?q="+encodeURIComponent(target)+"&limit=1");
-   const x=flatten(d);const hit=Array.isArray(x)?x[0]:(x.results&&x.results[0])||(x.content&&x.content[0])||x;
-   const n=hit?.scientificName||hit?.name||target;const rank=hit?.rank||hit?.taxonomicRank||"—";const key=hit?.id||hit?.nameUsageKey||id||"—";
+   if(!d)d=await getJSON("https://api.checklistbank.org/dataset/3LR/match/nameusage?q="+encodeURIComponent(target));
+   const x=flatten(d);
+   const hit=x?.match||x?.usage||x?.results?.[0]||x?.content?.[0]||(Array.isArray(x)?x[0]:x);
+   const n=hit?.scientificName||hit?.name||hit?.label||hit?.canonicalName||target;
+   const rank=hit?.rank||hit?.taxonomicRank||"—";
+   const key=hit?.id||hit?.nameUsageKey||hit?.key||id||"—";
+   target=n;
    document.getElementById("title").innerHTML=esc(n);
    document.getElementById("subtitle").textContent="Catalogue of Life identity resolved · downstream layers remain separately evidenced.";
    document.getElementById("identityBox").innerHTML='<div class="kv"><b>Scientific name</b><div class="value">'+esc(n)+'</div><b>Rank</b><div>'+esc(rank)+'</div><b>Identifier</b><div class="value">'+esc(key)+'</div><b>Source</b><div><span class="state live">CATALOGUE OF LIFE / CHECKLISTBANK</span></div><b>Interpretation</b><div style="color:var(--muted)">This is a taxonomic pivot. It does not automatically prove that every chemistry, phenotype or ethnobotany record belongs to the same biological material.</div></div>';
+   localRender();renderExpanded();renderCoverage();renderCorrelated();loadCrossTaxonomy();loadTaxonImage();renderMorphologySources();
  }catch(e){
    box.innerHTML='<div class="kv"><b>Requested name</b><div>'+esc(target)+'</div><b>Identifier</b><div>'+esc(id||"—")+'</div><b>Live source</b><div><span class="state missing">UNAVAILABLE IN BROWSER</span></div></div><div class="rule" style="margin-top:12px">The MATERIA page remains usable. No taxonomic field is fabricated when the live source cannot be reached.</div>';
  }
