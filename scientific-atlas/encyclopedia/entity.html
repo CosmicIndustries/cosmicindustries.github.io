@@ -25,8 +25,9 @@ svg{width:100%;height:100%;display:block}.node{fill:#10182a;stroke:var(--accent)
 <main class="shell"><div id="app">Loading article…</div></main>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const id=new URLSearchParams(location.search).get('id');
+const params=new URLSearchParams(location.search);const id=params.get('id');const isData=params.get('type')==='data';
 const load=async u=>{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw Error(r.status);const t=await r.text();return t.split(/\r?\n/).filter(Boolean).map(line=>JSON.parse(line))};
+const csvToRows=text=>{const out=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&q&&n==='"'){cell+='"';i++;continue}if(c==='"'){q=!q;continue}if(c===','&&!q){row.push(cell);cell='';continue}if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cell);cell='';if(row.length>1||row[0])out.push(row);row=[];continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}const head=out.shift()||[];return out.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])))};
 const val=(o,k)=>o&&o[k]!=null?o[k]:'';
 const domainGlyph=d=>({biodiversity:'◈',fungi:'◉','language':'文','atmospheric science':'≋','cryosphere':'❄','space physics':'✦','earth observation':'◎','materials science':'◇','hydrology/remote sensing':'≈','digital humanities':'⌘','public health surveillance':'+', 'energy systems':'∿','science of science':'Σ','medical imaging':'▦','public health history':'◷','ecology':'∴','gravitational-wave astronomy':'∿'}[d]||'◆');
 function timelineFor(e){
@@ -43,8 +44,8 @@ function svgGraph(e,entities,links){
  const lines=shown.map((n,i)=>{const a=i/Math.max(shown.length,1)*Math.PI*2-Math.PI/2,x=cx+Math.cos(a)*rad*2.15,y=cy+Math.sin(a)*rad*1.05;const edge=links.find(q=>(q.source===e.id&&q.target===n.id)||(q.target===e.id&&q.source===n.id));return '<line class="edge" x1="'+cx+'" y1="'+cy+'" x2="'+x+'" y2="'+y+'"/><text class="edgeText" text-anchor="middle" x="'+(cx+(x-cx)*.55)+'" y="'+(cy+(y-cy)*.55)+'">'+esc(edge?.relation_type||'related')+'</text><a href="entity.html?id='+encodeURIComponent(n.id)+'"><circle class="node" cx="'+x+'" cy="'+y+'" r="38"/><text class="nodeText" text-anchor="middle" x="'+x+'" y="'+(y+3)+'">'+esc(String(n.title||n.id).slice(0,25))+'</text></a>';}).join('');
  return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Evidence relationship map"><defs><filter id="glow"><feGaussianBlur stdDeviation="3"/></filter></defs><circle cx="'+cx+'" cy="'+cy+'" r="65" fill="#10182a" stroke="#8bd3ff" stroke-width="2" filter="url(#glow)"/><text class="nodeText" text-anchor="middle" x="'+cx+'" y="'+(cy+4)+'">'+esc(String(e.title||e.id).slice(0,32))+'</text>'+lines+'</svg>';
 }
-Promise.all([load('./entities.jsonl?v=20260927e'),load('../knowledge/relationships.jsonl?v=20260927e')]).then(([entities,edges])=>{
- const e=entities.find(x=>x.id===id)||entities[0];if(!e)throw Error('No entity');
+Promise.all([load('./entities.jsonl?v=20260927e'),load('../knowledge/relationships.jsonl?v=20260927e'),load('../catalog/harvested.jsonl?v=20260927e').catch(()=>[]),load('../daily/2026-09-27.jsonl?v=20260927e').catch(()=>[]),fetch('../scientific-atlas-seed.csv?v=20260927e').then(r=>r.ok?r.text():Promise.resolve('')).then(t=>t?csvToRows(t):[])]).then(([entities,edges,harvested,daily,seed])=>{
+ const catalog=[...harvested,...daily,...seed];const e=(isData?catalog.find(x=>(x.id||x.canonical_identifier||x.title)===id):entities.find(x=>x.id===id))||entities.find(x=>x.id===id)||catalog.find(x=>(x.id||x.canonical_identifier||x.title)===id)||entities[0];if(!e)throw Error('No entity');
  const links=edges.filter(x=>x.source===e.id||x.target===e.id);
  const related=[...new Set(links.flatMap(x=>[x.source,x.target]).filter(x=>x!==e.id))].map(rid=>entities.find(x=>x.id===rid)).filter(Boolean);
  const tl=timelineFor(e);
