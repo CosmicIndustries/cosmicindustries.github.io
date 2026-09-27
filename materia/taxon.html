@@ -8,18 +8,46 @@
 :root{--bg:#07100f;--panel:#0c1715;--panel2:#101e1b;--line:#28443d;--text:#e8eee9;--muted:#9cafaa;--accent:#8ed7b5;--gold:#d8b36a;--red:#d98f7d;--blue:#8fb7df}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 75% 0,#17382e 0,#07100f 42%);color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1240px;margin:auto;padding:0 24px}a{color:inherit;text-decoration:none}
 header{position:sticky;top:0;z-index:20;background:#07100fee;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.nav{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:12px;align-items:center}.sigil{font-size:25px;color:var(--accent)}.brand b{letter-spacing:.18em}.brand small{display:block;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em}nav{display:flex;gap:18px;color:var(--muted);font-size:13px}nav a:hover{color:var(--accent)}
-.hero{padding:65px 0 38px}.eyebrow,.mono,.tag{font:11px ui-monospace,monospace;letter-spacing:.13em;color:var(--accent)}h1{font-size:clamp(40px,7vw,76px);line-height:.94;letter-spacing:-.05em;margin:12px 0 8px}h1 em{font-style:normal;color:var(--accent)}.subtitle{color:var(--muted);max-width:850px;font-size:17px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.btn{border:1px solid var(--line);background:#091512;color:var(--accent);padding:9px 12px;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}section{padding:42px 0;border-top:1px solid var(--line)}.head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:20px}.head h2{font-size:32px;line-height:1;margin:8px 0}.head p{max-width:570px;color:var(--muted)}.panel{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);padding:20px}.span4{grid-column:span 4}.span5{grid-column:span 5}.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}.kv{display:grid;grid-template-columns:170px 1fr;gap:5px 14px}.kv b{color:var(--muted);font-weight:500}.value{overflow-wrap:anywhere}.state{display:inline-block;border:1px solid var(--line);padding:3px 7px;font:10px ui-monospace,monospace}.live{color:var(--accent);border-color:#376c59}.missing{color:var(--gold)}.err{color:var(--red)}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.card{border:1px solid var(--line);background:#0a1513;padding:17px}.card h3{margin:5px 0}.card p{color:var(--muted);font-size:13px}.evidence{display:inline-block;border:1px solid var(--line);padding:3px 7px;margin:2px;font:10px ui-monospace,monospace;color:var(--muted)}.rule{border-left:3px solid var(--gold);background:#0c1815;padding:14px;color:var(--muted)}table{width:100%;border-collapse:collapse}td,th{border-top:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{font:10px ui-monospace,monospace;color:var(--accent);letter-spacing:.1em}.source{color:var(--accent);text-decoration:underline}.sourcegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.sourcebox{border:1px solid var(--line);padding:15px;background:#0a1513}.sourcebox p{color:var(--muted);font-size:12px}.loading{padding:20px;color:var(--muted);border:1px dashed var(--line)}.metricgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.metric{border:1px solid var(--line);padding:13px;background:#0a1513}.metric strong{display:block;font-size:22px}.metric small{color:var(--muted);font:10px ui-monospace,monospace}.status{font:10px ui-monospace,monospace;letter-spacing:.08em}.status.live{color:var(--accent)}.status.gap{color:var(--gold)}.sourcequote{border-left:2px solid var(--accent);padding-left:14px;color:var(--muted);font-size:13px}footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em;display:flex;justify-content:space-between}
+.hero{padding:65px 0 38px}.eyebrow,.mono,.tag{font:11px ui-monospace,monospace;letter-spacing:.13em;color:var(--accent)}h1{font-size:clamp(40px,7vw,76px);line-height:.94;letter-spacing:-.05em;margin:12px 0 8px}h1 em{font-style:normal;color:var(--accent)}.subtitle{color:var(--muted);max-width:850px;font-size:17px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.btn{border:1px solid var(--line);background:#091512;color:var(--accent);padding:9px 12px;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}section{padding:42px 0;border-top:1px solid var(--line)}.head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:20px}.head h2{font-size:32px;line-height:1;margin:8px 0}.head p{max-width:570px;color:var(--muted)}.panel{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);padding:20px}.span4{grid-column:span 4}.span5{grid-column:span 5}.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}.kv{display:grid;grid-template-columns:170px 1fr;gap:5px 14px}.kv b{color:var(--muted);font-weight:500}.value{overflow-wrap:anywhere}.state{display:inline-block;border:1px solid var(--line);padding:3px 7px;font:10px ui-monospace,monospace}.live{color:var(--accent);border-color:#376c59}.missing{color:var(--gold)}.err{color:var(--red)}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.card{border:1px solid var(--line);background:#0a1513;padding:17px}.card h3{margin:5px 0}.card p{color:var(--muted);font-size:13px}.evidence{display:inline-block;border:1px solid var(--line);padding:3px 7px;margin:2px;font:10px ui-monospace,monospace;color:var(--muted)}.rule{border-left:3px solid var(--gold);background:#0c1815;padding:14px;color:var(--muted)}table{width:100%;border-collapse:collapse}td,th{border-top:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{font:10px ui-monospace,monospace;color:var(--accent);letter-spacing:.1em}.source{color:var(--accent);text-decoration:underline}.sourcegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.sourcebox{border:1px solid var(--line);padding:15px;background:#0a1513}.sourcebox p{color:var(--muted);font-size:12px}.loading{padding:20px;color:var(--muted);border:1px dashed var(--line)}.metricgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.metric{border:1px solid var(--line);padding:13px;background:#0a1513}.metric strong{display:block;font-size:22px}.metric small{color:var(--muted);font:10px ui-monospace,monospace}.status{font:10px ui-monospace,monospace;letter-spacing:.08em}.status.live{color:var(--accent)}.status.gap{color:var(--gold)}.sourcequote{border-left:2px solid var(--accent);padding-left:14px;color:var(--muted);font-size:13px}
+.heroGrid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:22px;align-items:stretch}
+.specimen{margin:0;border:1px solid var(--line);background:#091512;min-height:360px;position:relative;overflow:hidden}
+.specimen img{width:100%;height:100%;min-height:360px;object-fit:cover;display:block}
+.specimen figcaption{position:absolute;left:0;right:0;bottom:0;padding:11px 13px;background:linear-gradient(transparent,#07100fe8);font-size:11px;color:#d7e2dc}
+.specimen figcaption a{color:var(--accent);text-decoration:underline}
+.imageMeta{position:absolute;top:10px;right:10px;background:#07100fd9;border:1px solid var(--line);padding:5px 8px;font:10px ui-monospace,monospace;color:var(--muted)}
+.bridge{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.bridge a{display:block;border:1px solid var(--line);background:#091512;padding:10px;color:var(--muted)}
+.bridge a:hover{border-color:var(--accent);color:var(--accent)}
+.bridge b{display:block;color:var(--text);font-size:12px;margin-bottom:3px}
+@media(max-width:900px){.heroGrid{grid-template-columns:1fr}.specimen,.specimen img{min-height:300px}.bridge{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.bridge{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em;display:flex;justify-content:space-between}
 @media(max-width:900px){.span4,.span5,.span7,.span8{grid-column:span 12}.cards,.sourcegrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){nav{display:none}.cards,.sourcegrid{grid-template-columns:1fr}.wrap{padding:0 16px}.kv{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>TAXON DETAIL / v0.8.0</small></span></a><nav><a href="#identity">Identity</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#morphology">Morphology</a><a href="#uses">Uses</a><a href="#coverage">Coverage</a><a href="#chemistry">Chemistry</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav></div></header>
+<header><div class="wrap nav"><a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>TAXON DETAIL / v0.9.0</small></span></a><nav><a href="#identity">Identity</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#morphology">Morphology</a><a href="#uses">Uses</a><a href="#coverage">Coverage</a><a href="#chemistry">Chemistry</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav></div></header>
 <main class="wrap">
 <section class="hero">
+<div class="heroGrid">
+<div>
 <div class="eyebrow">TAXON / COMPLETE RECORD VIEW</div>
 <h1 id="title">Loading <em>taxon…</em></h1>
 <div id="subtitle" class="subtitle">Resolving the taxon identity and assembling every available MATERIA neighborhood.</div>
-<div class="actions"><a class="btn" href="./">← Back to Explorer</a><a id="colLink" class="btn" target="_blank" rel="noopener">Catalogue of Life ↗</a><a id="lotusLink" class="btn" target="_blank" rel="noopener">LOTUS search ↗</a></div>
+<div class="actions"><a class="btn" href="./">← Back to Explorer</a><a id="colLink" class="btn" target="_blank" rel="noopener">Catalogue of Life ↗</a><a id="lotusLink" class="btn" target="_blank" rel="noopener">LOTUS search ↗</a><a id="commonsLink" class="btn" target="_blank" rel="noopener">Image source ↗</a></div>
+</div>
+<figure class="specimen">
+<img id="taxonImage" alt="" loading="eager">
+<div id="imageMeta" class="imageMeta">IMAGE / RESOLVING</div>
+<figcaption id="imageCaption">Finding a source-attributed taxon image…</figcaption>
+</figure>
+</div>
+<div class="bridge" id="sourceBridges">
+<a id="bridgeCol" target="_blank" rel="noopener"><b>Taxonomy</b>Catalogue of Life</a>
+<a id="bridgeLotus" target="_blank" rel="noopener"><b>Chemistry</b>LOTUS natural products</a>
+<a href="https://www.try-db.org/" target="_blank" rel="noopener"><b>Traits</b>TRY trait reservoir</a>
+<a href="https://www.npatlas.org/" target="_blank" rel="noopener"><b>Natural products</b>Natural Products Atlas</a>
+</div>
 </section>
 
 <section id="identity"><div class="head"><div><div class="eyebrow">01 / IDENTITY</div><h2>Taxonomic identity</h2></div><p>The taxonomic source is kept separate from downstream observations. A name match is not treated as proof that every linked observation refers to the same specimen.</p></div>
@@ -121,6 +149,7 @@ document.getElementById("subtitle").textContent=id?"Taxon identifier "+id+" · a
 const colBase="https://www.catalogueoflife.org/";
 const colSource=id?"https://www.checklistbank.org/dataset/3LR/taxon/"+encodeURIComponent(id):colBase;
 document.getElementById("colLink").href=colSource;document.getElementById("sCol").href=colSource;
+document.getElementById("bridgeCol").href=colSource;document.getElementById("bridgeLotus").href="https://lotus.naturalproducts.net/search/simple/"+encodeURIComponent(target);
 document.getElementById("lotusLink").href="https://lotus.naturalproducts.net/search/simple/"+encodeURIComponent(target);
 document.getElementById("sLotus").href="https://lotus.naturalproducts.net/search/simple/"+encodeURIComponent(target);
 
@@ -154,6 +183,29 @@ ledger.innerHTML=p?p.sources.map(x=>'<article class="card"><span class="tag">SOU
 renderCoverage();
 
 
+async function loadTaxonImage(){
+ const img=document.getElementById("taxonImage"), meta=document.getElementById("imageMeta"), cap=document.getElementById("imageCaption"), link=document.getElementById("commonsLink");
+ const commons="https://commons.wikimedia.org/";
+ link.href="https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&search="+encodeURIComponent(target);
+ try{
+   const api="https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(target)+"&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=1200&format=json&origin=*";
+   const d=await getJSON(api);
+   const pages=Object.values(d.query?.pages||{});
+   const usable=pages.find(p=>p.imageinfo?.[0]?.thumburl||p.imageinfo?.[0]?.url);
+   if(!usable)throw new Error("No Wikimedia Commons image matched");
+   const info=usable.imageinfo[0];
+   const url=info.thumburl||info.url;
+   img.src=url; img.alt=target+" — taxon image";
+   const title=(usable.title||"").replace(/^File:/,"");
+   const author=info.extmetadata?.Artist?.value?.replace(/<[^>]+>/g,"")||"Wikimedia Commons contributor";
+   meta.textContent="IMAGE / COMMONS";
+   cap.innerHTML=esc(title)+" · "+esc(author)+" · <a href=\""+esc("https://commons.wikimedia.org/wiki/"+encodeURIComponent(usable.title))+"\" target=\"_blank\" rel=\"noopener\">source ↗</a>";
+ }catch(e){
+   img.style.display="none";
+   meta.textContent="IMAGE / NO MATCH";
+   cap.textContent="No source-attributed image was resolved. The taxon record remains usable without inventing an image.";
+ }
+}
 async function getJSON(url){
  const r=await fetch(url,{headers:{"Accept":"application/json"}});
  if(!r.ok)throw new Error("HTTP "+r.status);
@@ -183,6 +235,6 @@ async function loadLOTUS(){
    box.innerHTML=arr.slice(0,24).map(x=>{const n=x.name||x.molecule_name||x.moleculeName||"Natural product";const lid=x.lotus_id||x.lotusId||x.id||"";const formula=x.molecular_formula||x.formula||"—";const mw=x.molecular_weight||x.mass||"—";return '<article class="card"><span class="tag">LIVE · LOTUS</span><h3>'+esc(n)+'</h3><div class="kv"><b>LOTUS ID</b><span>'+esc(lid)+'</span><b>Formula</b><span>'+esc(formula)+'</span><b>Mass</b><span>'+esc(mw)+'</span></div><p><a class="source" href="https://lotus.naturalproducts.net/search/simple/'+encodeURIComponent(n)+'" target="_blank" rel="noopener">Open LOTUS record/search ↗</a></p></article>'}).join("")||'<div class="panel"><h3>No LOTUS hits returned</h3><p style="color:var(--muted)">No hit is not treated as absence. The current LOTUS public search returned zero records for this query.</p></div>';
  }catch(e){box.innerHTML='<div class="panel"><h3>LOTUS unavailable</h3><p style="color:var(--muted)">'+esc(e.message)+'</p><span class="state missing">EXTERNAL SOURCE NOT REACHED</span></div>'}
 }
-loadCOL();loadLOTUS();
+loadCOL();loadLOTUS();loadTaxonImage();
 </script>
 </body></html>
