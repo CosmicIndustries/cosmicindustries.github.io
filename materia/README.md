@@ -181,3 +181,34 @@ The morphology layer is designed to absorb high-value plant-phenotyping resource
 - taxonomic authentication studies
 
 These are external evidence sources, not claims that every trait or dataset has already been ingested locally.
+
+
+## v0.6.0 — Full Atlas Dump
+
+The visible MATERIA interface now exposes the complete layered model rather than only a morphology demonstration. The atlas covers taxonomy, morphology, phyllotaxis, development, phenology, environment, tissue, preparation, chemistry, bioactivity, toxicology, ethnobotany, and authenticity.
+
+### Source snapshot
+
+- Catalogue of Life Extended Release: 2026-08-26 XR; 8,096,804 names and 2,487,367 species. (Catalogue of Life, 2026)
+- TRY Plant Trait Database: version 7 released 2026-09-04; 22,860,407 trait records and 306,701 plant taxa reported by TRY.
+- Natural Products Atlas: v2024_09, distributed through Zenodo; the release includes JSON, SDF, TSV, XLSX and network exports.
+- LOTUS: February 2021 public download with SDF, MongoDB and SMILES representations and API access.
+
+Large source datasets remain external reservoirs. MATERIA stores provenance, release identity, mappings and derived relationships rather than silently copying an entire external corpus into a static GitHub Pages payload.
+
+### Core semantics
+
+1. Observation and interpretation are separate objects.
+2. Association does not establish causation.
+3. Prediction does not become experimental evidence.
+4. Traditional use documents human practice; it is not automatically clinical proof.
+5. Morphological resemblance does not replace authentication.
+6. Missing data is not equivalent to zero.
+7. Every transformation retains its source and mapping provenance.
+8. Source-specific licensing remains attached to imported material.
+
+### Visible interface
+
+https://cosmicindustries.github.io/materia/
+
+The page includes the biological context graph, phyllotaxis visualization, evidence ladder, searchable records, source registry, full domain dump, data contract, corpus snapshot, ingestion engine, coverage matrix, harvest queue, and research rules.
