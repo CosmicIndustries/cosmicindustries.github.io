@@ -1,96 +1,62 @@
 {
-  "schema_version": "0.5.0",
+  "schema_version": "0.6.0",
   "project": "MATERIA — Open Ethnobotanical Research Atlas",
   "architecture": "API-backed global corpus + provenance-preserving local evidence graph",
   "generated_at": "2026-09-27",
   "canonical_taxonomy": {
     "provider": "Catalogue of Life / ChecklistBank",
-    "release": "COL26.9",
-    "dataset_key": 316321,
-    "issued": "2026-09-11",
-    "totals": {
-      "taxa": 2709610,
-      "synonyms": 2722834,
-      "usages": 5432444,
-      "references": 1627636,
-      "vernacular_names": 190001,
-      "distributions": 2231249
-    },
-    "query_api": "https://api.checklistbank.org/dataset/3LR",
+    "release": "2026-08-26 XR",
+    "checklistbank_key": 316165,
+    "access": "open API + downloadable releases",
     "scope": ["Plantae", "Fungi"],
-    "notes": "MATERIA uses the live 3LR endpoint for browsing/search and keeps release metadata for reproducibility."
+    "notes": "MATERIA keeps release metadata for reproducibility and does not silently treat the Catalogue of Life as complete."
   },
-  "natural_products": [
-    {
-      "provider": "Natural Products Atlas",
-      "version": "2024_09",
-      "access": "download + REST API",
-      "url": "https://www.npatlas.org/download",
-      "license": "CC BY-NC 4.0"
-    },
-    {
-      "provider": "LOTUS",
-      "version": "February 2021 public download",
-      "access": "SDF/MongoDB/SMILES + API",
-      "url": "https://lotus.naturalproducts.net/download",
-      "license": "open data / CC-BY-SA data portal"
-    }
+  "domains": [
+    "taxonomy","morphology","phyllotaxis","development","phenology","environment",
+    "tissue","preparation","chemistry","bioactivity","toxicology","ethnobotany","authenticity"
   ],
-  "planned_chemistry": ["NP Atlas", "LOTUS", "COCONUT", "PubChem cross-references"],
-  "morphology_and_phenotype": {
-    "status": "schema-integrated",
-    "domains": [
-      "phyllotaxis",
-      "leaf_morphology",
-      "stem_and_internode_geometry",
-      "branching_architecture",
-      "inflorescence_architecture",
-      "root_architecture",
-      "development",
-      "phenology",
-      "harvest_state",
-      "environment",
-      "cultivation_treatment",
-      "temporal_phenotype",
-      "diagnostic_characters"
-    ],
-    "external_resources": [
-      "TRY Plant Trait Database",
-      "Sugar4D plant phenotyping",
-      "phyllotaxis/developmental genetics datasets",
-      "genome-to-phenotype resources"
-    ]
+  "natural_products": [
+    {"provider":"Natural Products Atlas","version":"2024_09","role":"microbial natural products, structures, biosources, ontology and networks","license":"CC BY-NC 4.0"},
+    {"provider":"LOTUS","version":"February 2021 public download","role":"natural-product structures and organism relationships","access":"SDF/MongoDB/SMILES + API"}
+  ],
+  "phenotype": {
+    "TRY_version": "7",
+    "released": "2026-09-04",
+    "reported_trait_records": 22860407,
+    "reported_plant_taxa": 306701,
+    "domains": ["functional traits","morphology","anatomy","physiology","phenology","environmental context"]
   },
   "evidence_model": {
-    "L0": "primary scientific evidence",
-    "L1": "peer-reviewed reviews and systematic syntheses",
-    "L2": "ethnobotany, ethnomycology, ethnobiology and historical-use evidence",
-    "L3": "human clinical observations, case reports and pharmacovigilance",
-    "L4": "community phenomenology and first-hand community observations",
-    "L5": "anecdotal or weakly sourced reports",
-    "prediction": "computational, inferred or model-derived relationship; never silently promoted to experimental evidence"
+    "L0":"primary scientific evidence",
+    "L1":"peer-reviewed reviews and systematic syntheses",
+    "L2":"ethnobotany, ethnomycology, ethnobiology and historical-use evidence",
+    "L3":"clinical observations, case reports and pharmacovigilance",
+    "L4":"community phenomenology and first-hand observations",
+    "L5":"anecdotal or weakly sourced reports",
+    "prediction":"computational, inferred or model-derived relationship; never silently promoted to experimental evidence"
   },
-  "evidence_sources": [
-    "PubMed",
-    "NCCIH",
-    "LiverTox",
-    "systematic reviews",
-    "primary chemistry",
-    "case reports",
-    "pharmacovigilance",
-    "ethnobotanical field studies",
-    "taxonomic resources"
-  ],
-  "local_seed_db": "ethnogenic.db.json",
-  "live_frontend": "ethnogenic.html",
+  "observation_contract": {
+    "required_context":["entity","trait_or_claim","value","unit_or_state","method","source","retrieval_or_observation_time"],
+    "null_states":["unknown","not_measured","not_applicable","withheld","disputed"],
+    "rule":"missing is not zero; association is not causation; prediction is not experiment"
+  },
+  "ingestion_pipeline":["harvest","source-lock","normalize","validate","link","expose"],
   "data_policy": {
-    "taxonomy": "Include accepted taxa and preserve synonym relationships.",
-    "chemistry": "Only attach a compound to an organism/material when a source explicitly supports the relationship.",
-    "morphology": "Preserve measured traits, measurement context, developmental state and provenance; do not infer pharmacological meaning from morphology alone.",
-    "preparation": "Preserve tissue, extraction, processing, formulation and other preparation variables.",
-    "evidence": "Traditional use, community phenomenology, clinical evidence and primary experimental evidence remain separate provenance layers.",
-    "safety": "Interactions, adverse events, toxicity, adulteration and uncertainty are first-class relationships.",
-    "authenticity": "Preserve labeled identity separately from authenticated identity when substitution or misidentification is possible.",
-    "completeness": "Global taxonomy is browsable through the live provider rather than copied into a single GitHub Pages JSON payload."
-  }
+    "taxonomy":"Preserve accepted concepts, synonyms, source datasets and taxonomic scrutiny.",
+    "morphology":"Preserve measured traits, measurement context and developmental state.",
+    "preparation":"Preserve tissue, process, solvent, ratio, duration and formulation.",
+    "chemistry":"Keep compound identity attached to the source material and preparation context.",
+    "evidence":"Never collapse distinct evidence classes into one confidence score.",
+    "safety":"Keep toxicity, adverse events, interactions and uncertainty first-class.",
+    "authenticity":"Keep labeled, morphological, voucher, genetic and chemical authentication distinct.",
+    "licensing":"Retain source-specific license and access constraints with every imported dataset."
+  },
+  "external_resources": [
+    "Catalogue of Life / ChecklistBank",
+    "TRY Plant Trait Database v7",
+    "Natural Products Atlas 2024_09",
+    "LOTUS",
+    "phyllotaxis and developmental literature",
+    "4D plant phenotyping datasets"
+  ]
 }
