@@ -26,7 +26,7 @@ footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);fon
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>TAXON DETAIL / v0.9.0</small></span></a><nav><a href="#identity">Identity</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#morphology">Morphology</a><a href="#uses">Uses</a><a href="#coverage">Coverage</a><a href="#chemistry">Chemistry</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav></div></header>
+<header><div class="wrap nav"><a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>TAXON DETAIL / v1.0.0</small></span></a><nav><a href="#identity">Identity</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#morphology">Morphology</a><a href="#uses">Uses</a><a href="#coverage">Coverage</a><a href="#chemistry">Chemistry</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav></div></header>
 <main class="wrap">
 <section class="hero">
 <div class="heroGrid">
@@ -70,6 +70,11 @@ footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);fon
 <section id="coverage"><div class="head"><div><div class="eyebrow">05 / DATA COMPLETENESS</div><h2>The whole organism graph</h2></div><p>Every major MATERIA layer is visible here. A green state means data is actually linked; amber means the field is known to be part of the model but has not yet been joined for this taxon.</p></div>
 <div class="metricgrid" id="coverageGrid"></div>
 <div class="panel" style="margin-top:12px"><h3>Research-source ledger</h3><div id="sourceLedger" class="cards"></div></div>
+</section>
+
+<section id="correlated"><div class="head"><div><div class="eyebrow">06 / CORRELATED DATA</div><h2>Cross-domain evidence map</h2></div><p>MATERIA does not stop at the species name. These bridges expose lineage, occurrences, traits, images, plant/fungal uses, chemistry and natural-product records at the appropriate taxonomic level.</p></div>
+<div id="correlatedGrid" class="cards"></div>
+<div class="rule" style="margin-top:12px"><b>Correlation rule:</b> a relationship is navigable because a source provides a join key, name, identifier or taxonomic placement. Navigation is not treated as proof of causation, efficacy, safety or shared specimen identity.</div>
 </section>
 
 <section id="local"><div class="head"><div><div class="eyebrow">02 / MATERIA NEIGHBORHOOD</div><h2>Local evidence already indexed</h2></div><p>These are records currently encoded directly in MATERIA. They remain distinct from external reservoirs and retain their original evidence layer.</p></div>
@@ -173,7 +178,27 @@ morph.innerHTML='<h3>Documented morphology</h3>'+p.morphology.map(x=>'<div class
 dev.innerHTML='<h3>Development / architecture</h3>'+p.development.map(x=>'<div class="card" style="margin:6px 0"><p>'+esc(x)+'</p></div>').join("");
 uses.innerHTML=p.uses.map(x=>'<article class="card"><span class="tag">'+esc(x.layer)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.text)+'</p></article>').join("");
 }
-renderExpanded();function renderCoverage(){
+renderExpanded();function renderCorrelated(){
+ const box=document.getElementById("correlatedGrid");
+ const q=encodeURIComponent(target);
+ const cards=[
+  ["TAXONOMY","Catalogue of Life / ChecklistBank","Names, accepted concepts, classification, synonyms and related name usages.","https://www.checklistbank.org/dataset/3LR/nameusage/search?q="+q],
+  ["LINEAGE","GBIF species graph","Parents, children, synonyms, references, media and species-profile endpoints are available from the GBIF taxonomic graph.","https://api.gbif.org/v1/species/match?name="+q],
+  ["OCCURRENCES","GBIF occurrence network","Specimen and observation records can be queried by taxon, including geography, dates, basis of record and associated metadata.","https://www.gbif.org/occurrence/search?scientific_name="+q],
+  ["TRAITS","TRY Plant Trait Database","Plant functional, morphological, anatomical, physiological and phenological traits from the TRY reservoir.","https://www.try-db.org/TryWeb/Home.php"],
+  ["PLANT / FUNGAL USES","Kew Plants for Health","Traditional medicine, pharmaceuticals, food, cosmetics, toxicity, trade and vernacular-name information spanning plants and fungi.","https://www.kew.org/science/our-science/projects/plants-for-health"],
+  ["MEDICINAL NAMES","Kew MPNS","Accepted names, synonyms, pharmaceutical/herbal names, plant parts, trade forms and medicinal references.","https://mpns.science.kew.org/"],
+  ["PLANT TAXONOMY + IMAGES","Kew POWO","Global plant names, descriptions, distributions and images where the target is a plant.","https://powo.science.kew.org/?q="+q],
+  ["FUNGAL TAXONOMY","MycoBank","Fungal nomenclature, descriptions, illustrations, identification resources and onward links to specimens and sequence resources.","https://www.mycobank.org/"],
+  ["NATURAL PRODUCTS","LOTUS","Natural-product structures, molecular identifiers, descriptors and taxonomic producer relationships.","https://lotus.naturalproducts.net/search/simple/"+q],
+  ["FUNGAL / MICROBIAL CHEMISTRY","Natural Products Atlas","Open coverage of bacterial and fungal natural products with compound structures, origins, bioactivities and chemical-space exploration.","https://www.npatlas.org/search/basic"],
+  ["NATURAL-PRODUCT USE CONTEXT","Kew Plant Use Informatics","Structured use knowledge for plants and fungi, including health, nutrition, products, trade, regulation and traditional use.","https://www.kew.org/science/our-science/departments/digital-revolution/plant-use-informatics"],
+  ["CHEMICAL STRUCTURE SEARCH","LOTUS advanced search","Search natural products by molecular formula, mass, structure, InChI, InChIKey and other descriptors.","https://lotus.naturalproducts.net/search/advanced"]
+ ];
+ box.innerHTML=cards.map(x=>'<article class="card"><span class="tag">'+esc(x[0])+'</span><h3>'+esc(x[1])+'</h3><p>'+esc(x[2])+'</p><a class="source" href="'+x[3]+'" target="_blank" rel="noopener">OPEN DATA BRIDGE ↗</a></article>').join("");
+}
+renderCorrelated();
+function renderCoverage(){
 const grid=document.getElementById("coverageGrid"),ledger=document.getElementById("sourceLedger"),p=profiles[target];
 const names=["Taxonomy","Phyllotaxis","Morphology","Development","Phenology","Environment","Tissue","Preparation","Chemistry","Bioactivity","Toxicology","Ethnobotany","Authenticity"];
 const live=["Taxonomy",...(p?["Phyllotaxis","Morphology","Development","Phenology","Environment","Tissue","Preparation","Chemistry","Ethnobotany"]:[])];
