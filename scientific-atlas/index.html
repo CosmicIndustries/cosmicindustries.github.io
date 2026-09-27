@@ -42,8 +42,8 @@ footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:
 <div class="stats" id="stats"></div>
 
 <h2 class="section-title">Atlas</h2>
-<p class="sub">Search the current seed corpus. Discovery potential is triage, not truth; original sources remain authoritative and every record keeps its provenance and uncertainty.</p>
-<div class="controls"><input id="q" placeholder="Search records…"><select id="domain"><option value="">All domains</option></select><select id="state"><option value="">All states</option></select></div>
+<p class="sub">Search the complete indexed evidence corpus. Every loaded field is searchable — title, summary, provenance, identifiers, semantic notes, language metadata, source registry, validation state, and other preserved metadata.</p>
+<div class="controls"><input id="q" placeholder="Search all indexed evidence, identifiers, provenance, language, notes…"><select id="domain"><option value="">All domains</option></select><select id="state"><option value="">All states</option></select></div>
 <div id="grid" class="grid"></div><div id="empty" class="empty">No records match the current filter.</div>
 
 <h2 class="section-title">Preservation system</h2>
@@ -57,7 +57,7 @@ footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:
 <div class="module"><h3>You are here</h3><p>Reference frames, epochs, time scales, coordinates, realizations, uncertainty, and source identity.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/YOU_ARE_HERE_ANCHORS.md" target="_blank">YOU_ARE_HERE_ANCHORS.md ↗</a></div>
 <div class="module"><h3>Arrival forecasts</h3><p>Versioned observations and predictions without collapsing detectability, arrival, recognition, or intention.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/ARRIVAL_FORECAST_PROTOCOL.md" target="_blank">ARRIVAL_FORECAST_PROTOCOL.md ↗</a></div>
 <div class="module"><h3>Physical media</h3><p>Independent preservation media and engineering controls for long-duration custody.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/PHYSICAL_LONGEVITY_MEDIA.md" target="_blank">PHYSICAL_LONGEVITY_MEDIA.md ↗</a></div>
-<div class="module"><h3>Daily expansion</h3><p>Latest validated evidence package: 2026-09-27. Thirty-one curated records and forty-two preservation/correlation edges, plus six explicitly unvalidated harvest candidates.</p><a href="daily/2026-09-27.md">2026-09-27 report ↗</a> · <a href="daily/2026-09-27.jsonl">JSONL ↗</a></div>
+<div class="module"><h3>Daily expansion</h3><p>Latest validated evidence package: 2026-09-27. Thirty-one curated records and forty-two preservation/correlation edges, plus six explicitly unvalidated harvest candidates. The Atlas page now loads and searches the complete merged catalog.</p><a href="daily/2026-09-27.md">2026-09-27 report ↗</a> · <a href="daily/2026-09-27.jsonl">JSONL ↗</a></div>
 <div class="module"><h3>Semantic integrity</h3><p>Keep claims, people, narratives, evidence, corrections, uncertainty, and moral context distinct.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/SEMANTIC_INTEGRITY_AND_ACCESS.md" target="_blank">SEMANTIC_INTEGRITY_AND_ACCESS.md ↗</a></div>
 </div>
 
@@ -79,7 +79,7 @@ footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:
 <div class="principle"><b>Access is not a moral score.</b><span>Ordinary knowledge is discoverable by default; explicit rights, privacy, safety, and integrity constraints are handled separately.</span></div>
 </div>
 
-<p class="note">Snapshot: 2026-09-27 · Fort Knowledge is a preservation architecture in development. OAIS, PREMIS, BagIt, WARC, PROV, and related standards are design references, not certification claims.</p>
+<p class="note">Snapshot: 2026-09-27 · Complete merged catalog view · Fort Knowledge is a preservation architecture in development. OAIS, PREMIS, BagIt, WARC, PROV, and related standards are design references, not certification claims.</p>
 </div></main>
 
 <footer><div class="shell">Cosmic Industries · Fort Knowledge · Scientific Data Atlas</div></footer>
@@ -88,20 +88,20 @@ footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const csvToRows=text=>{const out=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c=='"'&&q&&n=='"'){cell+='"';i++;continue}if(c=='"'){q=!q;continue}if(c==','&&!q){row.push(cell);cell='';continue}if((c=='\n'||c=='\r')&&!q){if(c=='\r'&&n=='\n')i++;row.push(cell);if(row.length>1||row[0])out.push(row);row=[];cell='';continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}const head=out.shift();return out.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])))}; 
 let records=[];
-function render(){const q=document.querySelector('#q').value.toLowerCase().trim(),d=document.querySelector('#domain').value,s=document.querySelector('#state').value;const grid=document.querySelector('#grid');let shown=0;grid.innerHTML='';records.filter(r=>(!q||JSON.stringify(r).toLowerCase().includes(q))&&(!d||r.domain===d)&&(!s||r.status===s)).forEach(r=>{shown++;const div=document.createElement('article');div.className='record';const priority=r.priority?'<span class="tag priority">priority '+esc(r.priority)+'</span>':'';const recover=r.what_to_recover?'<p><strong>Recover / test:</strong> '+esc(r.what_to_recover)+'</p>':'';const control=r.validation_note?'<p><strong>Control:</strong> '+esc(r.validation_note)+'</p>':'';const source=r.canonical_url?'<a href="'+esc(r.canonical_url)+'" target="_blank" rel="noreferrer">Authoritative / source record ↗</a>':'<a href="https://www.google.com/search?q='+encodeURIComponent(r.title)+'" target="_blank" rel="noreferrer">Search source ↗</a>';div.innerHTML='<div class="top"><span class="tag">'+esc(String(r.domain||'').toUpperCase())+'</span><span class="tag">'+esc(String(r.status||'').replaceAll('_',' '))+'</span>'+priority+'</div><h2>'+esc(r.title)+'</h2><p>'+esc(r.summary)+'</p><div class="meter">evidence: '+esc(r.evidence_class||'')+' · discovery: '+esc(r.discovery_potential||'')+' · accessibility risk: '+esc(r.accessibility_risk||'')+(r.source_registry?' · registry: '+esc(r.source_registry):'')+'</div>'+recover+control+'<div class="sources">'+source+'</div>';grid.appendChild(div)});document.querySelector('#empty').style.display=shown?'none':'block'}
+function render(){const q=document.querySelector('#q').value.toLowerCase().trim(),d=document.querySelector('#domain').value,s=document.querySelector('#state').value;const grid=document.querySelector('#grid');let shown=0;grid.innerHTML='';records.filter(r=>(!q||JSON.stringify(r).toLowerCase().includes(q))&&(!d||r.domain===d)&&(!s||r.status===s)).forEach(r=>{shown++;const div=document.createElement('article');div.className='record';const priority=r.priority?'<span class="tag priority">priority '+esc(r.priority)+'</span>':'';const recover=r.what_to_recover?'<p><strong>Recover / test:</strong> '+esc(r.what_to_recover)+'</p>':'';const control=r.validation_note?'<p><strong>Control:</strong> '+esc(r.validation_note)+'</p>':'';const source=r.canonical_url?'<a href="'+esc(r.canonical_url)+'" target="_blank" rel="noreferrer">Authoritative / source record ↗</a>':'<a href="https://www.google.com/search?q='+encodeURIComponent(r.title||'')+'" target="_blank" rel="noreferrer">Search source ↗</a>';div.innerHTML='<div class="top"><span class="tag">'+esc(String(r.domain||'').toUpperCase())+'</span><span class="tag">'+esc(String(r.status||'').replaceAll('_',' '))+'</span>'+priority+'</div><h2>'+esc(r.title)+'</h2><p>'+esc(r.summary)+'</p><div class="meter">evidence: '+esc(r.evidence_class||'')+' · discovery: '+esc(r.discovery_potential||'')+' · accessibility risk: '+esc(r.accessibility_risk||'')+(r.source_registry?' · registry: '+esc(r.source_registry):'')+'</div>'+recover+control+'<div class="sources">'+source+'</div>';grid.appendChild(div)});document.querySelector('#empty').style.display=shown?'none':'block'}
 async function loadJsonl(url){
   const r=await fetch(url,{cache:'no-store'});
   if(!r.ok) throw new Error(String(r.status));
   const text=await r.text();
-  return text.split(/\\r?\\n/).filter(Boolean).map(line=>JSON.parse(line));
+  return text.split(/\r?\n/).filter(Boolean).map(line=>JSON.parse(line));
 }
 async function loadCatalog(){
   const [harvested,seed,daily]=await Promise.all([
-    loadJsonl('./catalog/harvested.jsonl?v=20260927b').catch(()=>[]),
-    fetch('./scientific-atlas-seed.csv?v=20260927').then(r=>{if(!r.ok)throw new Error('dataset '+r.status);return r.text()}).then(csvToRows).then(rows=>rows.map(r=>({...r,source_registry:'curated-seed'}))),
-    loadJsonl('./daily/2026-09-27.jsonl?v=20260927b').catch(()=>[])
+    loadJsonl('./catalog/harvested.jsonl?v=20260927c').catch(()=>[]),
+    fetch('./scientific-atlas-seed.csv?v=20260927c').then(r=>{if(!r.ok)throw new Error('dataset '+r.status);return r.text()}).then(csvToRows).then(rows=>rows.map(r=>({...r,source_registry:'curated-seed'}))),
+    loadJsonl('./daily/2026-09-27.jsonl?v=20260927c').catch(()=>[])
   ]);
-  const merged=[...harvested,...daily,...seed];
+  const merged=[...harvested,...daily.map(r=>({...r,source_registry:'daily-curated'})),...seed];
   const seen=new Set();
   return merged.filter(r=>{const k=r.id||r.canonical_identifier||r.title;if(seen.has(k))return false;seen.add(k);return true});
 }
@@ -117,7 +117,7 @@ loadCatalog().then(data=>{
   const harvested=records.filter(r=>String(r.source_registry||'').startsWith('automated-harvest:')).length;
   const discovered=records.filter(r=>r.status==='DISCOVERED').length;
   const curated=records.filter(r=>String(r.source_registry||'')==='daily-curated').length;
-  document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>INDEXED RECORDS</span></div><div class="stat"><b>'+harvested+'</b><span>HARVESTED CANDIDATES</span></div><div class="stat"><b>'+discovered+'</b><span>DISCOVERED STATUS</span></div><div class="stat"><b>'+curated+'</b><span>SEED / CURATED</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div>';
+  document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>INDEXED RECORDS</span></div><div class="stat"><b>'+harvested+'</b><span>HARVEST CANDIDATES</span></div><div class="stat"><b>'+discovered+'</b><span>DISCOVERED STATUS</span></div><div class="stat"><b>'+curated+'</b><span>DAILY CURATED</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div>';
   document.querySelector('.lead').insertAdjacentHTML('afterend','<p class="note">Catalog layers: '+harvested+' harvested candidates · '+discovered+' records currently marked DISCOVERED · '+curated+' daily curated records · '+(records.length-harvested-curated)+' seed records. Harvested candidates are discovery inputs, not yet scientific validation.</p>');
   render();
 }).catch(e=>{
