@@ -1,32 +1,82 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fort Knowledge — Encyclopedia</title>
 <style>
-:root{--bg:#070a12;--panel:#0d1220;--panel2:#10182a;--text:#edf2f7;--muted:#93a0b4;--line:#1d2840;--accent:#8bd3ff;--accent2:#b8f2d8}
+:root{--bg:#070a12;--panel:#0d1220;--panel2:#10182a;--text:#edf2f7;--muted:#93a0b4;--line:#1d2840;--accent:#8bd3ff;--accent2:#b8f2d8;--warn:#ffd48b}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 75% -10%,#17263e,#070a12 48%);color:var(--text);font:15px/1.6 Inter,system-ui,sans-serif}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.shell{max-width:1180px;margin:auto;padding:24px}.nav{border-bottom:1px solid var(--line)}.brand{font:700 12px monospace;letter-spacing:.12em}.crumb{color:var(--muted);font:11px monospace;margin-top:28px}
-.hero{padding:34px 0 22px;border-bottom:1px solid var(--line)}h1{font-size:clamp(38px,6vw,72px);line-height:1;margin:8px 0 16px}.dek{font-size:20px;color:var(--muted);max-width:900px}.tags{display:flex;gap:8px;flex-wrap:wrap}.tag{border:1px solid var(--line);border-radius:99px;padding:4px 9px;font:10px monospace;color:var(--muted)}.tag:first-child{color:var(--accent)}
-.layout{display:grid;grid-template-columns:1.7fr .8fr;gap:18px;margin-top:24px}.panel{background:rgba(13,18,32,.9);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}.panel h2{margin:0 0 12px;font-size:22px}.panel h3{font-size:15px}.muted{color:var(--muted)}.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{padding:14px;background:var(--panel2);border-radius:11px}.stat b{display:block;font-size:18px}.stat span{font:9px monospace;color:var(--muted)}
-.graph{height:330px;position:relative;overflow:hidden;background:radial-gradient(circle,#10182a 0,#080c15 70%);border-radius:12px;border:1px solid var(--line)}svg{width:100%;height:100%}.node{fill:#10182a;stroke:#8bd3ff;stroke-width:1.5}.edge{stroke:#42536e;stroke-width:1.2}.nodeText{fill:#edf2f7;font:11px system-ui}.edgeText{fill:#93a0b4;font:9px monospace}.bar{height:8px;background:#1d2840;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:#8bd3ff}.meta{font:11px monospace;color:var(--muted);word-break:break-word}.source{padding:11px 0;border-top:1px solid var(--line)}.back{display:inline-block;margin-top:12px;font:11px monospace}
-@media(max-width:850px){.layout{grid-template-columns:1fr}.graph{height:280px}}
-</style></head><body>
-<div class="nav"><div class="shell"><a class="brand" href="./">COSMIC INDUSTRIES / FORT KNOWLEDGE / ENCYCLOPEDIA</a></div></div>
+.shell{max-width:1220px;margin:auto;padding:24px}.nav{border-bottom:1px solid var(--line)}.brand{font:700 12px monospace;letter-spacing:.12em}.crumb{color:var(--muted);font:11px monospace;margin-top:28px}
+.hero{padding:34px 0 24px;border-bottom:1px solid var(--line)}h1{font-size:clamp(38px,6vw,72px);line-height:1;margin:8px 0 16px;max-width:1000px}.dek{font-size:20px;color:var(--muted);max-width:940px}.tags{display:flex;gap:8px;flex-wrap:wrap}.tag{border:1px solid var(--line);border-radius:99px;padding:4px 9px;font:10px monospace;color:var(--muted)}.tag:first-child{color:var(--accent)}
+.layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:18px;margin-top:24px}.panel{background:rgba(13,18,32,.9);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}.panel h2{margin:0 0 12px;font-size:22px}.panel h3{font-size:14px;margin:18px 0 8px}.muted{color:var(--muted)}
+.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{padding:14px;background:var(--panel2);border-radius:11px;min-height:70px}.stat b{display:block;font-size:16px;overflow-wrap:anywhere}.stat span{font:9px monospace;color:var(--muted)}
+.hero-grid{display:grid;grid-template-columns:1.5fr .7fr;gap:16px;align-items:stretch}.visual{background:radial-gradient(circle at 50% 40%,#14223a,#080c15 72%);border:1px solid var(--line);border-radius:14px;min-height:250px;overflow:hidden}
+svg{width:100%;height:100%;display:block}.node{fill:#10182a;stroke:var(--accent);stroke-width:1.5}.node:hover{fill:#17263e}.edge{stroke:#42536e;stroke-width:1.2}.nodeText{fill:#edf2f7;font:11px system-ui}.edgeText{fill:#93a0b4;font:9px monospace}
+.infographic{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}.infocard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;min-height:95px}.infocard .glyph{font:22px monospace;color:var(--accent);margin-bottom:5px}.infocard b{display:block;font-size:12px}.infocard span{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.bar{height:8px;background:#1d2840;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}.meta{font:11px monospace;color:var(--muted);word-break:break-word;white-space:pre-wrap}.source{padding:14px 0;border-top:1px solid var(--line)}.source:first-child{border-top:0}.back{display:inline-block;margin-top:12px;font:11px monospace}
+.timeline{position:relative;padding-left:25px}.timeline:before{content:"";position:absolute;left:7px;top:5px;bottom:5px;width:1px;background:var(--line)}.event{position:relative;margin:0 0 17px}.event:before{content:"";position:absolute;left:-22px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--bg)}.event b{font:11px monospace;color:var(--accent)}.event span{display:block;color:var(--muted);font-size:12px}
+.related-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.related{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px}.related b{display:block;font-size:13px}.related span{display:block;color:var(--muted);font:10px monospace;margin-top:5px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font:10px monospace;color:var(--muted)}.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-right:5px}.legend i.alt{background:var(--accent2)}.legend i.warn{background:var(--warn)}
+@media(max-width:900px){.layout,.hero-grid{grid-template-columns:1fr}.infographic,.related-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.infographic,.statgrid,.related-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="nav"><div class="shell"><a class="brand" href="../">COSMIC INDUSTRIES / FORT KNOWLEDGE / ENCYCLOPEDIA</a></div></div>
 <main class="shell"><div id="app">Loading article…</div></main>
 <script>
-const esc=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const id=new URLSearchParams(location.search).get('id');
-const load=async u=>{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw Error(r.status);return r.text().then(t=>t.split(/\\r?\\n/).filter(Boolean).map(JSON.parse))};
-function wrap(s,max=900){s=String(s??'');return s.length>max?s.slice(0,max)+'…':s}
-Promise.all([load('./entities.jsonl?v=20260927d'),load('../knowledge/relationships.jsonl?v=20260927d')]).then(([entities,edges])=>{
- const e=entities.find(x=>x.id===id)||entities[0]; if(!e)throw Error('No entity');
+const load=async u=>{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw Error(r.status);const t=await r.text();return t.split(/\r?\n/).filter(Boolean).map(line=>JSON.parse(line))};
+const val=(o,k)=>o&&o[k]!=null?o[k]:'';
+const domainGlyph=d=>({biodiversity:'◈',fungi:'◉','language':'文','atmospheric science':'≋','cryosphere':'❄','space physics':'✦','earth observation':'◎','materials science':'◇','hydrology/remote sensing':'≈','digital humanities':'⌘','public health surveillance':'+', 'energy systems':'∿','science of science':'Σ','medical imaging':'▦','public health history':'◷','ecology':'∴','gravitational-wave astronomy':'∿'}[d]||'◆');
+function timelineFor(e){
+ const out=[];
+ if(e.verification_date)out.push({d:e.verification_date,t:'Atlas verification',s:'Record checked and indexed in Fort Knowledge.'});
+ if(e.status)out.push({d:e.status,t:'Source state',s:'Current Atlas state: '+e.status+'.'});
+ if(e.version)out.push({d:e.version,t:'Version',s:'Published version metadata supplied by the record.'});
+ if(e.period)out.push({d:e.period,t:'Recorded period',s:'Time span represented by the evidence object.'});
+ return out;
+}
+function svgGraph(e,entities,links){
+ const related=[];for(const x of links){const rid=x.source===e.id?x.target:x.source;const re=entities.find(y=>y.id===rid);if(re&&!related.some(n=>n.id===re.id))related.push(re);}
+ const shown=related.slice(0,12),w=1000,h=420,cx=500,cy=210,rad=Math.min(165,95+shown.length*5);
+ const lines=shown.map((n,i)=>{const a=i/Math.max(shown.length,1)*Math.PI*2-Math.PI/2,x=cx+Math.cos(a)*rad*2.15,y=cy+Math.sin(a)*rad*1.05;const edge=links.find(q=>(q.source===e.id&&q.target===n.id)||(q.target===e.id&&q.source===n.id));return '<line class="edge" x1="'+cx+'" y1="'+cy+'" x2="'+x+'" y2="'+y+'"/><text class="edgeText" text-anchor="middle" x="'+(cx+(x-cx)*.55)+'" y="'+(cy+(y-cy)*.55)+'">'+esc(edge?.relation_type||'related')+'</text><a href="entity.html?id='+encodeURIComponent(n.id)+'"><circle class="node" cx="'+x+'" cy="'+y+'" r="38"/><text class="nodeText" text-anchor="middle" x="'+x+'" y="'+(y+3)+'">'+esc(String(n.title||n.id).slice(0,25))+'</text></a>';}).join('');
+ return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Evidence relationship map"><defs><filter id="glow"><feGaussianBlur stdDeviation="3"/></filter></defs><circle cx="'+cx+'" cy="'+cy+'" r="65" fill="#10182a" stroke="#8bd3ff" stroke-width="2" filter="url(#glow)"/><text class="nodeText" text-anchor="middle" x="'+cx+'" y="'+(cy+4)+'">'+esc(String(e.title||e.id).slice(0,32))+'</text>'+lines+'</svg>';
+}
+Promise.all([load('./entities.jsonl?v=20260927e'),load('../knowledge/relationships.jsonl?v=20260927e')]).then(([entities,edges])=>{
+ const e=entities.find(x=>x.id===id)||entities[0];if(!e)throw Error('No entity');
  const links=edges.filter(x=>x.source===e.id||x.target===e.id);
- const max=Math.max(links.length,1);
- const related=links.slice(0,10);
- const nodes=[{id:e.id,label:e.title}];
- related.forEach(x=>{const rid=x.source===e.id?x.target:x.source;const re=entities.find(y=>y.id===rid);if(re&&!nodes.some(n=>n.id===re.id))nodes.push({id:re.id,label:re.title})});
- const w=900,h=330,cx=450,cy=165,rad=Math.min(120,45+nodes.length*9);
- const svg='<svg viewBox="0 0 '+w+' '+h+'">'+nodes.slice(1).map((n,i)=>{const a=(i/Math.max(nodes.length-1,1))*Math.PI*2-Math.PI/2;return '<line class="edge" x1="'+cx+'" y1="'+cy+'" x2="'+(cx+Math.cos(a)*rad*2.1)+'" y2="'+(cy+Math.sin(a)*rad*1.1)+'"/><text class="edgeText" x="'+(cx+Math.cos(a)*rad*1.35)+'" y="'+(cy+Math.sin(a)*rad*.7)+'">'+esc((related[i]||{}).relation_type||'related')+'</text>'}).join('')+'<circle class="node" cx="'+cx+'" cy="'+cy+'" r="55"/><text class="nodeText" text-anchor="middle" x="'+cx+'" y="'+(cy+4)+'">'+esc(wrap(e.title,28))+'</text>'+nodes.slice(1).map((n,i)=>{const a=(i/Math.max(nodes.length-1,1))*Math.PI*2-Math.PI/2;const x=cx+Math.cos(a)*rad*2.1,y=cy+Math.sin(a)*rad*1.1;return '<circle class="node" cx="'+x+'" cy="'+y+'" r="34"/><text class="nodeText" text-anchor="middle" x="'+x+'" y="'+(y+3)+'">'+esc(wrap(n.label,20))+'</text>'}).join('')+'</svg>';
+ const related=[...new Set(links.flatMap(x=>[x.source,x.target]).filter(x=>x!==e.id))].map(rid=>entities.find(x=>x.id===rid)).filter(Boolean);
+ const tl=timelineFor(e);
+ const canonical=e.canonical_url?'<a href="'+esc(e.canonical_url)+'" target="_blank" rel="noreferrer">Open canonical source ↗</a>':'No canonical URL recorded.';
+ const lang=e.language_metadata||{};
+ const provenance=(e.provenance||[]).map(x=>'<div class="source">'+esc(x)+'</div>').join('')||'<p class="muted">No provenance entries recorded.</p>';
+ const relationshipHtml=links.length?links.map(x=>{const rid=x.source===e.id?x.target:x.source;const re=entities.find(y=>y.id===rid);return '<div class="source"><div class="tags"><span class="tag">'+esc(x.relation_family||'RELATION')+'</span><span class="tag">'+esc(x.relation_type||'')+'</span><span class="tag">confidence '+esc(x.confidence??'')+'</span></div><p><b>'+(re?'<a href="entity.html?id='+encodeURIComponent(re.id)+'">'+esc(re.title)+'</a>':esc(rid))+'</b></p><p class="muted">'+esc(x.rationale||'')+'</p>'+(x.epistemic_status?'<p class="meta">Epistemic status: '+esc(x.epistemic_status)+'</p>':'')+'</div>'}).join(''):'<p class="muted">No relationships recorded yet.</p>';
+ const relatedHtml=related.length?'<div class="related-grid">'+related.slice(0,12).map(r=>'<a class="related" href="entity.html?id='+encodeURIComponent(r.id)+'"><b>'+esc(r.title)+'</b><span>'+esc(r.domain||'knowledge')+' · '+esc(r.status||'')+'</span></a>').join('')+'</div>':'<p class="muted">No linked articles are recorded yet.</p>';
+ const tlHtml=tl.length?'<div class="timeline">'+tl.map(x=>'<div class="event"><b>'+esc(x.d)+'</b><strong> '+esc(x.t)+'</strong><span>'+esc(x.s)+'</span></div>').join('')+'</div>':'<p class="muted">No timeline fields are present in this record.</p>';
  document.title='Fort Knowledge — '+e.title;
- document.querySelector('#app').innerHTML='<div class="crumb"><a href="./">ENCYCLOPEDIA</a> / '+esc(e.domain||'knowledge')+'</div><section class="hero"><div class="tags"><span class="tag">'+esc(e.domain||'')+'</span><span class="tag">'+esc(e.status||'')+'</span><span class="tag">'+esc(e.epistemic_status||'')+'</span></div><h1>'+esc(e.title)+'</h1><p class="dek">'+esc(e.summary)+'</p><a class="back" href="./">← Back to Atlas</a></section><div class="layout"><div><section class="panel"><h2>Knowledge map</h2><p class="muted">Connected evidence objects. Relationship labels describe the recorded relationship; they are not automatically causal.</p><div class="graph">'+svg+'</div></section><section class="panel"><h2>What this record is</h2><p>'+esc(e.summary)+'</p><h3>Semantic integrity</h3><p class="muted">'+esc(e.semantic_integrity||'No separate semantic-integrity note was recorded.')+'</p></section><section class="panel"><h2>Relationships</h2>'+ (links.length?links.map(x=>'<div class="source"><div class="tags"><span class="tag">'+esc(x.relation_family||'RELATION')+'</span><span class="tag">'+esc(x.relation_type||'')+'</span><span class="tag">confidence '+esc(x.confidence??'')+'</span></div><p><b>'+esc(x.source===e.id?'This record':'Related record')+'</b> → '+esc(x.source===e.id?x.target:x.source)+'</p><p class="muted">'+esc(x.rationale||'')+'</p></div>').join(''):'<p class="muted">No relationships recorded yet.</p>')+'</section></div><aside><section class="panel"><h2>Evidence profile</h2><div class="statgrid"><div class="stat"><b>'+esc(e.evidence_class||'—')+'</b><span>EVIDENCE CLASS</span></div><div class="stat"><b>'+esc(e.status||'—')+'</b><span>SOURCE STATE</span></div><div class="stat"><b>'+esc(e.discovery_potential||'—')+'</b><span>DISCOVERY POTENTIAL</span></div><div class="stat"><b>'+esc(e.accessibility_risk||'—')+'</b><span>ACCESS RISK</span></div></div></section><section class="panel"><h2>Provenance</h2><p class="meta">'+esc((e.provenance||[]).join('\\n'))+'</p><p class="meta">Verified: '+esc(e.verification_date||'—')+'</p>'+(e.canonical_identifier?'<p class="meta">Identifier: '+esc(e.canonical_identifier)+'</p>':'')+(e.canonical_url?'<p><a href="'+esc(e.canonical_url)+'" target="_blank" rel="noreferrer">Open source record ↗</a></p>':'')+'</section><section class="panel"><h2>Language / identity</h2><p class="meta">'+esc(JSON.stringify(e.language_metadata||{},null,2))+'</p></section><section class="panel"><h2>Graph footprint</h2><p>'+links.length+' recorded relationship'+(links.length===1?'':'s')+' connect this entity to the current knowledge graph.</p><div class="bar"><i style="width:'+Math.min(100,(links.length/max)*100)+'%"></i></div></section></aside></div>';
-}).catch(err=>{document.querySelector('#app').innerHTML='<section class="panel"><h2>Article unavailable</h2><p class="muted">'+esc(err.message)+'</p><a href="./">← Back to Atlas</a></section>'});
-</script></body></html>
+ document.querySelector('#app').innerHTML=
+ '<div class="crumb"><a href="../">ATLAS</a> / <a href="./">ENCYCLOPEDIA</a> / '+esc(e.domain||'knowledge')+'</div>'+
+ '<section class="hero"><div class="tags"><span class="tag">'+esc(e.domain||'')+'</span><span class="tag">'+esc(e.status||'')+'</span><span class="tag">'+esc(e.epistemic_status||'')+'</span></div><h1>'+esc(e.title)+'</h1><p class="dek">'+esc(e.summary)+'</p><a class="back" href="../">← Back to Scientific Data Atlas</a></section>'+
+ '<div class="layout"><div>'+
+ '<section class="panel"><div class="hero-grid"><div><h2>Evidence overview</h2><p class="muted">A visual index of the recorded evidence object. Graphics below are generated only from fields and relationships present in the Atlas; missing facts are not invented.</p><div class="infographic">'+
+ '<div class="infocard"><div class="glyph">'+domainGlyph(e.domain)+'</div><b>'+esc(e.domain||'Unknown')+'</b><span>DOMAIN</span></div>'+
+ '<div class="infocard"><div class="glyph">◫</div><b>'+esc(e.evidence_class||'Unspecified')+'</b><span>EVIDENCE CLASS</span></div>'+
+ '<div class="infocard"><div class="glyph">↗</div><b>'+esc(e.discovery_potential||'Unspecified')+'</b><span>DISCOVERY POTENTIAL</span></div>'+
+ '<div class="infocard"><div class="glyph">◌</div><b>'+esc(e.accessibility_risk||'Unspecified')+'</b><span>ACCESS RISK</span></div>'+
+ '</div></div><div class="visual">'+svgGraph(e,entities,links)+'</div></div></section>'+
+ '<section class="panel"><h2>Knowledge graph</h2><p class="muted">Click any surrounding node to open its full encyclopedia article. Relationship labels are descriptive records, not automatic causal conclusions.</p><div class="legend"><span><i></i>entity</span><span><i class="alt"></i>recorded relationship</span><span><i class="warn"></i>interpretive caution</span></div><div class="visual" style="height:420px;margin-top:10px">'+svgGraph(e,entities,links)+'</div></section>'+
+ '<section class="panel"><h2>What this record is</h2><p>'+esc(e.summary)+'</p><h3>Semantic integrity</h3><p class="muted">'+esc(e.semantic_integrity||'No separate semantic-integrity note was recorded.')+'</p></section>'+
+ '<section class="panel"><h2>Evidence relationships</h2>'+relationshipHtml+'</section>'+
+ '<section class="panel"><h2>Related encyclopedia articles</h2>'+relatedHtml+'</section>'+
+ '<section class="panel"><h2>Evidence timeline</h2>'+tlHtml+'</section>'+
+ '</div><aside>'+
+ '<section class="panel"><h2>Evidence profile</h2><div class="statgrid"><div class="stat"><b>'+esc(e.evidence_class||'—')+'</b><span>EVIDENCE CLASS</span></div><div class="stat"><b>'+esc(e.status||'—')+'</b><span>SOURCE STATE</span></div><div class="stat"><b>'+esc(e.epistemic_status||'—')+'</b><span>EPISTEMIC STATUS</span></div><div class="stat"><b>'+links.length+'</b><span>GRAPH EDGES</span></div></div></section>'+
+ '<section class="panel"><h2>Provenance</h2>'+provenance+'<p class="meta">Verified: '+esc(e.verification_date||'—')+'</p>'+(e.canonical_identifier?'<p class="meta">Identifier: '+esc(e.canonical_identifier)+'</p>':'')+'<p>'+canonical+'</p></section>'+
+ '<section class="panel"><h2>Language / identity</h2><p class="meta">'+esc(JSON.stringify(lang,null,2))+'</p></section>'+
+ '<section class="panel"><h2>Graph footprint</h2><p>'+links.length+' recorded relationship'+(links.length===1?'':'s')+' connect this entity to the current graph.</p><div class="bar"><i style="width:'+Math.min(100,links.length*10)+'%"></i></div></section>'+
+ '<section class="panel"><h2>Record discipline</h2><p class="muted">Identity, provenance, source state, uncertainty, and relationship typing are preserved separately. A dead, moved, archived, or changed source is not treated as proof of suppression.</p></section>'+
+ '</aside></div>';
+}).catch(err=>{document.querySelector('#app').innerHTML='<section class="panel"><h2>Article unavailable</h2><p class="muted">'+esc(err.message)+'</p><a href="../">← Back to Atlas</a></section>'});
+</script>
+</body></html>
