@@ -153,27 +153,43 @@ footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);fon
 <script>
 
 function escAttr(x){return String(x??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
-function svgShell(title,subtitle,body){return '<svg class="specimenSvg" id="'+title.toLowerCase().replace(/[^a-z]+/g,"-")+'" viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+escAttr(title)+'"><rect width="760" height="330" fill="#07100f"/><text x="24" y="28" fill="#8ed7b5" font-size="11" font-family="monospace" letter-spacing="2">'+escAttr(title.toUpperCase())+'</text><text x="24" y="50" fill="#9cafaa" font-size="12" font-family="system-ui">'+escAttr(subtitle)+'</text>'+body+'</svg>';}
-function renderMorphSVG(){
- const leaf=svgShell("Leaf Print","schematic / morphology aid",
- '<path d="M380 292 C335 236 300 165 325 98 C342 54 393 60 425 82 C471 113 493 170 458 224 C438 256 404 278 380 292Z" fill="none" stroke="#8ed7b5" stroke-width="3"/><path d="M380 292 C381 228 383 157 386 78" fill="none" stroke="#d8b36a" stroke-width="2"/><path d="M382 224 L332 181 M383 196 L431 157 M384 167 L340 133 M385 138 L427 111 M384 110 L358 91" stroke="#8ed7b5" stroke-width="1.5"/><circle cx="380" cy="292" r="4" fill="#d8b36a"/><text x="24" y="302" fill="#9cafaa" font-size="11">PRINT: outline + midrib + major venation · not a measured specimen</text>');
- const seed=svgShell("Seed Print","schematic / seed morphology aid",
- '<ellipse cx="380" cy="176" rx="142" ry="83" fill="none" stroke="#d8b36a" stroke-width="3"/><path d="M238 176 C300 151 351 145 418 157 C459 164 492 178 522 176" fill="none" stroke="#8ed7b5" stroke-width="2"/><ellipse cx="386" cy="176" rx="67" ry="38" fill="none" stroke="#8ed7b5" stroke-width="2" stroke-dasharray="5 5"/><circle cx="520" cy="176" r="5" fill="#d8b36a"/><text x="330" y="177" fill="#9cafaa" font-size="11">embryo</text><text x="24" y="302" fill="#9cafaa" font-size="11">PRINT: coat + embryo axes · replace with sourced seed measurements when available</text>');
- const spore=svgShell("Spore Print","schematic / fungal spore morphology aid",
- '<circle cx="380" cy="165" r="78" fill="none" stroke="#8fb7df" stroke-width="3"/><ellipse cx="380" cy="165" rx="44" ry="72" fill="none" stroke="#8fb7df" stroke-width="2" stroke-dasharray="6 5"/><path d="M325 165 Q380 132 435 165 M340 125 Q380 153 420 125 M340 205 Q380 177 420 205" fill="none" stroke="#8fb7df" stroke-width="1.5"/><text x="354" y="166" fill="#9cafaa" font-size="11">wall / ornament</text><text x="24" y="302" fill="#9cafaa" font-size="11">PRINT: generic spore geometry · biological applicability depends on taxon</text>');
- document.getElementById("leafSvg").innerHTML=leaf;document.getElementById("seedSvg").innerHTML=seed;document.getElementById("sporeSvg").innerHTML=spore;
+function svgPlate(title,subtitle,imageUrl,sourceUrl,sourceTitle){
+ const safe=escAttr(title);
+ if(!imageUrl)return '<div class="loading"><b>'+safe+'</b><br>'+esc(subtitle)+'<br><span class="status gap">NO SOURCE IMAGE RESOLVED — NO GEOMETRY INVENTED</span></div>';
+ return '<svg class="specimenSvg" viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+safe+' source plate"><rect width="760" height="330" fill="#07100f"/><image href="'+escAttr(imageUrl)+'" x="12" y="58" width="736" height="238" preserveAspectRatio="xMidYMid meet"/><rect x="12" y="58" width="736" height="238" fill="none" stroke="#28443d"/><text x="24" y="28" fill="#8ed7b5" font-size="11" font-family="monospace" letter-spacing="2">'+safe.toUpperCase()+'</text><text x="24" y="47" fill="#9cafaa" font-size="11" font-family="system-ui">'+escAttr(subtitle)+'</text><text x="24" y="319" fill="#9cafaa" font-size="10" font-family="monospace">'+escAttr(sourceTitle||"Wikimedia Commons source image")+'</text></svg>';
+}
+function setPlate(hostId,title,subtitle,hit){
+ const box=document.getElementById(hostId);
+ if(!hit){box.innerHTML=svgPlate(title,subtitle,null,"","");return;}
+ box.innerHTML=svgPlate(title,subtitle,hit.url,hit.source,hit.title);
+}
+async function commonsMorph(kind){
+ const q=target+" "+kind;
+ try{
+  const d=await getJSON("https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(q)+"&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=1200&format=json&origin=*");
+  const pages=Object.values(d.query?.pages||{});
+  const hit=pages.find(p=>p.imageinfo?.[0]?.thumburl||p.imageinfo?.[0]?.url);
+  if(!hit)return null;
+  const info=hit.imageinfo[0];
+  return {url:info.thumburl||info.url,source:"https://commons.wikimedia.org/wiki/"+encodeURIComponent(hit.title),title:(hit.title||"").replace(/^File:/,"")};
+ }catch(e){return null;}
+}
+async function renderMorphologySources(){
+ const kinds=[["leafSvg","Leaf source plate","leaf"],["seedSvg","Seed source plate","seed"],["sporeSvg","Spore source plate","spore"]];
+ await Promise.all(kinds.map(async x=>{
+  const hit=await commonsMorph(x[2]);
+  setPlate(x[0],x[1],"SOURCE IMAGE · "+x[2].toUpperCase(),hit);
+ }));
+ const box=document.getElementById("morphImages");
+ const q=encodeURIComponent(target);
+ box.innerHTML='<article class="card"><h3>Wikimedia Commons</h3><p>Source-attributed morphology images are queried for the current taxon. No missing morphology is replaced by a generic drawing.</p><a class="source" target="_blank" rel="noopener" href="https://commons.wikimedia.org/w/index.php?search='+q+'&title=Special:MediaSearch&type=image">SEARCH TAXON IMAGES ↗</a></article><article class="card"><h3>POWO</h3><p>Plant taxon imagery and botanical context where the target is a plant.</p><a class="source" target="_blank" rel="noopener" href="https://powo.science.kew.org/?q='+q+'">OPEN POWO ↗</a></article>';
 }
 function downloadSVG(id,filename){
- const host=document.getElementById(id),svg=host.querySelector("svg");if(!svg)return;
- const blob=new Blob([svg.outerHTML],{type:"image/svg+xml"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+ const host=document.getElementById(id),svg=host.querySelector("svg");
+ if(!svg)return;
+ const blob=new Blob([svg.outerHTML],{type:"image/svg+xml"}),a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
-renderMorphSVG();
-function renderMorphImages(){
- const q=encodeURIComponent(((typeof target==="string")?target:"")+" leaf seed spore");
- const box=document.getElementById("morphImages");
- box.innerHTML='<article class="card"><h3>Wikimedia Commons</h3><p>Source-attributed images can be searched without treating an image as a measurement.</p><a class="source" target="_blank" rel="noopener" href="https://commons.wikimedia.org/w/index.php?search='+q+'&title=Special:MediaSearch&type=image">SEARCH SPECIMEN IMAGES ↗</a></article><article class="card"><h3>POWO</h3><p>Plant taxon imagery and botanical context where the target is a plant.</p><a class="source" target="_blank" rel="noopener" href="https://powo.science.kew.org/?q='+encodeURIComponent(target)+'">OPEN POWO ↗</a></article>';
-}
-renderMorphImages();
 
 const compoundPresets=["resveratrol","quercetin","catechin","gallic acid","chlorogenic acid"];
 let mol={atoms:[],bonds:[],props:null,theta:0,playing:true,unfold:false};
@@ -264,6 +280,7 @@ sources:[
 ["Wild grape ethnobotany","https://rjb.revistas.csic.es/index.php/rjb/article/view/517"],
 ["Phenology genetics","https://pubmed.ncbi.nlm.nih.gov/18419811/"]
 ]}};const target=name||"Unknown taxon";
+renderMorphologySources();
 document.getElementById("title").innerHTML=esc(target).replace(/^(.+)$/,"<em>$1</em>");
 document.getElementById("subtitle").textContent=id?"Taxon identifier "+id+" · assembling live and local evidence.":"Name-based record · resolving the current taxonomic identity before attaching downstream evidence.";
 const colBase="https://www.catalogueoflife.org/";
