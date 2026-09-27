@@ -57,7 +57,7 @@ footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:
 <div class="module"><h3>You are here</h3><p>Reference frames, epochs, time scales, coordinates, realizations, uncertainty, and source identity.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/YOU_ARE_HERE_ANCHORS.md" target="_blank">YOU_ARE_HERE_ANCHORS.md ↗</a></div>
 <div class="module"><h3>Arrival forecasts</h3><p>Versioned observations and predictions without collapsing detectability, arrival, recognition, or intention.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/ARRIVAL_FORECAST_PROTOCOL.md" target="_blank">ARRIVAL_FORECAST_PROTOCOL.md ↗</a></div>
 <div class="module"><h3>Physical media</h3><p>Independent preservation media and engineering controls for long-duration custody.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/PHYSICAL_LONGEVITY_MEDIA.md" target="_blank">PHYSICAL_LONGEVITY_MEDIA.md ↗</a></div>
-<div class="module"><h3>Daily expansion</h3><p>Latest validated evidence package: 2026-09-27. Twenty-four curated records and thirty-two preservation/correlation edges, plus six explicitly unvalidated harvest candidates.</p><a href="daily/2026-09-27.md">2026-09-27 report ↗</a> · <a href="daily/2026-09-27.jsonl">JSONL ↗</a></div>
+<div class="module"><h3>Daily expansion</h3><p>Latest validated evidence package: 2026-09-27. Thirty-one curated records and forty-two preservation/correlation edges, plus six explicitly unvalidated harvest candidates.</p><a href="daily/2026-09-27.md">2026-09-27 report ↗</a> · <a href="daily/2026-09-27.jsonl">JSONL ↗</a></div>
 <div class="module"><h3>Semantic integrity</h3><p>Keep claims, people, narratives, evidence, corrections, uncertainty, and moral context distinct.</p><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io/blob/main/scientific-atlas/SEMANTIC_INTEGRITY_AND_ACCESS.md" target="_blank">SEMANTIC_INTEGRITY_AND_ACCESS.md ↗</a></div>
 </div>
 
@@ -97,9 +97,9 @@ async function loadJsonl(url){
 }
 async function loadCatalog(){
   const [harvested,seed,daily]=await Promise.all([
-    loadJsonl('./catalog/harvested.jsonl?v=20260927').catch(()=>[]),
+    loadJsonl('./catalog/harvested.jsonl?v=20260927b').catch(()=>[]),
     fetch('./scientific-atlas-seed.csv?v=20260927').then(r=>{if(!r.ok)throw new Error('dataset '+r.status);return r.text()}).then(csvToRows).then(rows=>rows.map(r=>({...r,source_registry:'curated-seed'}))),
-    loadJsonl('./daily/2026-09-27.jsonl?v=20260927').catch(()=>[])
+    loadJsonl('./daily/2026-09-27.jsonl?v=20260927b').catch(()=>[])
   ]);
   const merged=[...harvested,...daily,...seed];
   const seen=new Set();
@@ -116,9 +116,9 @@ loadCatalog().then(data=>{
   const integrity=records.filter(r=>['failed-claim','fraud-case','meta-dataset','controversial-claim'].includes(r.record_type)).length;
   const harvested=records.filter(r=>String(r.source_registry||'').startsWith('automated-harvest:')).length;
   const discovered=records.filter(r=>r.status==='DISCOVERED').length;
-  const curated=records.filter(r=>String(r.source_registry||'').startsWith('curated-')).length;
+  const curated=records.filter(r=>String(r.source_registry||'')==='daily-curated').length;
   document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>INDEXED RECORDS</span></div><div class="stat"><b>'+harvested+'</b><span>HARVESTED CANDIDATES</span></div><div class="stat"><b>'+discovered+'</b><span>DISCOVERED STATUS</span></div><div class="stat"><b>'+curated+'</b><span>SEED / CURATED</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div>';
-  document.querySelector('.lead').insertAdjacentHTML('afterend','<p class="note">Catalog layers: '+harvested+' harvested candidates · '+discovered+' records currently marked DISCOVERED · '+curated+' seed/curated records. Harvested candidates are discovery inputs, not yet scientific validation.</p>');
+  document.querySelector('.lead').insertAdjacentHTML('afterend','<p class="note">Catalog layers: '+harvested+' harvested candidates · '+discovered+' records currently marked DISCOVERED · '+curated+' daily curated records · '+(records.length-harvested-curated)+' seed records. Harvested candidates are discovery inputs, not yet scientific validation.</p>');
   render();
 }).catch(e=>{
   document.querySelector('#grid').innerHTML='<div class="empty" style="display:block">Dataset could not be loaded.</div>';
