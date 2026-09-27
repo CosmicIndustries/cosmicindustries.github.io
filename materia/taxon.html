@@ -169,7 +169,7 @@ function downloadSVG(id,filename){
 }
 renderMorphSVG();
 function renderMorphImages(){
- const q=encodeURIComponent(target+" leaf seed spore");
+ const q=encodeURIComponent(((typeof target==="string")?target:"")+" leaf seed spore");
  const box=document.getElementById("morphImages");
  box.innerHTML='<article class="card"><h3>Wikimedia Commons</h3><p>Source-attributed images can be searched without treating an image as a measurement.</p><a class="source" target="_blank" rel="noopener" href="https://commons.wikimedia.org/w/index.php?search='+q+'&title=Special:MediaSearch&type=image">SEARCH SPECIMEN IMAGES ↗</a></article><article class="card"><h3>POWO</h3><p>Plant taxon imagery and botanical context where the target is a plant.</p><a class="source" target="_blank" rel="noopener" href="https://powo.science.kew.org/?q='+encodeURIComponent(target)+'">OPEN POWO ↗</a></article>';
 }
