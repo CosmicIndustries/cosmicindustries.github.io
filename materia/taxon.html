@@ -13,7 +13,7 @@ header{position:sticky;top:0;z-index:20;background:#07100fee;backdrop-filter:blu
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>TAXON DETAIL / v0.7.0</small></span></a><nav><a href="#identity">Identity</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#morphology">Morphology</a><a href="#uses">Uses</a><a href="#chemistry">Chemistry</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav></div></header>
+<header><div class="wrap nav"><a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>TAXON DETAIL / v0.8.0</small></span></a><nav><a href="#identity">Identity</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#morphology">Morphology</a><a href="#uses">Uses</a><a href="#coverage">Coverage</a><a href="#chemistry">Chemistry</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav></div></header>
 <main class="wrap">
 <section class="hero">
 <div class="eyebrow">TAXON / COMPLETE RECORD VIEW</div>
@@ -38,6 +38,11 @@ header{position:sticky;top:0;z-index:20;background:#07100fee;backdrop-filter:blu
 
 <section id="uses"><div class="head"><div><div class="eyebrow">04 / HUMAN USE + ETHNOBOTANY</div><h2>Uses are records, not claims of efficacy</h2></div><p>MATERIA separates food, material, cultural and medicinal use. Traditional use documents human practice; it does not by itself establish clinical efficacy or safety.</p></div>
 <div id="usesBox" class="cards"></div></section>
+
+<section id="coverage"><div class="head"><div><div class="eyebrow">05 / DATA COMPLETENESS</div><h2>The whole organism graph</h2></div><p>Every major MATERIA layer is visible here. A green state means data is actually linked; amber means the field is known to be part of the model but has not yet been joined for this taxon.</p></div>
+<div class="metricgrid" id="coverageGrid"></div>
+<div class="panel" style="margin-top:12px"><h3>Research-source ledger</h3><div id="sourceLedger" class="cards"></div></div>
+</section>
 
 <section id="local"><div class="head"><div><div class="eyebrow">02 / MATERIA NEIGHBORHOOD</div><h2>Local evidence already indexed</h2></div><p>These are records currently encoded directly in MATERIA. They remain distinct from external reservoirs and retain their original evidence layer.</p></div>
 <div id="localBox" class="cards"></div></section>
@@ -139,7 +144,14 @@ morph.innerHTML='<h3>Documented morphology</h3>'+p.morphology.map(x=>'<div class
 dev.innerHTML='<h3>Development / architecture</h3>'+p.development.map(x=>'<div class="card" style="margin:6px 0"><p>'+esc(x)+'</p></div>').join("");
 uses.innerHTML=p.uses.map(x=>'<article class="card"><span class="tag">'+esc(x.layer)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.text)+'</p></article>').join("");
 }
-renderExpanded();
+renderExpanded();function renderCoverage(){
+const grid=document.getElementById("coverageGrid"),ledger=document.getElementById("sourceLedger"),p=profiles[target];
+const names=["Taxonomy","Phyllotaxis","Morphology","Development","Phenology","Environment","Tissue","Preparation","Chemistry","Bioactivity","Toxicology","Ethnobotany","Authenticity"];
+const live=["Taxonomy",...(p?["Phyllotaxis","Morphology","Development","Phenology","Environment","Tissue","Preparation","Chemistry","Ethnobotany"]:[])];
+grid.innerHTML=names.map(n=>'<div class="metric"><strong>'+ (live.includes(n)?'LINKED':'GAP') +'</strong><small>'+esc(n.toUpperCase())+'</small></div>').join("");
+ledger.innerHTML=p?p.sources.map(x=>'<article class="card"><span class="tag">SOURCE</span><h3>'+esc(x[0])+'</h3><p><a class="source" href="'+x[1]+'" target="_blank" rel="noopener">'+esc(x[1])+' ↗</a></p></article>').join(""):'<article class="card"><h3>No taxon-specific source bundle</h3><p>Use the general source network below.</p></article>';
+}
+renderCoverage();
 
 
 async function getJSON(url){
@@ -152,9 +164,9 @@ async function loadCOL(){
  const box=document.getElementById("identityBox");
  try{
    let d=null;
-   if(id)d=await getJSON("https://api.checklistbank.org/dataset/3LR/nameusage/"+encodeURIComponent(id));
+   if(id)d=await getJSON("https://api.checklistbank.org/dataset/3LR/taxon/"+encodeURIComponent(id)+"/info");
    if(!d)d=await getJSON("https://api.checklistbank.org/dataset/3LR/nameusage/search?q="+encodeURIComponent(target)+"&limit=1");
-   const x=flatten(d);const hit=Array.isArray(x)?x[0]:(x.results&&x.results[0])||x;
+   const x=flatten(d);const hit=Array.isArray(x)?x[0]:(x.results&&x.results[0])||(x.content&&x.content[0])||x;
    const n=hit?.scientificName||hit?.name||target;const rank=hit?.rank||hit?.taxonomicRank||"—";const key=hit?.id||hit?.nameUsageKey||id||"—";
    document.getElementById("title").innerHTML=esc(n);
    document.getElementById("subtitle").textContent="Catalogue of Life identity resolved · downstream layers remain separately evidenced.";
