@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MATERIA — Taxon Record</title>
+<meta name="description" content="MATERIA taxon detail record: taxonomy, phenotype, morphology, preparation, chemistry, bioactivity, toxicology, ethnobotany and provenance.">
+<style>
+:root{--bg:#07100f;--panel:#0c1715;--panel2:#101e1b;--line:#28443d;--text:#e8eee9;--muted:#9cafaa;--accent:#8ed7b5;--gold:#d8b36a;--red:#d98f7d;--blue:#8fb7df}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 75% 0,#17382e 0,#07100f 42%);color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1240px;margin:auto;padding:0 24px}a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:20;background:#07100fee;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.nav{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:12px;align-items:center}.sigil{font-size:25px;color:var(--accent)}.brand b{letter-spacing:.18em}.brand small{display:block;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em}nav{display:flex;gap:18px;color:var(--muted);font-size:13px}nav a:hover{color:var(--accent)}
+.hero{padding:65px 0 38px}.eyebrow,.mono,.tag{font:11px ui-monospace,monospace;letter-spacing:.13em;color:var(--accent)}h1{font-size:clamp(40px,7vw,76px);line-height:.94;letter-spacing:-.05em;margin:12px 0 8px}h1 em{font-style:normal;color:var(--accent)}.subtitle{color:var(--muted);max-width:850px;font-size:17px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.btn{border:1px solid var(--line);background:#091512;color:var(--accent);padding:9px 12px;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}section{padding:42px 0;border-top:1px solid var(--line)}.head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:20px}.head h2{font-size:32px;line-height:1;margin:8px 0}.head p{max-width:570px;color:var(--muted)}.panel{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);padding:20px}.span4{grid-column:span 4}.span5{grid-column:span 5}.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}.kv{display:grid;grid-template-columns:170px 1fr;gap:5px 14px}.kv b{color:var(--muted);font-weight:500}.value{overflow-wrap:anywhere}.state{display:inline-block;border:1px solid var(--line);padding:3px 7px;font:10px ui-monospace,monospace}.live{color:var(--accent);border-color:#376c59}.missing{color:var(--gold)}.err{color:var(--red)}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.card{border:1px solid var(--line);background:#0a1513;padding:17px}.card h3{margin:5px 0}.card p{color:var(--muted);font-size:13px}.evidence{display:inline-block;border:1px solid var(--line);padding:3px 7px;margin:2px;font:10px ui-monospace,monospace;color:var(--muted)}.rule{border-left:3px solid var(--gold);background:#0c1815;padding:14px;color:var(--muted)}table{width:100%;border-collapse:collapse}td,th{border-top:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{font:10px ui-monospace,monospace;color:var(--accent);letter-spacing:.1em}.source{color:var(--accent);text-decoration:underline}.sourcegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.sourcebox{border:1px solid var(--line);padding:15px;background:#0a1513}.sourcebox p{color:var(--muted);font-size:12px}.loading{padding:20px;color:var(--muted);border:1px dashed var(--line)}footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em;display:flex;justify-content:space-between}
+@media(max-width:900px){.span4,.span5,.span7,.span8{grid-column:span 12}.cards,.sourcegrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){nav{display:none}.cards,.sourcegrid{grid-template-columns:1fr}.wrap{padding:0 16px}.kv{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="./"><span class="sigil">✦</span><span><b>MATERIA</b><small>TAXON DETAIL / v0.7.0</small></span></a><nav><a href="#identity">Identity</a><a href="#local">MATERIA</a><a href="#chemistry">Chemistry</a><a href="#phenotype">Phenotype</a><a href="#evidence">Evidence</a><a href="#sources">Sources</a></nav></div></header>
+<main class="wrap">
+<section class="hero">
+<div class="eyebrow">TAXON / COMPLETE RECORD VIEW</div>
+<h1 id="title">Loading <em>taxon…</em></h1>
+<div id="subtitle" class="subtitle">Resolving the taxon identity and assembling every available MATERIA neighborhood.</div>
+<div class="actions"><a class="btn" href="./">← Back to Explorer</a><a id="colLink" class="btn" target="_blank" rel="noopener">Catalogue of Life ↗</a><a id="lotusLink" class="btn" target="_blank" rel="noopener">LOTUS search ↗</a></div>
+</section>
+
+<section id="identity"><div class="head"><div><div class="eyebrow">01 / IDENTITY</div><h2>Taxonomic identity</h2></div><p>The taxonomic source is kept separate from downstream observations. A name match is not treated as proof that every linked observation refers to the same specimen.</p></div>
+<div id="identityBox" class="panel loading">Resolving Catalogue of Life…</div></section>
+
+<section id="local"><div class="head"><div><div class="eyebrow">02 / MATERIA NEIGHBORHOOD</div><h2>Local evidence already indexed</h2></div><p>These are records currently encoded directly in MATERIA. They remain distinct from external reservoirs and retain their original evidence layer.</p></div>
+<div id="localBox" class="cards"></div></section>
+
+<section id="chemistry"><div class="head"><div><div class="eyebrow">03 / CHEMISTRY</div><h2>Natural-product neighborhood</h2></div><p>LOTUS is queried by organism name. Returned molecules are external-source relationships, not automatically claims of abundance, efficacy or safety.</p></div>
+<div id="lotusBox" class="cards"><div class="loading">Querying LOTUS…</div></div></section>
+
+<section id="phenotype"><div class="head"><div><div class="eyebrow">04 / PHENOTYPE STACK</div><h2>What MATERIA can connect</h2></div><p>The detail page deliberately exposes unavailable layers instead of filling them with inferred values.</p></div>
+<div class="grid">
+<div class="panel span4"><span class="tag">MORPHOLOGY</span><h3>Form & structure</h3><p id="morphState">Not yet linked for this taxon.</p><span class="state missing">NOT YET LINKED</span></div>
+<div class="panel span4"><span class="tag">DEVELOPMENT</span><h3>Growth & transition</h3><p id="devState">Stage, meristem and plastochron records are not yet linked.</p><span class="state missing">NOT YET LINKED</span></div>
+<div class="panel span4"><span class="tag">PHENOLOGY</span><h3>Season & state</h3><p id="phenState">No taxon-specific time series is currently encoded.</p><span class="state missing">NOT YET LINKED</span></div>
+<div class="panel span4"><span class="tag">ENVIRONMENT</span><h3>Conditions</h3><p>Site, climate, water, light, soil and cultivation variables require observation-level joins.</p><span class="state missing">GAP EXPOSED</span></div>
+<div class="panel span4"><span class="tag">TISSUE</span><h3>Sample material</h3><p>Leaf, root, bark, flower, fruit and other material must remain tied to the source sample.</p><span class="state missing">GAP EXPOSED</span></div>
+<div class="panel span4"><span class="tag">AUTHENTICITY</span><h3>Identity control</h3><p>Voucher, microscopy, DNA and chemical-fingerprint evidence are separate authentication channels.</p><span class="state missing">GAP EXPOSED</span></div>
+</div></section>
+
+<section><div class="head"><div><div class="eyebrow">05 / PREPARATION</div><h2>Preparation & processing</h2></div><p>Preparation is a first-class node because extraction and processing can change the measured chemical and biological result.</p></div>
+<div id="prepBox" class="panel"></div></section>
+
+<section id="evidence"><div class="head"><div><div class="eyebrow">06 / EVIDENCE</div><h2>Evidence ledger</h2></div><p>Evidence classes are descriptive provenance, not a single composite score. Prediction remains distinct from observation.</p></div>
+<div id="evidenceBox" class="panel"></div></section>
+
+<section><div class="head"><div><div class="eyebrow">07 / SAFETY</div><h2>Bioactivity & toxicology</h2></div><p>No effect, hazard or safety conclusion is generated merely because a compound is linked to a taxon.</p></div>
+<div class="grid"><div class="panel span6"><h3>Bioactivity</h3><div id="bioBox"></div></div><div class="panel span6"><h3>Toxicology</h3><div id="toxBox"></div></div></div></section>
+
+<section id="sources"><div class="head"><div><div class="eyebrow">08 / PROVENANCE</div><h2>Source network</h2></div><p>Every external relationship has an explicit source boundary. Large datasets are reservoirs; MATERIA does not pretend to have locally ingested what it has only linked.</p></div>
+<div class="sourcegrid">
+<a class="sourcebox" id="sCol" target="_blank" rel="noopener"><b>Catalogue of Life</b><p>Taxonomic identity, names, classification and distributions.</p></a>
+<a class="sourcebox" id="sLotus" target="_blank" rel="noopener"><b>LOTUS</b><p>Natural-product structures and organism relationships.</p></a>
+<a class="sourcebox" href="https://www.try-db.org/" target="_blank" rel="noopener"><b>TRY</b><p>Plant functional, morphological, anatomical, physiological and phenological traits.</p></a>
+<a class="sourcebox" href="https://www.npatlas.org/" target="_blank" rel="noopener"><b>Natural Products Atlas</b><p>Natural-product structures and biosource relationships where applicable.</p></a>
+</div>
+<div class="rule" style="margin-top:14px"><b>Semantic rule:</b> unknown ≠ not measured ≠ not applicable ≠ withheld ≠ disputed. A missing layer on this page is an exposed research gap, not a zero.</div>
+</section>
+</main>
+<footer><span>COSMIC INDUSTRIES / MATERIA</span><span>OBSERVE · SOURCE · DISTINGUISH · PRESERVE</span></footer>
+<script>
+const params=new URLSearchParams(location.search);
+const name=params.get("name")||"";
+const id=params.get("id")||"";
+const records=[
+{name:"Ficus sycomorus",layer:"L0",kind:"PREPARATION × BIOACTIVITY",text:"Leaf extraction study: aqueous, methanol, ethyl-acetate and dichloromethane preparations are retained as separate experimental contexts; antimicrobial and antioxidant assays remain preparation-specific.",tags:["leaf","extraction","phenolics","flavonoids","antimicrobial"]},
+{name:"Vitis vinifera",layer:"L0",kind:"PHENOLOGY × CHEMISTRY",text:"Leaf chemistry varies with harvest timing. March, May and September samples are represented as separate harvest states rather than one timeless metabolite profile.",tags:["leaf","harvest","phenology","chlorogenic acid","gallic acid"]},
+{name:"Glycyrrhiza uralensis",layer:"L0",kind:"ENVIRONMENT × CHEMISTRY",text:"Water-deficit and glycine-betaine treatment are explicit environmental/cultivation nodes linked to measured physiology and changes in liquiritin, glycyrrhizic acid and flavonoids.",tags:["stress","cultivation","liquiritin","glycyrrhizic acid"]},
+{name:"Tagetes erecta",layer:"L0",kind:"FORMULATION × TOXICOLOGY",text:"Ethanolic flower extract is linked to a topical cream formulation, tick repellency assays and in-vitro acetylcholinesterase inhibition. Docking is separately marked as prediction.",tags:["flower","ethanol","formulation","ticks","AChE","prediction"]},
+{name:"Rosmarinus officinalis",layer:"L0",kind:"EXTRACTION × CHEMISTRY",text:"Six extraction approaches are represented independently so solvent/process effects on rosmarinic acid, carnosic acid, carnosol and related compounds remain queryable.",tags:["SC-CO2","Soxhlet","tincture","hydrodistillation","carnosic acid"]}
+];
+const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+const target=name||"Unknown taxon";
+document.getElementById("title").innerHTML=esc(target).replace(/^(.+)$/,"<em>$1</em>");
+document.getElementById("subtitle").textContent=id?"Taxon identifier "+id+" · assembling live and local evidence.":"Name-based record · resolving the current taxonomic identity before attaching downstream evidence.";
+const colBase="https://www.catalogueoflife.org/";
+const colSource=id?"https://www.checklistbank.org/dataset/3LR/taxon/"+encodeURIComponent(id):colBase;
+document.getElementById("colLink").href=colSource;document.getElementById("sCol").href=colSource;
+document.getElementById("lotusLink").href="https://lotus.naturalproducts.net/search/simple/"+encodeURIComponent(target);
+document.getElementById("sLotus").href="https://lotus.naturalproducts.net/search/simple/"+encodeURIComponent(target);
+
+function localRender(){
+ const rows=records.filter(r=>r.name.toLowerCase()===target.toLowerCase()||r.name.toLowerCase().includes(target.toLowerCase())||target.toLowerCase().includes(r.name.toLowerCase()));
+ document.getElementById("localBox").innerHTML=rows.length?rows.map(r=>'<article class="card"><span class="tag">'+esc(r.layer)+' · '+esc(r.kind)+'</span><h3>'+esc(r.name)+'</h3><p>'+esc(r.text)+'</p><div>'+r.tags.map(t=>'<span class="evidence">'+esc(t)+'</span>').join("")+'</div></article>').join(""):'<div class="panel"><h3>No local MATERIA record yet</h3><p style="color:var(--muted)">The taxon can still have external data. MATERIA distinguishes an unbuilt local record from absence of scientific information.</p></div>';
+ const all=rows.flatMap(r=>r.tags);
+ document.getElementById("prepBox").innerHTML=rows.length?'<div class="kv"><b>Known preparation signals</b><div>'+all.filter(x=>/extract|ethanol|sc-co2|soxhlet|tincture|hydrodistillation|leaf|flower/i.test(x)).map(x=>'<span class="evidence">'+esc(x)+'</span>').join("")+'</div><b>Source state</b><div><span class="state live">LOCAL MATERIA RECORD</span></div></div>':'<div class="rule">No preparation record is locally encoded for this taxon. This is a research gap, not evidence of no preparation.</div>';
+ document.getElementById("evidenceBox").innerHTML=rows.length?rows.map(r=>'<div class="card" style="margin-bottom:8px"><b>'+esc(r.layer)+' · '+esc(r.kind)+'</b><p>'+esc(r.text)+'</p><span class="state live">LOCAL PROVENANCE · MATERIA</span></div>').join(""):'<div class="rule">No local claim has been attached yet. External search results are kept separate until provenance is encoded.</div>';
+ document.getElementById("bioBox").innerHTML=rows.length&&rows.some(r=>/bioactivity|antimicrobial|AChE|ticks/i.test(r.text))?'<span class="state live">LOCAL BIOACTIVITY RECORD PRESENT</span><p style="color:var(--muted)">See the linked preparation-specific record above. Assay details are not generalized across preparations.</p>':'<span class="state missing">NOT LOCALLY LINKED</span><p style="color:var(--muted)">No taxon-specific bioactivity object is currently encoded here.</p>';
+ document.getElementById("toxBox").innerHTML=rows.length&&rows.some(r=>/toxicology|AChE/i.test(r.kind+" "+r.text))?'<span class="state live">LOCAL TOXICOLOGY CONTEXT PRESENT</span><p style="color:var(--muted)">The existing record retains formulation and assay context; it does not create a general safety conclusion.</p>':'<span class="state missing">NOT LOCALLY LINKED</span><p style="color:var(--muted)">No taxon-specific toxicology object is currently encoded here.</p>';
+}
+localRender();
+
+async function getJSON(url){
+ const r=await fetch(url,{headers:{"Accept":"application/json"}});
+ if(!r.ok)throw new Error("HTTP "+r.status);
+ return await r.json();
+}
+function flatten(x){if(!x)return{};if(x.result&&typeof x.result==="object")return x.result;if(x.data&&typeof x.data==="object"&&!Array.isArray(x.data))return x.data;return x}
+async function loadCOL(){
+ const box=document.getElementById("identityBox");
+ try{
+   let d=null;
+   if(id)d=await getJSON("https://api.checklistbank.org/dataset/3LR/nameusage/"+encodeURIComponent(id));
+   if(!d)d=await getJSON("https://api.checklistbank.org/dataset/3LR/nameusage/search?q="+encodeURIComponent(target)+"&limit=1");
+   const x=flatten(d);const hit=Array.isArray(x)?x[0]:(x.results&&x.results[0])||x;
+   const n=hit?.scientificName||hit?.name||target;const rank=hit?.rank||hit?.taxonomicRank||"—";const key=hit?.id||hit?.nameUsageKey||id||"—";
+   document.getElementById("title").innerHTML=esc(n);
+   document.getElementById("subtitle").textContent="Catalogue of Life identity resolved · downstream layers remain separately evidenced.";
+   document.getElementById("identityBox").innerHTML='<div class="kv"><b>Scientific name</b><div class="value">'+esc(n)+'</div><b>Rank</b><div>'+esc(rank)+'</div><b>Identifier</b><div class="value">'+esc(key)+'</div><b>Source</b><div><span class="state live">CATALOGUE OF LIFE / CHECKLISTBANK</span></div><b>Interpretation</b><div style="color:var(--muted)">This is a taxonomic pivot. It does not automatically prove that every chemistry, phenotype or ethnobotany record belongs to the same biological material.</div></div>';
+ }catch(e){
+   box.innerHTML='<div class="kv"><b>Requested name</b><div>'+esc(target)+'</div><b>Identifier</b><div>'+esc(id||"—")+'</div><b>Live source</b><div><span class="state missing">UNAVAILABLE IN BROWSER</span></div></div><div class="rule" style="margin-top:12px">The MATERIA page remains usable. No taxonomic field is fabricated when the live source cannot be reached.</div>';
+ }
+}
+async function loadLOTUS(){
+ const box=document.getElementById("lotusBox");
+ try{
+   const d=await getJSON("https://lotus.naturalproducts.net/api/search/simple?query="+encodeURIComponent(target));
+   const arr=Array.isArray(d)?d:(d.results||d.data||[]);
+   box.innerHTML=arr.slice(0,24).map(x=>{const n=x.name||x.molecule_name||x.moleculeName||"Natural product";const lid=x.lotus_id||x.lotusId||x.id||"";const formula=x.molecular_formula||x.formula||"—";const mw=x.molecular_weight||x.mass||"—";return '<article class="card"><span class="tag">LIVE · LOTUS</span><h3>'+esc(n)+'</h3><div class="kv"><b>LOTUS ID</b><span>'+esc(lid)+'</span><b>Formula</b><span>'+esc(formula)+'</span><b>Mass</b><span>'+esc(mw)+'</span></div><p><a class="source" href="https://lotus.naturalproducts.net/search/simple/'+encodeURIComponent(n)+'" target="_blank" rel="noopener">Open LOTUS record/search ↗</a></p></article>'}).join("")||'<div class="panel"><h3>No LOTUS hits returned</h3><p style="color:var(--muted)">No hit is not treated as absence. The current LOTUS public search returned zero records for this query.</p></div>';
+ }catch(e){box.innerHTML='<div class="panel"><h3>LOTUS unavailable</h3><p style="color:var(--muted)">'+esc(e.message)+'</p><span class="state missing">EXTERNAL SOURCE NOT REACHED</span></div>'}
+}
+loadCOL();loadLOTUS();
+</script>
+</body></html>
