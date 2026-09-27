@@ -5,6 +5,7 @@
 <meta name="description" content="Fort Knowledge / Scientific Data Atlas — scientific evidence, provenance, preservation, language, uncertainty, and recovery.">
 <title>Scientific Data Atlas — Fort Knowledge — Cosmic Industries</title>
 <style>
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:34px}.section-head .section-title{margin:0}.popout{appearance:none;background:var(--panel2);border:1px solid var(--line);color:var(--accent);border-radius:9px;padding:7px 11px;font:10px monospace;cursor:pointer;letter-spacing:.08em}.popout:hover{border-color:var(--accent);background:#14223a}.section-panel{min-width:0}.section-panel:fullscreen{background:var(--bg);padding:32px;overflow:auto}.section-panel:fullscreen .grid{max-width:1400px;margin:auto}.section-panel:fullscreen:before{content:attr(data-title);display:block;color:var(--accent);font:700 12px monospace;letter-spacing:.12em;margin-bottom:18px}
 :root{--bg:#070a12;--panel:#0d1220;--panel2:#10182a;--text:#edf2f7;--muted:#93a0b4;--line:#1d2840;--accent:#8bd3ff;--accent2:#b8f2d8}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% -10%,#17263e 0,#070a12 45%);color:var(--text);font:15px/1.55 Inter,system-ui,sans-serif}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}.shell{max-width:1240px;margin:auto;padding:24px}
@@ -41,12 +42,12 @@ footer{border-top:1px solid var(--line);margin-top:42px;color:var(--muted);font:
 
 <div class="stats" id="stats"></div>
 
-<h2 class="section-title">Atlas</h2>
+<div class="section-head"><h2 class="section-title">Atlas</h2><button class="popout" data-popout="atlas">POP OUT ↗</button></div>
 <p class="sub">Search the complete indexed evidence corpus. Every loaded field is searchable — title, summary, provenance, identifiers, semantic notes, language metadata, source registry, validation state, and other preserved metadata.</p>
 <div class="controls"><input id="q" placeholder="Search all indexed evidence, identifiers, provenance, language, notes…"><select id="domain"><option value="">All domains</option></select><select id="state"><option value="">All states</option></select></div>
-<div id="grid" class="grid"></div><div id="empty" class="empty">No records match the current filter.</div>
+<div id="atlasPanel" class="section-panel"><div id="grid" class="grid"></div><div id="empty" class="empty">No records match the current filter.</div></div>
 
-<h2 class="section-title">Evidence graph</h2><p class="sub">The correlation layer is searchable too. Search source IDs, target IDs, relationship types, confidence, rationale, or supporting sources.</p><div class="controls"><input id="edgeq" placeholder="Search relationships, IDs, evidence, confidence…"></div><div class="graph-tools"><select id="relationFamily"><option value="">All relationship families</option><option>STRUCTURAL</option><option>PROVENANCE</option><option>EVIDENTIAL</option><option>ANALOGICAL</option><option>CORRELATIONAL</option><option>CAUSAL</option></select></div><div id="edges" class="grid"></div><div id="edgeempty" class="empty">No graph relationships match the search.</div>
+<div class="section-head"><h2 class="section-title">Evidence graph</h2><button class="popout" data-popout="evidence">POP OUT ↗</button></div><p class="sub">The correlation layer is searchable too. Search source IDs, target IDs, relationship types, confidence, rationale, or supporting sources.</p><div class="controls"><input id="edgeq" placeholder="Search relationships, IDs, evidence, confidence…"></div><div class="graph-tools"><select id="relationFamily"><option value="">All relationship families</option><option>STRUCTURAL</option><option>PROVENANCE</option><option>EVIDENTIAL</option><option>ANALOGICAL</option><option>CORRELATIONAL</option><option>CAUSAL</option></select></div><div id="evidencePanel" class="section-panel"><div id="edges" class="grid"></div><div id="edgeempty" class="empty">No graph relationships match the search.</div></div>
 <h2 class="section-title">Encyclopedia</h2><p class="sub">Entity articles are generated from source-backed records. They expose the evidence object, provenance, semantic notes, and connected relationships without pretending the derived article is the primary source.</p><div class="controls"><input id="entityq" placeholder="Search entities, domains, identifiers, semantic notes…"></div><div id="entities" class="grid"></div><div id="entityempty" class="empty">No encyclopedia entities match the search.</div>
 <h2 class="section-title">Knowledge map</h2><p class="sub">Concept indexes are mechanical navigation aids. They tell you what is connected in the corpus; they do not add unsupported scientific claims.</p><div id="concepts" class="modules"></div>
 
@@ -114,6 +115,7 @@ async function loadCatalog(){
   const seen=new Set();
   return merged.filter(r=>{const k=r.id||r.canonical_identifier||r.title;if(seen.has(k))return false;seen.add(k);return true});
 }
+document.querySelectorAll('.popout').forEach(btn=>btn.addEventListener('click',()=>{const panel=btn.dataset.popout==='atlas'?document.querySelector('#atlasPanel'):document.querySelector('#evidencePanel');panel.dataset.title=btn.dataset.popout==='atlas'?'ATLAS / FULL VIEW':'EVIDENCE GRAPH / FULL VIEW';if(panel.requestFullscreen)panel.requestFullscreen();}));
 document.querySelector('#q').addEventListener('input',render);document.querySelector('#domain').addEventListener('change',render);document.querySelector('#state').addEventListener('change',render);document.querySelector('#edgeq').addEventListener('input',renderEdges);document.querySelector('#relationFamily').addEventListener('change',renderEdges);document.querySelector('#entityq').addEventListener('input',renderEntities);
 Promise.all([loadEncyclopedia(),loadCatalog()]).then(([_,data])=>{
   records=data;
