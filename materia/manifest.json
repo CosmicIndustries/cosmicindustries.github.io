@@ -1,8 +1,8 @@
 {
-  "schema_version": "0.4.0",
+  "schema_version": "0.5.0",
   "project": "MATERIA — Open Ethnobotanical Research Atlas",
-  "architecture": "API-backed global corpus + curated local evidence graph",
-  "generated_at": "2026-09-21",
+  "architecture": "API-backed global corpus + provenance-preserving local evidence graph",
+  "generated_at": "2026-09-27",
   "canonical_taxonomy": {
     "provider": "Catalogue of Life / ChecklistBank",
     "release": "COL26.9",
@@ -17,11 +17,8 @@
       "distributions": 2231249
     },
     "query_api": "https://api.checklistbank.org/dataset/3LR",
-    "scope": [
-      "Plantae",
-      "Fungi"
-    ],
-    "notes": "MATERIA uses the live 3LR endpoint for browsing/search and keeps release metadata for reproducibility. COL release identifiers can churn between monthly releases; stable annual snapshots should be archived for publication-grade analyses."
+    "scope": ["Plantae", "Fungi"],
+    "notes": "MATERIA uses the live 3LR endpoint for browsing/search and keeps release metadata for reproducibility."
   },
   "natural_products": [
     {
@@ -39,12 +36,40 @@
       "license": "open data / CC-BY-SA data portal"
     }
   ],
-  "planned_chemistry": [
-    "NP Atlas",
-    "LOTUS",
-    "COCONUT",
-    "PubChem cross-references"
-  ],
+  "planned_chemistry": ["NP Atlas", "LOTUS", "COCONUT", "PubChem cross-references"],
+  "morphology_and_phenotype": {
+    "status": "schema-integrated",
+    "domains": [
+      "phyllotaxis",
+      "leaf_morphology",
+      "stem_and_internode_geometry",
+      "branching_architecture",
+      "inflorescence_architecture",
+      "root_architecture",
+      "development",
+      "phenology",
+      "harvest_state",
+      "environment",
+      "cultivation_treatment",
+      "temporal_phenotype",
+      "diagnostic_characters"
+    ],
+    "external_resources": [
+      "TRY Plant Trait Database",
+      "Sugar4D plant phenotyping",
+      "phyllotaxis/developmental genetics datasets",
+      "genome-to-phenotype resources"
+    ]
+  },
+  "evidence_model": {
+    "L0": "primary scientific evidence",
+    "L1": "peer-reviewed reviews and systematic syntheses",
+    "L2": "ethnobotany, ethnomycology, ethnobiology and historical-use evidence",
+    "L3": "human clinical observations, case reports and pharmacovigilance",
+    "L4": "community phenomenology and first-hand community observations",
+    "L5": "anecdotal or weakly sourced reports",
+    "prediction": "computational, inferred or model-derived relationship; never silently promoted to experimental evidence"
+  },
   "evidence_sources": [
     "PubMed",
     "NCCIH",
@@ -52,16 +77,20 @@
     "systematic reviews",
     "primary chemistry",
     "case reports",
-    "Erowid",
-    "Shroomery"
+    "pharmacovigilance",
+    "ethnobotanical field studies",
+    "taxonomic resources"
   ],
   "local_seed_db": "ethnogenic.db.json",
   "live_frontend": "ethnogenic.html",
   "data_policy": {
     "taxonomy": "Include accepted taxa and preserve synonym relationships.",
-    "chemistry": "Only attach a compound to an organism when a source explicitly supports the relationship.",
-    "evidence": "Traditional use, community phenomenology and clinical evidence remain separate provenance layers.",
-    "safety": "Interactions, adverse events, toxicity and uncertainty are first-class relationships.",
+    "chemistry": "Only attach a compound to an organism/material when a source explicitly supports the relationship.",
+    "morphology": "Preserve measured traits, measurement context, developmental state and provenance; do not infer pharmacological meaning from morphology alone.",
+    "preparation": "Preserve tissue, extraction, processing, formulation and other preparation variables.",
+    "evidence": "Traditional use, community phenomenology, clinical evidence and primary experimental evidence remain separate provenance layers.",
+    "safety": "Interactions, adverse events, toxicity, adulteration and uncertainty are first-class relationships.",
+    "authenticity": "Preserve labeled identity separately from authenticated identity when substitution or misidentification is possible.",
     "completeness": "Global taxonomy is browsable through the live provider rather than copied into a single GitHub Pages JSON payload."
   }
 }
