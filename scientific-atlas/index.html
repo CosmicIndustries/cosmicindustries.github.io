@@ -96,27 +96,29 @@ async function loadJsonl(url){
   return text.split(/\\r?\\n/).filter(Boolean).map(line=>JSON.parse(line));
 }
 async function loadCatalog(){
-  try{
-    const harvested=await loadJsonl('./catalog/harvested.jsonl?v=20260921');
-    if(harvested.length){
-      return harvested;
-    }
-  }catch(e){}
-  const seed=await fetch('./scientific-atlas-seed.csv?v=20260921').then(r=>{if(!r.ok)throw new Error('dataset '+r.status);return r.text()}).then(csvToRows);
-  return seed.map(r=>({...r,source_registry:'curated-seed'}));
+  const [harvested,seed,daily]=await Promise.all([
+    loadJsonl('./catalog/harvested.jsonl?v=20260927').catch(()=>[]),
+    fetch('./scientific-atlas-seed.csv?v=20260927').then(r=>{if(!r.ok)throw new Error('dataset '+r.status);return r.text()}).then(csvToRows).then(rows=>rows.map(r=>({...r,source_registry:'curated-seed'}))),
+    loadJsonl('./daily/2026-09-27.jsonl?v=20260927').catch(()=>[])
+  ]);
+  const merged=[...harvested,...daily,...seed];
+  const seen=new Set();
+  return merged.filter(r=>{const k=r.id||r.canonical_identifier||r.title;if(seen.has(k))return false;seen.add(k);return true});
 }
 loadCatalog().then(data=>{
   records=data;
-  const domains=[...new Set(records.map(r=>r.domain))].sort();
-  const states=[...new Set(records.map(r=>r.status))].sort();
+  const domains=[...new Set(records.map(r=>r.domain).filter(Boolean))].sort();
+  const states=[...new Set(records.map(r=>r.status).filter(Boolean))].sort();
   document.querySelector('#domain').innerHTML='<option value="">All domains</option>'+domains.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
   document.querySelector('#state').innerHTML='<option value="">All states</option>'+states.map(x=>'<option value="'+esc(x)+'">'+esc(x.replaceAll('_',' '))+'</option>').join('');
   const strong=records.filter(r=>r.evidence_class==='STRONG').length;
   const loss=records.filter(r=>['AT_RISK','MOVED','PARTIAL','ARCHIVED','RETIRED','MIGRATING'].includes(r.status)).length;
   const integrity=records.filter(r=>['failed-claim','fraud-case','meta-dataset','controversial-claim'].includes(r.record_type)).length;
+  const harvested=records.filter(r=>String(r.source_registry||'').startsWith('automated-harvest:')).length;
   const discovered=records.filter(r=>r.status==='DISCOVERED').length;
-  document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>INDEXED RECORDS</span></div><div class="stat"><b>'+strong+'</b><span>STRONG EVIDENCE</span></div><div class="stat"><b>'+discovered+'</b><span>HARVESTED / DISCOVERED</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div><div class="stat"><b>'+integrity+'</b><span>CONTROL / INTEGRITY TRACK</span></div>';
-  document.querySelector('.lead').insertAdjacentHTML('afterend','<p class="note">Catalog source: '+(discovered?'automated harvested index':'curated seed; harvested index not available yet')+'</p>');
+  const curated=records.filter(r=>String(r.source_registry||'').startsWith('curated-')).length;
+  document.querySelector('#stats').innerHTML='<div class="stat"><b>'+records.length+'</b><span>INDEXED RECORDS</span></div><div class="stat"><b>'+harvested+'</b><span>HARVESTED CANDIDATES</span></div><div class="stat"><b>'+discovered+'</b><span>DISCOVERED STATUS</span></div><div class="stat"><b>'+curated+'</b><span>SEED / CURATED</span></div><div class="stat"><b>'+loss+'</b><span>LOSS-SENSITIVE STATES</span></div>';
+  document.querySelector('.lead').insertAdjacentHTML('afterend','<p class="note">Catalog layers: '+harvested+' harvested candidates · '+discovered+' records currently marked DISCOVERED · '+curated+' seed/curated records. Harvested candidates are discovery inputs, not yet scientific validation.</p>');
   render();
 }).catch(e=>{
   document.querySelector('#grid').innerHTML='<div class="empty" style="display:block">Dataset could not be loaded.</div>';
