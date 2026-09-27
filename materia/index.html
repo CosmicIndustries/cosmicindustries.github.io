@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MATERIA — Morphology & Evidence Atlas</title>
+<title>MATERIA — Open Ethnobotanical Research Atlas · Full Knowledge Dump</title>
 <meta name="description" content="MATERIA — Open Ethnobotanical Research Atlas. Taxonomy, morphology, phyllotaxis, development, preparation, chemistry, bioactivity and evidence provenance.">
 <style>
 :root{--bg:#07100f;--panel:#0c1715;--panel2:#101e1b;--line:#28443d;--text:#e8eee9;--muted:#9cafaa;--accent:#8ed7b5;--gold:#d8b36a;--red:#d98f7d;--blue:#8fb7df}
@@ -16,13 +16,13 @@ header{position:sticky;top:0;z-index:10;background:#07100fee;backdrop-filter:blu
 .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{border:1px solid var(--line);padding:17px}.stat strong{display:block;font-size:27px}.stat span{color:var(--muted);font:11px ui-monospace,monospace}
 .levels{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.level{border:1px solid var(--line);padding:15px;min-height:150px}.level b{font:20px ui-monospace,monospace;color:var(--accent)}.level h4{margin:8px 0}.level p{color:var(--muted);font-size:12px}
 .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.controls input,.controls select{background:#091512;color:var(--text);border:1px solid var(--line);padding:12px;border-radius:3px}.controls input{flex:1;min-width:220px}.controls button{background:#091512;color:var(--accent);border:1px solid var(--line);padding:12px;cursor:pointer}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.card{border:1px solid var(--line);padding:18px;background:#0a1513}.card h3{margin:6px 0}.card p{color:var(--muted);font-size:13px}.tag{font:10px ui-monospace,monospace;color:var(--accent);letter-spacing:.12em}.evidence{display:inline-block;border:1px solid var(--line);padding:3px 7px;margin:2px;font:10px ui-monospace,monospace}.evidence.l0{color:var(--accent);border-color:#376c59}.evidence.pred{color:var(--gold)}
-table{width:100%;border-collapse:collapse}td,th{border-top:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{font:10px ui-monospace,monospace;color:var(--accent);letter-spacing:.1em}.rule{border-left:3px solid var(--gold);background:#0c1815;padding:15px;color:var(--muted)}
+table{width:100%;border-collapse:collapse}td,th{border-top:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}th{font:10px ui-monospace,monospace;color:var(--accent);letter-spacing:.1em}.rule{border-left:3px solid var(--gold);background:#0c1815;padding:15px;color:var(--muted)}.dumpgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.dumpgrid .panel{min-height:210px}.dumpgrid p{color:var(--muted);font-size:13px}
 footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.1em;display:flex;justify-content:space-between}
-@media(max-width:900px){.span4,.span5,.span7,.span8{grid-column:span 12}.cards{grid-template-columns:1fr 1fr}.levels{grid-template-columns:repeat(3,1fr)}.statgrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){nav{display:none}.cards,.levels,.statgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
+@media(max-width:900px){.span4,.span5,.span7,.span8{grid-column:span 12}.cards{grid-template-columns:1fr 1fr}.levels{grid-template-columns:repeat(3,1fr)}.statgrid{grid-template-columns:1fr 1fr}.dumpgrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){nav{display:none}.cards,.levels,.statgrid,.dumpgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand" href="#"><span class="sigil">✦</span><span><b>MATERIA</b><small>OPEN ETHNOBOTANICAL RESEARCH ATLAS · v0.5.0</small></span></a><nav><a href="#architecture">Architecture</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#evidence">Evidence</a><a href="#corpus">Corpus</a></nav></div></header>
+<header><div class="wrap nav"><a class="brand" href="#"><span class="sigil">✦</span><span><b>MATERIA</b><small>OPEN ETHNOBOTANICAL RESEARCH ATLAS · v0.6.0</small></span></a><nav><a href="#architecture">Architecture</a><a href="#phyllotaxis">Phyllotaxis</a><a href="#evidence">Evidence</a><a href="#corpus">Corpus</a><a href="#dump">Full Dump</a></nav></div></header>
 <main class="wrap">
 <section class="hero"><div class="eyebrow">TAXONOMY / MORPHOLOGY / PHARMACOGNOSY / ETHNOBOTANY</div><h1>Plants are not<br><em>flat records.</em></h1><p>MATERIA preserves the organism, its morphology, developmental state, environment, preparation, chemistry, activity and human knowledge as connected but separately evidenced observations.</p><div class="pillrow"><span class="pill active">PHYLLOTAXIS</span><span class="pill">ARCHITECTURE</span><span class="pill">DEVELOPMENT</span><span class="pill">PHENOLOGY</span><span class="pill">PREPARATION</span><span class="pill">CHEMISTRY</span><span class="pill">TOXICOLOGY</span></div></section>
 
@@ -59,6 +59,90 @@ footer{border-top:1px solid var(--line);padding:30px 24px;color:var(--muted);fon
 <div id="cards" class="cards"></div></section>
 
 <section><div class="head"><div><div class="eyebrow">06 / SOURCE NETWORK</div><h2>External corpus bridges</h2></div></div><div class="panel"><table><tr><th>RESOURCE</th><th>ROLE IN MATERIA</th><th>STATUS</th></tr><tr><td>Catalogue of Life / ChecklistBank</td><td>Global taxonomy, synonyms, distributions</td><td><span class="evidence l0">LIVE</span></td></tr><tr><td>Natural Products Atlas</td><td>Natural-product structures and biosources</td><td><span class="evidence">BRIDGE</span></td></tr><tr><td>LOTUS</td><td>Compound ↔ organism relationships</td><td><span class="evidence">BRIDGE</span></td></tr><tr><td>TRY Plant Trait Database</td><td>Plant functional traits</td><td><span class="evidence">PHENOTYPE TARGET</span></td></tr><tr><td>Sugar4D-style phenotyping</td><td>4D plant architecture / leaf geometry</td><td><span class="evidence">PHENOTYPE TARGET</span></td></tr><tr><td>Phyllotaxis developmental datasets</td><td>Meristem patterning, genetics, organ initiation</td><td><span class="evidence">DEVELOPMENT TARGET</span></td></tr></table></div></section>
+
+<section id="dump"><div class="head"><div><div class="eyebrow">07 / FULL DUMP</div><h2>MATERIA knowledge layers</h2></div><p>The atlas is organized as interoperable evidence layers. A record can exist in several layers without collapsing their provenance or certainty.</p></div>
+<div class="dumpgrid">
+<div class="panel"><span class="tag">01 · TAXONOMY</span><h3>Names & identity</h3><p>Accepted names, synonyms, basionyms, classifications, vernacular names, distributions, source datasets and taxonomic scrutiny.</p><div class="evidence l0">CATALOGUE OF LIFE</div><div class="evidence">CHECKLISTBANK</div></div>
+<div class="panel"><span class="tag">02 · MORPHOLOGY</span><h3>Form & structure</h3><p>Leaf dimensions, shape, margin, venation, arrangement, stem geometry, branching, roots, inflorescences, organs and diagnostic characters.</p><div class="evidence">TRAIT OBSERVATION</div><div class="evidence">IMAGE / SPECIMEN</div></div>
+<div class="panel"><span class="tag">03 · DEVELOPMENT</span><h3>Growth & transition</h3><p>Meristem state, organ initiation, plastochron, branching order, ontogenetic transitions and developmental stage.</p><div class="evidence">TIME SERIES</div><div class="evidence">MERISTEM</div></div>
+<div class="panel"><span class="tag">04 · PHENOLOGY</span><h3>Season & state</h3><p>Bud, leaf, flowering, fruiting, dormancy, senescence and harvest state linked to observation date and location.</p><div class="evidence">DATE / PLACE</div><div class="evidence">HARVEST STATE</div></div>
+<div class="panel"><span class="tag">05 · ENVIRONMENT</span><h3>Conditions</h3><p>Light, temperature, water, soil, nutrients, elevation, climate, stressors, cultivation treatment and experimental context.</p><div class="evidence">SITE</div><div class="evidence">TREATMENT</div></div>
+<div class="panel"><span class="tag">06 · TISSUE</span><h3>Material state</h3><p>Leaf, stem, root, bark, flower, seed, fruit, resin, latex, whole plant and other explicitly sampled material.</p><div class="evidence">MATERIAL</div><div class="evidence">PART</div></div>
+<div class="panel"><span class="tag">07 · PREPARATION</span><h3>Processing</h3><p>Fresh, dried, powdered, decocted, infused, macerated, distilled, extracted, fermented and formulated states with solvent/process metadata.</p><div class="evidence">METHOD</div><div class="evidence">SOLVENT</div></div>
+<div class="panel"><span class="tag">08 · CHEMISTRY</span><h3>Molecules & mixtures</h3><p>Natural products, structures, formulas, identifiers, abundance, extraction context, biosource and chemical ontology terms.</p><div class="evidence">LOTUS</div><div class="evidence">NP ATLAS</div></div>
+<div class="panel"><span class="tag">09 · BIOACTIVITY</span><h3>Observed effects</h3><p>Assay system, endpoint, dose, exposure, controls, units, organism/cell model and experimental result—never detached from preparation.</p><div class="evidence">ASSAY</div><div class="evidence">ENDPOINT</div></div>
+<div class="panel"><span class="tag">10 · TOXICOLOGY</span><h3>Hazard & safety</h3><p>Adverse events, poisoning reports, cytotoxicity, dose-response, contraindication evidence and uncertainty.</p><div class="evidence">SAFETY</div><div class="evidence">DOSE</div></div>
+<div class="panel"><span class="tag">11 · CULTURE</span><h3>Human knowledge</h3><p>Documented traditional use, preparation practice, historical sources, community context, language and transmission pathway.</p><div class="evidence">ETHNOGRAPHY</div><div class="evidence">HISTORY</div></div>
+<div class="panel"><span class="tag">12 · AUTHENTICITY</span><h3>Identity control</h3><p>Voucher, specimen, microscopy, DNA, chemical fingerprint, morphology and adulteration checks remain distinct authentication evidence.</p><div class="evidence">VOUCHER</div><div class="evidence">AUTHENTICATION</div></div>
+</div></section>
+
+<section><div class="head"><div><div class="eyebrow">08 / DATA CONTRACT</div><h2>Every observation keeps its context</h2></div><p>This is the core rule for the database: a value without its observational context is incomplete data.</p></div>
+<div class="grid"><div class="panel span8"><table><tr><th>OBJECT</th><th>REQUIRED CONTEXT</th><th>EXAMPLES</th></tr>
+<tr><td>Taxon</td><td>name, rank, source, status</td><td>accepted name / synonym / basionym</td></tr>
+<tr><td>Observation</td><td>entity, trait, value, unit, method</td><td>leaf length = 84 mm</td></tr>
+<tr><td>Specimen</td><td>voucher, collector, date, locality</td><td>herbarium accession</td></tr>
+<tr><td>Phenotype</td><td>genotype, stage, environment, time</td><td>leaf area under drought</td></tr>
+<tr><td>Preparation</td><td>material, process, solvent, ratio, duration</td><td>70% ethanol extract</td></tr>
+<tr><td>Compound</td><td>identifier, structure, source material</td><td>natural-product record</td></tr>
+<tr><td>Assay</td><td>system, dose, endpoint, controls</td><td>growth inhibition assay</td></tr>
+<tr><td>Claim</td><td>proposition, source, evidence level</td><td>documented traditional use</td></tr>
+</table></div><div class="panel span4"><h3>Null is information</h3><p>Unknown, not measured, not applicable, disputed and withheld are different states.</p><div class="rule"><b>Never infer a zero.</b><br>A missing trait is not evidence that the trait is absent.</div></div></div></section>
+
+<section><div class="head"><div><div class="eyebrow">09 / CORPUS SNAPSHOT</div><h2>Known external reservoirs</h2></div><p>Current source metadata is displayed separately from local records. Large source datasets are linked, not silently copied into the GitHub page.</p></div>
+<div class="statgrid">
+<div class="stat"><strong>8.10M</strong><span>COL XR names · 2026-08-26</span></div>
+<div class="stat"><strong>2.49M</strong><span>COL XR species · 2026-08-26</span></div>
+<div class="stat"><strong>22.86M</strong><span>TRY v7 trait records</span></div>
+<div class="stat"><strong>306.7K</strong><span>TRY v7 plant taxa</span></div>
+</div>
+<div class="panel" style="margin-top:12px"><table><tr><th>SOURCE</th><th>RELEASE</th><th>WHAT MATERIA HARVESTS</th><th>LICENSE / ACCESS NOTE</th></tr>
+<tr><td>Catalogue of Life</td><td>2026-08-26 XR</td><td>names, accepted concepts, synonyms, classification, distributions, references</td><td>open access; source caveats retained</td></tr>
+<tr><td>TRY Plant Trait Database</td><td>v7 · 2026-09-04</td><td>plant functional, morphological, anatomical, physiological and phenological traits</td><td>data access governed by TRY policy; attribution preserved</td></tr>
+<tr><td>Natural Products Atlas</td><td>v2024_09</td><td>microbial natural products, structures, taxonomy, ontology and network relationships</td><td>CC BY-NC 4.0 for releases from 2024_09</td></tr>
+<tr><td>LOTUS</td><td>February 2021 public download</td><td>natural-product structures and organism relationships</td><td>open-data portal; provenance and citation retained</td></tr>
+</table></div></section>
+
+<section><div class="head"><div><div class="eyebrow">10 / INGESTION ENGINE</div><h2>Harvest → normalize → preserve</h2></div><p>MATERIA can expand without destroying source semantics. Each imported object receives a stable source identity and a local provenance trail.</p></div>
+<div class="grid">
+<div class="panel span4"><h3>01 · Harvest</h3><p>Acquire metadata, releases, files, APIs and citations. Record retrieval date and exact source version.</p><div class="evidence l0">SOURCE LOCK</div></div>
+<div class="panel span4"><h3>02 · Normalize</h3><p>Map taxonomic identifiers, units, trait vocabulary, chemical identifiers and controlled terms without rewriting the original value.</p><div class="evidence">MAPPING</div></div>
+<div class="panel span4"><h3>03 · Preserve</h3><p>Store source value, normalized value, transformation, evidence level, license and citation together.</p><div class="evidence">PROVENANCE</div></div>
+<div class="panel span4"><h3>04 · Validate</h3><p>Check units, impossible values, duplicates, identifier collisions, taxonomy mismatches and missing context.</p><div class="evidence">QA</div></div>
+<div class="panel span4"><h3>05 · Link</h3><p>Connect taxon ↔ specimen ↔ trait ↔ environment ↔ preparation ↔ compound ↔ assay while retaining one-to-many relationships.</p><div class="evidence">GRAPH</div></div>
+<div class="panel span4"><h3>06 · Expose</h3><p>Make the result searchable, filterable and visually inspectable without implying that linked objects share equal evidentiary weight.</p><div class="evidence">QUERY</div></div>
+</div></section>
+
+<section><div class="head"><div><div class="eyebrow">11 / COVERAGE MATRIX</div><h2>What is known—and what is still missing</h2></div><p>The atlas should expose gaps rather than hiding them behind polished pages.</p></div>
+<div class="panel"><table><tr><th>DOMAIN</th><th>TAXONOMIC COVERAGE</th><th>TIME</th><th>ENVIRONMENT</th><th>PRIMARY EVIDENCE</th><th>MATURITY</th></tr>
+<tr><td>Taxonomy</td><td>Global</td><td>versioned</td><td>distribution</td><td>High</td><td>CORE</td></tr>
+<tr><td>Functional traits</td><td>Large global sample</td><td>observation-specific</td><td>site/treatment where available</td><td>High</td><td>INGEST</td></tr>
+<tr><td>Morphology</td><td>fragmented</td><td>often specimen/stage-specific</td><td>often absent</td><td>Variable</td><td>EXPAND</td></tr>
+<tr><td>Phyllotaxis</td><td>fragmented</td><td>developmental</td><td>rarely standardized</td><td>Variable</td><td>EXPAND</td></tr>
+<tr><td>Phenology</td><td>large but uneven</td><td>date/season critical</td><td>site dependent</td><td>High/Variable</td><td>EXPAND</td></tr>
+<tr><td>Chemistry</td><td>compound-centric</td><td>release/versioned</td><td>biosource + preparation</td><td>High</td><td>BRIDGE</td></tr>
+<tr><td>Ethnobotany</td><td>highly uneven</td><td>historical + contemporary</td><td>culture/place critical</td><td>Variable</td><td>EXPAND</td></tr>
+<tr><td>Toxicology</td><td>uneven</td><td>dose/exposure critical</td><td>model dependent</td><td>Variable</td><td>EXPAND</td></tr>
+</table></div></section>
+
+<section><div class="head"><div><div class="eyebrow">12 / HARVEST QUEUE</div><h2>Next datasets to ingest</h2></div><p>Priority is driven by information gain: datasets that connect currently isolated layers come first.</p></div>
+<div class="cards">
+<article class="card"><span class="tag">P1 · TRAITS</span><h3>TRY v7 trait corpus</h3><p>Map trait definitions, units, source references and taxonomy into observation objects. Preserve source-level access controls.</p><span class="evidence">22.86M TRAITS</span></article>
+<article class="card"><span class="tag">P1 · CHEMISTRY</span><h3>Natural Products Atlas 2024_09</h3><p>Build compound ↔ microbial biosource ↔ taxonomy edges and retain the post-2024_09 non-commercial licensing boundary.</p><span class="evidence">2024_09</span></article>
+<article class="card"><span class="tag">P1 · CHEMISTRY</span><h3>LOTUS public dataset</h3><p>Import structure identifiers and organism relationships as chemistry objects rather than attaching compounds directly to species names.</p><span class="evidence">OPEN DATA</span></article>
+<article class="card"><span class="tag">P2 · MORPHOLOGY</span><h3>Phyllotaxis literature corpus</h3><p>Extract divergence, organ initiation, plastochron, spiral structure and developmental transitions from primary literature.</p><span class="evidence">DEVELOPMENT</span></article>
+<article class="card"><span class="tag">P2 · PHENOTYPING</span><h3>4D plant imaging datasets</h3><p>Represent time-resolved architecture as observations with image/frame provenance rather than as a single morphology label.</p><span class="evidence">4D</span></article>
+<article class="card"><span class="tag">P2 · ETHNOBOTANY</span><h3>Preparation literature</h3><p>Expand the preparation graph: plant part → process → solvent/water → dose/formulation → documented use → safety context.</p><span class="evidence">METHOD</span></article>
+</div></section>
+
+<section><div class="head"><div><div class="eyebrow">13 / RESEARCH RULES</div><h2>Non-negotiable semantics</h2></div></div>
+<div class="grid">
+<div class="panel span4"><h3>Observation ≠ interpretation</h3><p>Store measured or reported observations separately from explanations, mechanisms and hypotheses.</p></div>
+<div class="panel span4"><h3>Association ≠ causation</h3><p>A linked compound, use or phenotype does not establish causal efficacy.</p></div>
+<div class="panel span4"><h3>Prediction ≠ evidence</h3><p>Docking, ML and inferred mechanisms retain a prediction flag and source model.</p></div>
+<div class="panel span4"><h3>Traditional use ≠ clinical proof</h3><p>Cultural documentation is valuable evidence of human practice, not automatic evidence of efficacy or safety.</p></div>
+<div class="panel span4"><h3>Identity ≠ resemblance</h3><p>Morphological similarity cannot silently replace voucher, taxonomic or analytical authentication.</p></div>
+<div class="panel span4"><h3>Absence ≠ zero</h3><p>Missing, unmeasured, inaccessible and genuinely absent values remain distinct states.</p></div>
+</div></section>
 </main>
 <footer><span>COSMIC INDUSTRIES / MATERIA</span><span>OBSERVE · SOURCE · DISTINGUISH · PRESERVE</span></footer>
 <script>
