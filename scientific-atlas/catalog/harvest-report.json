@@ -1,13 +1,18 @@
 {
-  "harvested_at": "2026-10-02T12:50:08Z",
-  "records_seen": 9100,
-  "records_written": 9100,
+  "harvested_at": "2026-10-03T11:49:35Z",
+  "records_seen": 6100,
+  "records_written": 6100,
   "duplicates_removed": 0,
-  "errors": [],
+  "errors": [
+    {
+      "source": "usgs-sciencebase-data-releases",
+      "error": "<HTTPError 500: 'Internal Server Error'>",
+      "time": "2026-10-03T11:49:33Z"
+    }
+  ],
   "sources": [
     "datacite-datasets",
     "nasa-cmr-collections",
-    "noaa-ncei-search",
-    "usgs-sciencebase-data-releases"
+    "noaa-ncei-search"
   ]
 }
