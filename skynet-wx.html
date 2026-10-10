@@ -229,7 +229,7 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
 
 /* ── Map wrapper ── */
 #map-wrap{flex:1;position:relative;overflow:hidden}
-#map{position:absolute;inset:0}
+#map{position:absolute;inset:0;z-index:1}
 
 /* Loading overlay */
 #map-load{
@@ -653,17 +653,30 @@ try {
 }
 
 // ════════════════════════════════════════════════════════════════════════
-// ADD LAYERS TO MAP (Leaflet API)
+// ADD LAYERS TO MAP (Leaflet API — named panes for blend-mode support)
 // ════════════════════════════════════════════════════════════════════════
 function addMapLayers() {
+  // Create one named pane per layer so CSS mix-blend-mode can be set per-layer
+  LAYERS_DEF.forEach((def, idx) => {
+    const paneName = `pane-${def.id}`;
+    if (!map.getPane(paneName)) {
+      map.createPane(paneName);
+      const pane = map.getPane(paneName);
+      pane.style.zIndex       = 210 + idx * 10;  // stack above basemap tiles (z=200)
+      pane.style.mixBlendMode = layerSt[def.id].blend || 'normal';
+      pane.style.pointerEvents = 'none';
+    }
+  });
+
   // Satellite image overlays — georeferenced to sector bounds
+  // NOTE: crossOrigin NOT set — NOAA CDN has no CORS headers; setting it blocks img load
   LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
     const url    = `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/${def.band}/latest.jpg`;
     const bounds = sectorBounds(sector);
     const layer  = L.imageOverlay(url, bounds, {
       opacity:     def.on ? def.opacity : 0,
       interactive: false,
-      crossOrigin: true,
+      pane:        `pane-${def.id}`,
     });
     if (def.on) layer.addTo(map);
     _leafletLayers[def.id] = layer;
@@ -678,6 +691,7 @@ function addMapLayers() {
       version:     '1.3.0',
       opacity:     def.on ? def.opacity : 0,
       tileSize:    512,
+      pane:        `pane-${def.id}`,
     });
     if (def.on) layer.addTo(map);
     _leafletLayers[def.id] = layer;
@@ -689,9 +703,10 @@ function addMapLayers() {
       color:       feature.properties.color || '#64748b',
       fillColor:   feature.properties.color || '#64748b',
       weight:      1.4,
-      opacity:     layerSt.alerts.on ? 0.8 : 0,
-      fillOpacity: layerSt.alerts.on ? layerSt.alerts.opacity : 0,
+      opacity:     0.8,
+      fillOpacity: layerSt.alerts.opacity,
     }),
+    pane: 'pane-alerts',
   });
   if (layerSt.alerts.on) alertsLayer.addTo(map);
   _leafletLayers.alerts = alertsLayer;
@@ -710,7 +725,7 @@ function applyLayer(id) {
       if (!map.hasLayer(layer)) layer.addTo(map);
       layer.setStyle({ opacity: 0.8, fillOpacity: s.opacity });
     } else {
-      layer.setStyle({ opacity: 0, fillOpacity: 0 });
+      if (map.hasLayer(layer)) map.removeLayer(layer);
     }
     return;
   }
@@ -719,7 +734,7 @@ function applyLayer(id) {
     if (!map.hasLayer(layer)) layer.addTo(map);
     layer.setOpacity(s.opacity);
   } else {
-    layer.setOpacity(0);
+    if (map.hasLayer(layer)) map.removeLayer(layer);
   }
 }
 
@@ -780,8 +795,10 @@ function renderLayerPanel() {
 
   el.querySelectorAll('.bsel').forEach(sel => {
     sel.addEventListener('change', () => {
-      layerSt[sel.dataset.lid].blend = sel.value;
-      // Note: true per-layer CSS blend modes require multi-canvas — stored for future enhancement
+      const lid = sel.dataset.lid;
+      layerSt[lid].blend = sel.value;
+      const pane = map.getPane(`pane-${lid}`);
+      if (pane) pane.style.mixBlendMode = sel.value;
     });
   });
 }
