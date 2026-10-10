@@ -294,6 +294,12 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
   font-family:inherit;cursor:pointer;transition:all .15s
 }
 .spd-btn.on{background:var(--bg3);color:var(--accent);border-color:var(--accent)}
+.hrs-btn{
+  padding:3px 7px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--rs);color:var(--text2);font-size:10px;
+  font-family:inherit;cursor:pointer;transition:all .15s
+}
+.hrs-btn.on{background:var(--bg3);color:var(--accent2);border-color:var(--accent2)}
 .tl-track{display:flex;align-items:center;gap:2px;height:18px}
 .tf{
   flex:1;height:5px;border-radius:2px;background:var(--bg3);
@@ -306,6 +312,44 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
   background:var(--accent);border-color:var(--accent);
   box-shadow:0 0 6px var(--glow)
 }
+
+/* ── Storm chips ── */
+.storm-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 9px;margin:2px;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:14px;color:var(--text);font-size:11px;font-weight:600;
+  font-family:inherit;cursor:pointer;transition:all .15s;text-align:left
+}
+.storm-chip:hover{background:var(--bg3);border-color:var(--warn)}
+.storm-chip.active{background:rgba(245,158,11,.15);border-color:var(--warn);color:var(--warn)}
+.st-tip{font-size:10px;color:var(--text3);padding:5px 4px;line-height:1.4}
+.st-divider{height:1px;background:var(--border);margin:6px 0}
+
+/* ── Model toggles ── */
+.models-hd{font-size:9.5px;letter-spacing:.09em;font-weight:700;color:var(--text3);
+  text-transform:uppercase;padding:4px 0 2px}
+.model-toggle{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 0;cursor:pointer;font-size:11px;color:var(--text2);
+  transition:color .15s
+}
+.model-toggle:hover{color:var(--text)}
+.model-toggle input{display:none}
+.model-swatch{
+  width:22px;height:4px;border-radius:2px;
+  background:var(--mc,var(--accent));flex-shrink:0;opacity:.85
+}
+.model-toggle input:checked ~ .model-swatch{opacity:1}
+.model-toggle input:not(:checked) ~ *{opacity:.45}
+.model-toggle input:not(:checked) ~ .model-swatch{opacity:.2}
+
+/* ── Ghost button ── */
+#tl-ghost{font-size:13px;padding:0 7px;min-width:52px;transition:all .15s}
+#tl-ghost.on{background:rgba(168,85,247,.25);border-color:#a855f7;color:#c084fc}
+
+/* ── Track mode cursor ── */
+body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
 
 /* ── Mobile ── */
 @media(max-width:640px){
@@ -350,11 +394,9 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
           <div class="ps-bd" id="ps-sec">
             <div class="sec-grid">
               <button class="sec-btn on" data-sector="se">SE</button>
-              <button class="sec-btn" data-sector="gm">Gulf</button>
+              <button class="sec-btn" data-sector="pr">Caribbean</button>
               <button class="sec-btn" data-sector="nr">NE</button>
               <button class="sec-btn" data-sector="psw">SW</button>
-              <button class="sec-btn" data-sector="CONUS">CONUS</button>
-              <button class="sec-btn" data-sector="FD">Full Disk</button>
             </div>
           </div>
         </div>
@@ -409,6 +451,25 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
           </div>
         </div>
 
+        <!-- STORMS & TRACKS -->
+        <div class="ps">
+          <div class="ps-hd open" data-tgt="ps-storms">
+            <span>🌀 STORMS &amp; TRACKS</span><span class="chev">▶</span>
+          </div>
+          <div class="ps-bd" id="ps-storms">
+            <div class="st-tip">Active NHC tropical cyclones — click to center map and set track origin.</div>
+            <div id="st-storms" style="margin:4px 0 2px">
+              <div style="font-size:11px;color:var(--text3)">Loading storms…</div>
+            </div>
+            <div class="st-divider"></div>
+            <div class="st-tip">Right-click any map point to place a custom track origin (🎯). Model trajectory spaghetti will radiate forward 72 h.</div>
+            <div class="models-hd" style="margin-top:6px">NWP MODELS</div>
+            <div id="st-models">
+              <!-- populated by renderStormPanel() -->
+            </div>
+          </div>
+        </div>
+
       </div><!-- /sb-inner -->
     </aside>
 
@@ -432,11 +493,19 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
           <button class="tl-btn" id="tl-next" title="Step forward">▷</button>
           <span id="tl-ts">-- UTC</span>
           <span class="tl-sp"></span>
+          <span style="font-size:10px;color:var(--text3);margin-right:2px">LOOP</span>
+          <button class="hrs-btn on" data-hrs="1">1h</button>
+          <button class="hrs-btn" data-hrs="2">2h</button>
+          <button class="hrs-btn" data-hrs="3">3h</button>
+          <button class="hrs-btn" data-hrs="6">6h</button>
+          <span style="width:1px;height:14px;background:var(--border2);display:inline-block;margin:0 2px"></span>
           <span style="font-size:10px;color:var(--text3);margin-right:2px">SPEED</span>
           <button class="spd-btn" data-fps="0.5">½×</button>
           <button class="spd-btn on" data-fps="1">1×</button>
           <button class="spd-btn" data-fps="2">2×</button>
           <button class="spd-btn" data-fps="4">4×</button>
+          <span style="width:1px;height:14px;background:var(--border2);display:inline-block;margin:0 2px"></span>
+          <button class="tl-btn" id="tl-ghost" title="Ghost frames — overlay previous frame at 35% opacity">👻 OFF</button>
         </div>
         <div class="tl-track" id="tl-track"></div>
       </div>
@@ -455,12 +524,10 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
 
 // ── Config ───────────────────────────────────────────────────────────────
 const SECTORS = {
-  se:    {label:'Southeast',     w:-105,e:-55, s:15,  n:47.5, cx:-80,  cy:31,  z:5  },
-  gm:    {label:'Gulf of Mexico',w:-100,e:-77, s:17,  n:35,   cx:-88,  cy:26,  z:5.5},
-  nr:    {label:'Northeast',     w:-82, e:-62, s:35,  n:48,   cx:-72,  cy:42,  z:6  },
-  psw:   {label:'Pacific SW',    w:-130,e:-105,s:25,  n:45,   cx:-118, cy:35,  z:5.5},
-  CONUS: {label:'CONUS',         w:-130,e:-60, s:20,  n:50,   cx:-95,  cy:37,  z:4  },
-  FD:    {label:'Full Disk',     w:-155,e:-15, s:-5,  n:60,   cx:-77,  cy:25,  z:3  },
+  se:  {label:'Southeast',   w:-105,e:-55, s:15,  n:47.5, cx:-80,  cy:31,  z:5  },
+  pr:  {label:'Caribbean',   w:-75, e:-55, s:14,  n:27,   cx:-65,  cy:20,  z:5.5},
+  nr:  {label:'Northeast',   w:-82, e:-62, s:35,  n:48,   cx:-72,  cy:42,  z:6  },
+  psw: {label:'Pacific SW',  w:-130,e:-105,s:25,  n:45,   cx:-118, cy:35,  z:5.5},
 };
 
 const LAYERS_DEF = [
@@ -477,8 +544,9 @@ const LAYERS_DEF = [
 ];
 
 const ALERT_AREAS = 'AL,FL,GA,LA,MS,NC,SC,TN,TX,AR,OK,VA';
-const FRAME_COUNT = 12;
-const FRAME_MS    = 5 * 60 * 1000;
+// NOAA STAR CDN uses lowercase sector codes in filenames (same as internal keys)
+let frameCount = 12;       // mutable — changed by hours selector
+const FRAME_MS = 5 * 60 * 1000;  // 5-min intervals between frames
 
 // WMS base URLs and layer names
 const WMS_URLS = {
@@ -498,7 +566,7 @@ const WMS_LAYERS = {
 
 // ── State ─────────────────────────────────────────────────────────────────
 let sector    = 'se';
-let frame     = FRAME_COUNT - 1;
+let frame     = frameCount - 1;
 let playing   = true;
 let animFps   = 1;
 let animTimer = null;
@@ -506,6 +574,25 @@ let frames    = [];
 let modelData = null;
 const layerSt = {};
 LAYERS_DEF.forEach(d => { layerSt[d.id] = {...d}; });
+
+// Ghost frame state
+let ghostMode  = false;
+let ghostLayer = null;
+const GHOST_BACK = 5;   // show this many frames behind current
+
+// Track / spaghetti state
+let trackLatLon  = null;
+let _trackLayers = [];   // Leaflet polylines+markers on map
+
+// NWP models for spaghetti tracks
+const MODEL_APIS = [
+  { id:'gfs',  url:'https://api.open-meteo.com/v1/gfs',         label:'GFS (NOAA)',    color:'#38bdf8' },
+  { id:'ecmwf',url:'https://api.open-meteo.com/v1/ecmwf',       label:'ECMWF IFS',     color:'#4ade80' },
+  { id:'icon', url:'https://api.open-meteo.com/v1/dwd-icon',    label:'ICON (DWD)',    color:'#fb923c' },
+  { id:'gem',  url:'https://api.open-meteo.com/v1/gem',         label:'GEM (CMC)',     color:'#a78bfa' },
+  { id:'mf',   url:'https://api.open-meteo.com/v1/meteofrance', label:'Météo-France',  color:'#f472b6' },
+];
+let activeModels = new Set(['gfs','ecmwf','icon']);
 
 // Leaflet layer references
 const _leafletLayers = {};
@@ -522,31 +609,36 @@ function _julianDay(d) {
 }
 
 function _toStarTs(date) {
-  const d = new Date(date);
-  d.setUTCMinutes(Math.floor(d.getUTCMinutes() / 5) * 5, 0, 0);
+  const d   = new Date(date);
+  const min = d.getUTCMinutes();
+  // GOES-19 sector scans complete at :01,:06,:11,...,:56 (every 5 min, offset by 1)
+  // Snap down to the nearest scan minute; JS Date handles negative minutes gracefully
+  const rem = ((min - 1) % 5 + 5) % 5;
+  d.setUTCMinutes(min - rem, 0, 0);
   const y   = d.getUTCFullYear();
   const day = String(_julianDay(d)).padStart(3, '0');
   const h   = String(d.getUTCHours()).padStart(2, '0');
   const m   = String(d.getUTCMinutes()).padStart(2, '0');
-  return `${y}${day}${h}${m}00`;
+  return `${y}${day}${h}${m}`;  // 11-digit YYYYDDDHHMM — no seconds
 }
 
 function satGetFrames(sec, band, count) {
   const key = `${sec}:${band}:${count}`;
   const c   = _satMemo.get(key);
   if (c && Date.now() - c.ts < _SAT_TTL) return c.data;
-  const out  = [];
-  const now  = Date.now();
-  const base = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR';
+  const out     = [];
+  const now     = Date.now();
+  const base    = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR';
   for (let i = count - 1; i >= 0; i--) {
-    const t   = new Date(now - i * FRAME_MS);
-    const ts  = _toStarTs(t);
+    const t  = new Date(now - i * FRAME_MS);
+    const ts = _toStarTs(t);
     out.push({
-      idx:       count - 1 - i,
+      idx:     count - 1 - i,
       ts,
-      iso:       t.toISOString(),
-      wmsTime:   t.toISOString().slice(0, 19) + 'Z',
-      starUrl:   `${base}/${sec}/${band}/${ts}_GOES19-ABI-${sec}-${band}-1000x1000.jpg`,
+      iso:     t.toISOString(),
+      wmsTime: t.toISOString().slice(0, 19) + 'Z',
+      // starUrl for GEOCOLOR; applyFrame builds per-band URLs using ts directly
+      starUrl:   `${base}/${sec}/${band}/${ts}_GOES19-ABI-${sec}-${band}-1200x1200.jpg`,
       latestUrl: `${base}/${sec}/${band}/latest.jpg`,
     });
   }
@@ -710,6 +802,23 @@ function addMapLayers() {
   });
   if (layerSt.alerts.on) alertsLayer.addTo(map);
   _leafletLayers.alerts = alertsLayer;
+
+  // Ghost frame overlay — sits just above sat layers, below WMS
+  if (!map.getPane('pane-ghost')) {
+    map.createPane('pane-ghost');
+    const gp = map.getPane('pane-ghost');
+    gp.style.zIndex        = 260;   // above sat (210-250) but below WMS (260+… actually fine)
+    gp.style.mixBlendMode  = 'normal';
+    gp.style.pointerEvents = 'none';
+    gp.style.opacity       = '0';   // hidden until ghost mode on
+  }
+  const ghostUrl    = `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/GEOCOLOR/latest.jpg`;
+  const ghostBounds = sectorBounds(sector);
+  ghostLayer = L.imageOverlay(ghostUrl, ghostBounds, {
+    opacity:     0.35,
+    interactive: false,
+    pane:        'pane-ghost',
+  }).addTo(map);
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -808,20 +917,25 @@ function renderLayerPanel() {
 // ════════════════════════════════════════════════════════════════════════
 function genFrames() {
   try {
-    frames = satGetFrames(sector, 'GEOCOLOR', FRAME_COUNT);
+    frames = satGetFrames(sector, 'GEOCOLOR', frameCount);
   } catch {
     frames = [];
     const now = Date.now();
-    for (let i = FRAME_COUNT - 1; i >= 0; i--) {
-      const t = new Date(now - i * FRAME_MS);
+    for (let i = frameCount - 1; i >= 0; i--) {
+      const t  = new Date(now - i * FRAME_MS);
+      const ts = _toStarTs(t);
       frames.push({
-        idx: FRAME_COUNT - 1 - i,
-        iso: t.toISOString(),
+        idx:     frameCount - 1 - i,
+        ts,
+        iso:     t.toISOString(),
         wmsTime: t.toISOString().slice(0, 19) + 'Z',
+        starUrl: `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/GEOCOLOR/${ts}_GOES19-ABI-${sector}-GEOCOLOR-1200x1200.jpg`,
         latestUrl: `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/GEOCOLOR/latest.jpg`,
       });
     }
   }
+  // Clamp current frame to new length
+  frame = Math.min(frame, frames.length - 1);
   renderTrack();
 }
 
@@ -852,7 +966,7 @@ function syncTimestamp() {
 }
 
 function goFrame(i) {
-  frame = Math.max(0, Math.min(FRAME_COUNT - 1, i));
+  frame = Math.max(0, Math.min(frames.length - 1, i));
   syncTimestamp();
   applyFrame();
 }
@@ -860,15 +974,26 @@ function goFrame(i) {
 function applyFrame() {
   if (!frames[frame]) return;
   const f = frames[frame];
+  const base = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR';
 
-  // Update sat image overlays — prefer timestamped URL, fall back to latest
+  // Update sat image overlays — each band gets its own timestamped URL with fallback
   LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
     const layer = _leafletLayers[def.id];
     if (!layer) return;
-    const url = (def.band === 'GEOCOLOR' && f.starUrl)
-      ? f.starUrl
-      : (f.latestUrl || `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/${def.band}/latest.jpg`);
-    try { layer.setUrl(url); } catch {}
+    const fallUrl = `${base}/${sector}/${def.band}/latest.jpg`;
+    const tsUrl   = f.ts
+      ? `${base}/${sector}/${def.band}/${f.ts}_GOES19-ABI-${sector}-${def.band}-1200x1200.jpg`
+      : null;
+    if (tsUrl) {
+      // Wire onerror before changing src so 404s silently fall back
+      const img = layer.getElement ? layer.getElement() : null;
+      if (img) {
+        img.onerror = () => { img.onerror = null; try { layer.setUrl(fallUrl); } catch {} };
+      }
+      try { layer.setUrl(tsUrl); } catch {}
+    } else {
+      try { layer.setUrl(fallUrl); } catch {}
+    }
   });
 
   // Update nowcoast WMS time parameter
@@ -879,12 +1004,29 @@ function applyFrame() {
 
   // Trigger data fusion with current satellite frame timestamp
   if (modelData) runFusion(f.iso);
+
+  // Ghost overlay — show GEOCOLOR image GHOST_BACK frames behind current
+  if (ghostMode && ghostLayer) {
+    const gi    = Math.max(0, frame - GHOST_BACK);
+    const gf    = frames[gi];
+    if (gf) {
+      const gUrl = gf.ts
+        ? `${base}/${sector}/GEOCOLOR/${gf.ts}_GOES19-ABI-${sector}-GEOCOLOR-1200x1200.jpg`
+        : `${base}/${sector}/GEOCOLOR/latest.jpg`;
+      try { ghostLayer.setUrl(gUrl); } catch {}
+    }
+    const gpane = map.getPane('pane-ghost');
+    if (gpane) gpane.style.opacity = '1';
+  } else if (ghostLayer) {
+    const gpane = map.getPane('pane-ghost');
+    if (gpane) gpane.style.opacity = '0';
+  }
 }
 
 function startAnim() {
   stopAnim();
   animTimer = setInterval(() => {
-    frame = (frame + 1) % FRAME_COUNT;
+    frame = (frame + 1) % (frames.length || 1);
     syncTimestamp();
     applyFrame();
   }, 1000 / animFps);
@@ -1089,6 +1231,21 @@ document.getElementById('tl-next').addEventListener('click', () => {
   goFrame(frame + 1);
 });
 
+// Hours (loop duration) buttons
+document.querySelectorAll('.hrs-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const hrs = parseInt(btn.dataset.hrs, 10);
+    frameCount = hrs * 12;  // 12 frames per hour (5-min intervals)
+    _satMemo.clear();       // flush cached frames so genFrames rebuilds
+    document.querySelectorAll('.hrs-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    frame = frameCount - 1; // jump to latest frame
+    genFrames();
+    applyFrame();
+    if (playing) startAnim();
+  });
+});
+
 // Speed buttons
 document.querySelectorAll('.spd-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1097,6 +1254,22 @@ document.querySelectorAll('.spd-btn').forEach(btn => {
     btn.classList.add('on');
     if (playing) startAnim();
   });
+});
+
+// Ghost frames toggle
+document.getElementById('tl-ghost').addEventListener('click', () => {
+  ghostMode = !ghostMode;
+  const btn = document.getElementById('tl-ghost');
+  if (ghostMode) {
+    btn.textContent = '👻 ON';
+    btn.classList.add('on');
+  } else {
+    btn.textContent = '👻 OFF';
+    btn.classList.remove('on');
+    const gpane = map && map.getPane('pane-ghost');
+    if (gpane) gpane.style.opacity = '0';
+  }
+  applyFrame();
 });
 
 // Sidebar toggle — use invalidateSize() for Leaflet
@@ -1119,6 +1292,182 @@ if (map) {
     const { lat, lng } = e.latlng;
     fetchModel(lat, lng);
   });
+
+  // Right-click → set track origin for spaghetti model tracks
+  map.on('contextmenu', e => {
+    L.DomEvent.stop(e);
+    selectTrackPoint(e.latlng.lat, e.latlng.lng);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// STORM TRACKER & SPAGHETTI TRACK FUNCTIONS
+// ════════════════════════════════════════════════════════════════════════
+
+/** Euler-integrate a 72-hour track from lat/lon using hourly wind vectors from modelData.
+ *  mdlHours — array of {hour, u10, v10} from Open-Meteo response.
+ *  Returns array of [lat, lon] tuples (includes origin). */
+function computeTrack(lat, lon, mdlHours) {
+  const R   = 6371;     // Earth radius km
+  const pts = [[lat, lon]];
+  let clat  = lat, clon = lon;
+  for (const h of mdlHours) {
+    const u  = h.u10 || 0;  // m/s east
+    const v  = h.v10 || 0;  // m/s north
+    // 1 hour → displacement in km
+    const dx = u * 3.6;     // km (u * 1000m/km * 3600s/hr / 1000)
+    const dy = v * 3.6;
+    clat += (dy / R) * (180 / Math.PI);
+    clon += (dx / (R * Math.cos(clat * Math.PI / 180))) * (180 / Math.PI);
+    pts.push([clat, clon]);
+  }
+  return pts;
+}
+
+/** Remove all track polylines, markers and origin pin from the map. */
+function clearModelTracks() {
+  _trackLayers.forEach(l => { try { map.removeLayer(l); } catch {} });
+  _trackLayers = [];
+}
+
+/** Fetch wind data from all active NWP model endpoints and draw tracks. */
+async function fetchModelTrack(lat, lon) {
+  clearModelTracks();
+  if (!map) return;
+
+  // Origin marker
+  const origin = L.circleMarker([lat, lon], {
+    radius: 6, color: '#fff', fillColor: '#f59e0b',
+    fillOpacity: 1, weight: 2, pane: 'tooltipPane',
+  }).bindPopup(`<b>Track origin</b><br>${lat.toFixed(3)}°, ${lon.toFixed(3)}°`).addTo(map);
+  _trackLayers.push(origin);
+
+  for (const mdl of MODEL_APIS) {
+    if (!activeModels.has(mdl.id)) continue;
+    try {
+      const params = new URLSearchParams({
+        latitude:  lat.toFixed(4),
+        longitude: lon.toFixed(4),
+        hourly:    'windspeed_10m,winddirection_10m',
+        forecast_days: 3,
+        wind_speed_unit: 'ms',
+      });
+      const res  = await fetch(`${mdl.url}?${params}`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const hrs  = data.hourly;
+      if (!hrs || !hrs.windspeed_10m) continue;
+
+      // Build hourly u/v from speed+direction
+      const mdlHours = hrs.time.slice(0, 72).map((_, i) => {
+        const spd = hrs.windspeed_10m[i]     || 0;
+        const dir = hrs.winddirection_10m[i] || 0;
+        const rad = dir * Math.PI / 180;
+        return { u10: -spd * Math.sin(rad), v10: -spd * Math.cos(rad) };
+      });
+
+      const pts  = computeTrack(lat, lon, mdlHours);
+      const line = L.polyline(pts, {
+        color:   mdl.color,
+        weight:  2.5,
+        opacity: 0.82,
+        pane:    'tooltipPane',
+      }).bindTooltip(mdl.label, { sticky: true, className: 'lf-tt' }).addTo(map);
+
+      // Terminal marker (end of 72-h track)
+      const last = pts[pts.length - 1];
+      const end  = L.circleMarker(last, {
+        radius: 4, color: mdl.color, fillColor: mdl.color,
+        fillOpacity: 0.7, weight: 1.5, pane: 'tooltipPane',
+      }).addTo(map);
+
+      _trackLayers.push(line, end);
+    } catch (err) {
+      console.warn(`Track ${mdl.id}:`, err);
+    }
+  }
+}
+
+/** Fetch active NHC tropical storms (CORS-graceful). */
+async function fetchNHCStorms() {
+  const stormDiv = document.getElementById('st-storms');
+  if (!stormDiv) return;
+
+  let storms = [];
+  try {
+    const proxy = 'https://api.allorigins.win/raw?url=' +
+      encodeURIComponent('https://www.nhc.noaa.gov/CurrentStorms.json');
+    const res = await fetch(proxy);
+    if (res.ok) {
+      const json = await res.json();
+      storms = json.activeStorms || [];
+    }
+  } catch {
+    // CORS or network failure — show empty state gracefully
+  }
+
+  renderStormPanel(storms);
+}
+
+/** Render storm selector chips and model toggles into #st-storms / #st-models. */
+function renderStormPanel(storms = []) {
+  const stormDiv  = document.getElementById('st-storms');
+  const modelDiv  = document.getElementById('st-models');
+
+  // Storm chips
+  if (stormDiv) {
+    if (!storms.length) {
+      stormDiv.innerHTML = '<div style="font-size:11px;color:var(--text3)">No active tropical storms at this time.</div>';
+    } else {
+      stormDiv.innerHTML = storms.map(s => `
+        <button class="storm-chip" data-lat="${s.lat || ''}" data-lon="${s.lon || ''}"
+          title="Center on ${s.name || 'storm'}">
+          🌀 ${s.name || 'Unnamed'} <span style="font-size:9px;color:var(--text3)">${s.classification || ''}</span>
+        </button>`).join('');
+      stormDiv.querySelectorAll('.storm-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lat = parseFloat(btn.dataset.lat);
+          const lon = parseFloat(btn.dataset.lon);
+          if (!isNaN(lat) && !isNaN(lon)) {
+            map.setView([lat, lon], 6);
+            selectTrackPoint(lat, lon);
+            stormDiv.querySelectorAll('.storm-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          }
+        });
+      });
+    }
+  }
+
+  // Model toggles
+  if (modelDiv) {
+    modelDiv.innerHTML = MODEL_APIS.map(m => `
+      <label class="model-toggle">
+        <input type="checkbox" data-mid="${m.id}" ${activeModels.has(m.id) ? 'checked' : ''}>
+        <span class="model-swatch" style="--mc:${m.color}"></span>
+        <span>${m.label}</span>
+      </label>`).join('');
+    modelDiv.querySelectorAll('input[data-mid]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) activeModels.add(cb.dataset.mid);
+        else            activeModels.delete(cb.dataset.mid);
+        if (trackLatLon) fetchModelTrack(trackLatLon.lat, trackLatLon.lon);
+      });
+    });
+  }
+}
+
+/** Set the spaghetti track origin and trigger model fetches. */
+function selectTrackPoint(lat, lon) {
+  trackLatLon = { lat, lon };
+  fetchModelTrack(lat, lon);
+  // Open the storms panel if collapsed
+  const psBd = document.getElementById('ps-storms');
+  const psHd = psBd && psBd.previousElementSibling;
+  if (psBd && !psBd.style.maxHeight) {
+    psBd.style.maxHeight = psBd.scrollHeight + 'px';
+    if (psHd) psHd.classList.add('open');
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -1146,10 +1495,12 @@ if (map) {
     // Background data fetches — fire and forget
     fetchAlerts();
     fetchModel(31, -80);
+    fetchNHCStorms();
 
     // Periodic refresh
-    setInterval(fetchAlerts, 5 * 60 * 1000);
-    setInterval(genFrames,   5 * 60 * 1000);
+    setInterval(fetchAlerts,    5 * 60 * 1000);
+    setInterval(genFrames,      5 * 60 * 1000);
+    setInterval(fetchNHCStorms, 10 * 60 * 1000);
   });
 }
 </script>
