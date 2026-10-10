@@ -257,14 +257,11 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
 }
 #sb-tog:hover{color:var(--text)}
 
-/* Cursor readout */
+/* Cursor readout — lives inside #timeline, not floating over the map */
 #cursor-info{
-  position:absolute;bottom:72px;right:11px;
-  background:rgba(13,17,23,.85);border:1px solid var(--border2);
-  border-radius:var(--rs);padding:5px 10px;
-  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);
-  backdrop-filter:blur(6px);pointer-events:none;z-index:10;
-  font-variant-numeric:tabular-nums
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);
+  padding:3px 0 0;margin-top:1px;pointer-events:none;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em
 }
 
 /* ── Timeline ── */
@@ -348,6 +345,55 @@ body{background:var(--bg);color:var(--text);overflow:hidden}
 #tl-ghost{font-size:13px;padding:0 7px;min-width:52px;transition:all .15s}
 #tl-ghost.on{background:rgba(168,85,247,.25);border-color:#a855f7;color:#c084fc}
 
+/* ── Satellite picker ── */
+.sat-picker{display:flex;gap:5px;margin-bottom:8px}
+.sat-btn{
+  flex:1;padding:4px 8px;border-radius:var(--rs);
+  background:var(--bg2);border:1px solid var(--border2);
+  color:var(--text2);font-size:10px;font-family:inherit;
+  cursor:pointer;text-align:center;transition:all .15s;font-weight:600
+}
+.sat-btn.on{background:rgba(14,165,233,.15);border-color:var(--accent);color:var(--accent2)}
+.sat-btn:hover{background:var(--bg3)}
+
+/* ── 3D tilt button ── */
+#tl-3d{font-size:9px;font-weight:700;letter-spacing:.06em;min-width:32px;padding:0 6px}
+#tl-3d.on{background:rgba(168,85,247,.2);border-color:#a855f7;color:#c084fc}
+
+/* ── 3D globe container ── */
+#map{transition:transform .5s cubic-bezier(.4,0,.2,1);transform-origin:50% 65%}
+#globe{
+  position:absolute;inset:0;z-index:1;
+  display:none;background:#06080e;
+  user-select:none;-webkit-user-select:none
+}
+#globe.active{display:block}
+/* Cesium canvas fills globe div */
+#globe .cesium-widget,
+#globe .cesium-widget canvas{width:100%!important;height:100%!important}
+/* Hide Cesium chrome we don't need */
+.cesium-credit-logoContainer{display:none!important}
+.cesium-infoBox{background:var(--bg2)!important;border-color:var(--border2)!important;color:var(--text)!important}
+/* Satellite image draped over globe via CSS matrix3d */
+#globe-sat-wrap{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  overflow:hidden;z-index:10
+}
+#globe-sat-img{
+  position:absolute;top:0;left:0;
+  width:1200px;height:1200px;
+  transform-origin:0 0;
+  opacity:.82;
+  mix-blend-mode:screen;
+  image-rendering:auto
+}
+/* Track mode cursor in globe */
+body.track-mode #globe,body.track-mode #globe *{cursor:crosshair!important}
+/* 3D button glows purple when active */
+#tl-3d.on{background:rgba(168,85,247,.2);border-color:#a855f7;color:#c084fc}
+
 /* ── Track mode cursor ── */
 body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
 
@@ -362,6 +408,9 @@ body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
   #sidebar.closed{transform:translateX(-272px)!important}
   #topbar{padding:0 12px}
   #main{flex-direction:column}
+  .tl-ctl{flex-wrap:wrap;gap:5px}
+  .tl-sp{display:none}
+  #tl-ts{min-width:90px}
 }
 </style>
 
@@ -392,11 +441,13 @@ body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
             <span>SECTOR / VIEW</span><span class="chev">▶</span>
           </div>
           <div class="ps-bd" id="ps-sec">
-            <div class="sec-grid">
-              <button class="sec-btn on" data-sector="se">SE</button>
-              <button class="sec-btn" data-sector="pr">Caribbean</button>
-              <button class="sec-btn" data-sector="nr">NE</button>
-              <button class="sec-btn" data-sector="psw">SW</button>
+            <div class="sat-picker" id="sat-picker">
+              <button class="sat-btn on" data-sat="GOES19">GOES-19 East</button>
+              <button class="sat-btn" data-sat="GOES18">GOES-18 West</button>
+              <button class="sat-btn" data-sat="HIMAWARI9">Himawari-9</button>
+            </div>
+            <div class="sec-grid" id="sec-grid">
+              <!-- populated by renderSectorGrid() -->
             </div>
           </div>
         </div>
@@ -476,6 +527,12 @@ body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
     <!-- MAP -->
     <div id="map-wrap">
       <div id="map"></div>
+      <!-- ── 3D Globe (CesiumJS) ── -->
+      <div id="globe">
+        <div id="globe-sat-wrap">
+          <img id="globe-sat-img" alt="" aria-hidden="true" />
+        </div>
+      </div>
 
       <div id="map-load">
         <div class="spin"></div>
@@ -483,8 +540,6 @@ body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
       </div>
 
       <button id="sb-tog" title="Toggle panels">⊞</button>
-
-      <div id="cursor-info">Lat — &nbsp; Lon —</div>
 
       <div id="timeline">
         <div class="tl-ctl">
@@ -506,8 +561,10 @@ body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
           <button class="spd-btn" data-fps="4">4×</button>
           <span style="width:1px;height:14px;background:var(--border2);display:inline-block;margin:0 2px"></span>
           <button class="tl-btn" id="tl-ghost" title="Ghost frames — overlay previous frame at 35% opacity">👻 OFF</button>
+          <button class="tl-btn" id="tl-3d" title="Toggle 3D perspective tilt view">3D</button>
         </div>
         <div class="tl-track" id="tl-track"></div>
+        <div id="cursor-info">Lat —  Lon —</div>
       </div>
     </div><!-- /map-wrap -->
 
@@ -523,12 +580,56 @@ body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
 // ════════════════════════════════════════════════════════════════════════
 
 // ── Config ───────────────────────────────────────────────────────────────
-const SECTORS = {
-  se:  {label:'Southeast',   w:-105,e:-55, s:15,  n:47.5, cx:-80,  cy:31,  z:5  },
-  pr:  {label:'Caribbean',   w:-75, e:-55, s:14,  n:27,   cx:-65,  cy:20,  z:5.5},
-  nr:  {label:'Northeast',   w:-82, e:-62, s:35,  n:48,   cx:-72,  cy:42,  z:6  },
-  psw: {label:'Pacific SW',  w:-130,e:-105,s:25,  n:45,   cx:-118, cy:35,  z:5.5},
+const SAT_DEF = {
+  GOES19: {
+    label: 'GOES-19 East', satNum: 19,
+    sectors: {
+      se:  {label:'SE / Gulf',      w:-105,e:-55, s:15,  n:47.5, cx:-80,  cy:31,  z:5  },
+      nr:  {label:'Northeast',      w:-82, e:-62, s:35,  n:48,   cx:-72,  cy:42,  z:6  },
+      pr:  {label:'Caribbean',      w:-75, e:-55, s:14,  n:27,   cx:-65,  cy:20,  z:5.5},
+      psw: {label:'Pacific SW',     w:-130,e:-105,s:25,  n:45,   cx:-118, cy:35,  z:5.5},
+      gm:  {label:'Gulf of Mexico', w:-100,e:-78, s:18,  n:32,   cx:-89,  cy:25,  z:5.5},
+    },
+  },
+  GOES18: {
+    label: 'GOES-18 West', satNum: 18,
+    sectors: {
+      wus: {label:'Western US',  w:-130,e:-100,s:25,  n:50,   cx:-115, cy:37,  z:5  },
+      pnw: {label:'Pacific NW',  w:-130,e:-110,s:40,  n:52,   cx:-120, cy:46,  z:6  },
+      hi:  {label:'Hawaii',      w:-162,e:-152,s:17,  n:24,   cx:-157, cy:20.5,z:7  },
+      ak:  {label:'Alaska',      w:-170,e:-130,s:52,  n:72,   cx:-150, cy:62,  z:5  },
+    },
+  },
+  // Himawari-9 (JAXA/JMA) — Asia-Pacific; open real-time imagery via NICT mirror
+  HIMAWARI9: {
+    label: 'Himawari-9 Pacific', satNum: 9, himawari: true,
+    sectors: {
+      fd:  {label:'Full Disk',   w:80,  e:200, s:-60, n:60,  cx:145,  cy:0,   z:3  },
+      jpn: {label:'Japan',       w:127, e:147, s:30,  n:46,  cx:137,  cy:38,  z:6  },
+      pac: {label:'W. Pacific',  w:115, e:155, s:5,   n:35,  cx:135,  cy:20,  z:5  },
+      aus: {label:'Australia',   w:105, e:160, s:-45, n:-10, cx:132,  cy:-27, z:4.5},
+    },
+  },
 };
+function getSectors() { return SAT_DEF[activeSat].sectors; }
+function isHimawari() { return !!(SAT_DEF[activeSat] && SAT_DEF[activeSat].himawari); }
+function getSatBase() {
+  if (isHimawari()) return 'https://himawari8.nict.go.jp/img/D531106';
+  return `https://cdn.star.nesdis.noaa.gov/GOES${SAT_DEF[activeSat].satNum}/ABI/SECTOR`;
+}
+function getSatId() { return isHimawari() ? 'HIM9' : `GOES${SAT_DEF[activeSat].satNum}`; }
+/** Build Himawari-9 URL for a given Date and band (currently Full-Disk at 550px segments). */
+function himawariUrl(date, band) {
+  // NICT real-time tiles: /img/D531106/1d/550/YYYY/MM/DD/HHmm00_0_0.png (1×1 tile)
+  // For simplicity we use the pre-composited 1100×1100 band image where available
+  const d  = new Date(date);
+  const YY = d.getUTCFullYear();
+  const MM = String(d.getUTCMonth()+1).padStart(2,'0');
+  const DD = String(d.getUTCDate()).padStart(2,'0');
+  const HH = String(d.getUTCHours()).padStart(2,'0');
+  const mi = String(Math.floor(d.getUTCMinutes()/10)*10).padStart(2,'0');
+  return `https://himawari8.nict.go.jp/img/D531106/1d/550/${YY}/${MM}/${DD}/${HH}${mi}00_0_0.png`;
+}
 
 const LAYERS_DEF = [
   {id:'sat-geo',  icon:'🛰️', label:'GeoColor RGB',    sub:'True color composite',      type:'sat', band:'GEOCOLOR',opacity:.9, blend:'normal',   on:true },
@@ -566,6 +667,8 @@ const WMS_LAYERS = {
 
 // ── State ─────────────────────────────────────────────────────────────────
 let sector    = 'se';
+let activeSat = 'GOES19';
+let tilt3d    = false;
 let frame     = frameCount - 1;
 let playing   = true;
 let animFps   = 1;
@@ -597,6 +700,14 @@ let activeModels = new Set(['gfs','ecmwf','icon']);
 // Leaflet layer references
 const _leafletLayers = {};
 
+// ── 3D Globe state ──────────────────────────────────────────────────────
+let globe3d          = false;
+let cesiumViewer     = null;          // CesiumJS Viewer instance
+let _cesiumTrackEnts = [];            // Cesium Entity handles for tracks
+let _globePostRender = null;          // removeEventListener handle
+let _globeSatImg     = null;          // cached #globe-sat-img element
+let _cesiumLoaded    = false;         // script injected flag
+
 // ════════════════════════════════════════════════════════════════════════
 // INLINE MEMOIZED SAT DATA (CSP-safe — no blob URL workers)
 // ════════════════════════════════════════════════════════════════════════
@@ -623,12 +734,13 @@ function _toStarTs(date) {
 }
 
 function satGetFrames(sec, band, count) {
-  const key = `${sec}:${band}:${count}`;
-  const c   = _satMemo.get(key);
+  const key   = `${activeSat}:${sec}:${band}:${count}`;
+  const c     = _satMemo.get(key);
   if (c && Date.now() - c.ts < _SAT_TTL) return c.data;
-  const out     = [];
-  const now     = Date.now();
-  const base    = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR';
+  const out   = [];
+  const now   = Date.now();
+  const base  = getSatBase();
+  const satId = getSatId();
   for (let i = count - 1; i >= 0; i--) {
     const t  = new Date(now - i * FRAME_MS);
     const ts = _toStarTs(t);
@@ -637,8 +749,7 @@ function satGetFrames(sec, band, count) {
       ts,
       iso:     t.toISOString(),
       wmsTime: t.toISOString().slice(0, 19) + 'Z',
-      // starUrl for GEOCOLOR; applyFrame builds per-band URLs using ts directly
-      starUrl:   `${base}/${sec}/${band}/${ts}_GOES19-ABI-${sec}-${band}-1200x1200.jpg`,
+      starUrl:   `${base}/${sec}/${band}/${ts}_${satId}-ABI-${sec}-${band}-1200x1200.jpg`,
       latestUrl: `${base}/${sec}/${band}/latest.jpg`,
     });
   }
@@ -697,7 +808,8 @@ function modelFuse(satIso, mdl) {
 // SECTOR BOUNDS HELPER
 // ════════════════════════════════════════════════════════════════════════
 function sectorBounds(s) {
-  const sec = SECTORS[s];
+  const secs = getSectors();
+  const sec  = secs[s] || secs[Object.keys(secs)[0]];
   return L.latLngBounds([sec.s, sec.w], [sec.n, sec.e]);
 }
 
@@ -763,7 +875,7 @@ function addMapLayers() {
   // Satellite image overlays — georeferenced to sector bounds
   // NOTE: crossOrigin NOT set — NOAA CDN has no CORS headers; setting it blocks img load
   LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
-    const url    = `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/${def.band}/latest.jpg`;
+    const url    = `${getSatBase()}/${sector}/${def.band}/latest.jpg`;
     const bounds = sectorBounds(sector);
     const layer  = L.imageOverlay(url, bounds, {
       opacity:     def.on ? def.opacity : 0,
@@ -812,7 +924,7 @@ function addMapLayers() {
     gp.style.pointerEvents = 'none';
     gp.style.opacity       = '0';   // hidden until ghost mode on
   }
-  const ghostUrl    = `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/GEOCOLOR/latest.jpg`;
+  const ghostUrl    = `${getSatBase()}/${sector}/GEOCOLOR/latest.jpg`;
   const ghostBounds = sectorBounds(sector);
   ghostLayer = L.imageOverlay(ghostUrl, ghostBounds, {
     opacity:     0.35,
@@ -929,8 +1041,8 @@ function genFrames() {
         ts,
         iso:     t.toISOString(),
         wmsTime: t.toISOString().slice(0, 19) + 'Z',
-        starUrl: `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/GEOCOLOR/${ts}_GOES19-ABI-${sector}-GEOCOLOR-1200x1200.jpg`,
-        latestUrl: `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/GEOCOLOR/latest.jpg`,
+        starUrl: `${getSatBase()}/${sector}/GEOCOLOR/${ts}_${getSatId()}-ABI-${sector}-GEOCOLOR-1200x1200.jpg`,
+        latestUrl: `${getSatBase()}/${sector}/GEOCOLOR/latest.jpg`,
       });
     }
   }
@@ -973,8 +1085,9 @@ function goFrame(i) {
 
 function applyFrame() {
   if (!frames[frame]) return;
-  const f = frames[frame];
-  const base = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR';
+  const f     = frames[frame];
+  const base  = getSatBase();
+  const satId = getSatId();
 
   // Update sat image overlays — each band gets its own timestamped URL with fallback
   LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
@@ -982,7 +1095,7 @@ function applyFrame() {
     if (!layer) return;
     const fallUrl = `${base}/${sector}/${def.band}/latest.jpg`;
     const tsUrl   = f.ts
-      ? `${base}/${sector}/${def.band}/${f.ts}_GOES19-ABI-${sector}-${def.band}-1200x1200.jpg`
+      ? `${base}/${sector}/${def.band}/${f.ts}_${satId}-ABI-${sector}-${def.band}-1200x1200.jpg`
       : null;
     if (tsUrl) {
       // Wire onerror before changing src so 404s silently fall back
@@ -1011,7 +1124,7 @@ function applyFrame() {
     const gf    = frames[gi];
     if (gf) {
       const gUrl = gf.ts
-        ? `${base}/${sector}/GEOCOLOR/${gf.ts}_GOES19-ABI-${sector}-GEOCOLOR-1200x1200.jpg`
+        ? `${base}/${sector}/GEOCOLOR/${gf.ts}_${satId}-ABI-${sector}-GEOCOLOR-1200x1200.jpg`
         : `${base}/${sector}/GEOCOLOR/latest.jpg`;
       try { ghostLayer.setUrl(gUrl); } catch {}
     }
@@ -1021,6 +1134,9 @@ function applyFrame() {
     const gpane = map.getPane('pane-ghost');
     if (gpane) gpane.style.opacity = '0';
   }
+
+  // 3D globe — update satellite imagery drape on the globe
+  if (globe3d) updateGlobeSat();
 }
 
 function startAnim() {
@@ -1126,25 +1242,356 @@ async function fetchAlerts() {
 }
 
 // ════════════════════════════════════════════════════════════════════════
+// SATELLITE PICKER & SECTOR GRID
+// ════════════════════════════════════════════════════════════════════════
+function renderSectorGrid() {
+  const grid = document.getElementById('sec-grid');
+  if (!grid) return;
+  const secs = getSectors();
+  grid.innerHTML = '';
+  Object.entries(secs).forEach(([key, sec]) => {
+    const btn = document.createElement('button');
+    btn.className   = 'sec-btn' + (key === sector ? ' on' : '');
+    btn.dataset.sector = key;
+    btn.textContent = sec.label;
+    btn.addEventListener('click', () => switchSector(key));
+    grid.appendChild(btn);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// TRUE 3D GLOBE — CesiumJS + ECEF Vector Coordinates
+// ════════════════════════════════════════════════════════════════════════
+
+/**
+ * Dynamically load CesiumJS 1.111 (CDN) and its widget CSS then call cb().
+ * Safe to call multiple times — injects once, queues callbacks.
+ */
+let _cesiumCbs = [];
+function loadCesium(cb) {
+  if (_cesiumLoaded) { cb(); return; }
+  _cesiumCbs.push(cb);
+  if (_cesiumCbs.length > 1) return;   // already injecting
+
+  // Cesium widget CSS
+  const link = document.createElement('link');
+  link.rel   = 'stylesheet';
+  link.href  = 'https://cdn.jsdelivr.net/npm/cesium@1.111.0/Build/CesiumUnminified/Widgets/widgets.css';
+  document.head.appendChild(link);
+
+  // Cesium JS
+  const s  = document.createElement('script');
+  s.src    = 'https://cdn.jsdelivr.net/npm/cesium@1.111.0/Build/CesiumUnminified/Cesium.js';
+  s.onload = () => {
+    _cesiumLoaded = true;
+    // Point Cesium assets to CDN (no self-hosted)
+    window.CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.111.0/Build/CesiumUnminified/';
+    const pending = _cesiumCbs.splice(0);
+    pending.forEach(fn => fn());
+  };
+  s.onerror = () => console.error('Cesium failed to load');
+  document.head.appendChild(s);
+}
+
+/**
+ * Gaussian elimination to solve Ah = b (8×8 system) for perspective homography.
+ * Returns the 16-element CSS matrix3d array [a,b,0,c, d,e,0,f, 0,0,1,0, g,h,0,1].
+ *
+ * @param {[number,number][]} src - 4 source [x,y] image pixel coords
+ * @param {[number,number][]} dst - 4 destination [x,y] screen coords
+ */
+function computePerspectiveMatrix(src, dst) {
+  // Build 8×9 augmented matrix [A | b]
+  const M = [];
+  for (let i = 0; i < 4; i++) {
+    const [sx, sy] = src[i];
+    const [dx, dy] = dst[i];
+    M.push([sx, sy, 1, 0,  0,  0, -sx*dx, -sy*dx, dx]);
+    M.push([ 0,  0, 0, sx, sy, 1, -sx*dy, -sy*dy, dy]);
+  }
+  // Forward elimination
+  for (let col = 0; col < 8; col++) {
+    let pivot = col;
+    for (let row = col+1; row < 8; row++) {
+      if (Math.abs(M[row][col]) > Math.abs(M[pivot][col])) pivot = row;
+    }
+    [M[col], M[pivot]] = [M[pivot], M[col]];
+    const dv = M[col][col];
+    if (Math.abs(dv) < 1e-12) continue;
+    for (let row = col+1; row < 8; row++) {
+      const f = M[row][col] / dv;
+      for (let k = col; k <= 8; k++) M[row][k] -= f * M[col][k];
+    }
+  }
+  // Back substitution
+  const h = new Array(8).fill(0);
+  for (let i = 7; i >= 0; i--) {
+    let s2 = M[i][8];
+    for (let j = i+1; j < 8; j++) s2 -= M[i][j] * h[j];
+    h[i] = Math.abs(M[i][i]) > 1e-12 ? s2 / M[i][i] : 0;
+  }
+  // h = [h0,h1,h2, h3,h4,h5, h6,h7]  (row-major 3×3 homography, h8=1 implied)
+  // CSS matrix3d is column-major 4×4:
+  // [h0, h3, 0, h6,
+  //  h1, h4, 0, h7,
+  //  0,  0,  1, 0,
+  //  h2, h5, 0, 1 ]
+  return [h[0], h[3], 0, h[6],
+          h[1], h[4], 0, h[7],
+          0,    0,    1, 0,
+          h[2], h[5], 0, 1];
+}
+
+/** Apply CSS matrix3d warp to the satellite img overlay so it drapes onto the globe. */
+function updateGlobeSatTransform() {
+  if (!cesiumViewer || !_globeSatImg) return;
+  const scene  = cesiumViewer.scene;
+  const sd     = SAT_DEF[activeSat].sectors[sector];
+  if (!sd) return;
+
+  // Four corners of the sector in WGS84 — converted to ECEF via Cesium
+  const corners = [
+    [sd.w, sd.n], [sd.e, sd.n],
+    [sd.e, sd.s], [sd.w, sd.s],
+  ];
+  const Carto = Cesium.Cartographic.fromDegrees;
+  const screenPts = corners.map(([lon, lat]) => {
+    const cart3 = Cesium.Cartesian3.fromDegrees(lon, lat, 0);
+    return Cesium.SceneTransforms.wgs84ToWindowCoordinates(scene, cart3);
+  });
+
+  // If any corner is off-screen/behind globe, skip warp to avoid artifacts
+  if (screenPts.some(p => !p)) {
+    _globeSatImg.style.transform = 'none';
+    _globeSatImg.style.opacity   = '0';
+    return;
+  }
+  _globeSatImg.style.opacity = '0.82';
+
+  // Image corners (src): the 1200×1200 image corners [TL, TR, BR, BL]
+  const imgW = 1200, imgH = 1200;
+  const src = [[0,0],[imgW,0],[imgW,imgH],[0,imgH]];
+  const dst = screenPts.map(p => [p.x, p.y]);
+
+  const m = computePerspectiveMatrix(src, dst);
+  _globeSatImg.style.transform = `matrix3d(${m.join(',')})`;
+}
+
+/** Get the satellite image URL for a given frame (Himawari uses different pattern). */
+function getGlobeSatUrl() {
+  if (!frames[frame]) return '';
+  const f = frames[frame];
+  if (isHimawari()) return himawariUrl(f.iso, 'B13');
+  const base  = getSatBase();
+  const satId = getSatId();
+  return f.ts
+    ? `${base}/${sector}/GEOCOLOR/${f.ts}_${satId}-ABI-${sector}-GEOCOLOR-1200x1200.jpg`
+    : `${base}/${sector}/GEOCOLOR/latest.jpg`;
+}
+
+/** Update the globe satellite overlay src to the current frame. */
+function updateGlobeSat() {
+  if (!_globeSatImg) _globeSatImg = document.getElementById('globe-sat-img');
+  if (!_globeSatImg) return;
+  const url = getGlobeSatUrl();
+  if (_globeSatImg.src !== url) _globeSatImg.src = url;
+}
+
+/** Position the Cesium camera over the active sector using WGS84 ECEF vectors. */
+function flyToSector(s) {
+  if (!cesiumViewer) return;
+  const sd = SAT_DEF[activeSat] && SAT_DEF[activeSat].sectors[s];
+  if (!sd) return;
+  cesiumViewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(sd.cx, sd.cy, _zoomAlt(sd.z)),
+    orientation: {
+      heading:   Cesium.Math.toRadians(0),
+      pitch:     Cesium.Math.toRadians(-55),   // slight tilt for depth
+      roll:      0,
+    },
+    duration: 1.2,
+  });
+}
+
+/** Convert Leaflet zoom level to approximate Cesium camera altitude (metres). */
+function _zoomAlt(z) {
+  // Rough mapping: z=3→8M, z=5→2M, z=6→1M, z=7→500k, z=9→100k
+  return 10000000 / Math.pow(2, z - 2);
+}
+
+/** Rebuild Cesium entity polylines for all model tracks from current _trackLayers data. */
+function updateGlobeTracks() {
+  if (!cesiumViewer) return;
+  // Remove old track entities
+  _cesiumTrackEnts.forEach(e => { try { cesiumViewer.entities.remove(e); } catch {} });
+  _cesiumTrackEnts = [];
+  // Re-fetch if we have a track origin
+  if (trackLatLon) fetchModelTrack(trackLatLon.lat, trackLatLon.lon);
+}
+
+/** Initialize the CesiumJS Viewer in #globe. */
+function initGlobe() {
+  if (cesiumViewer) return;
+
+  // Suppress Cesium's Ion token warning (we use OSM basemap only)
+  Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZWZhdWx0IiwiaWF0IjoxNjAwMDAwMDAwfQ.placeholder';
+
+  try {
+    cesiumViewer = new Cesium.Viewer('globe', {
+      imageryProvider: new Cesium.UrlTemplateImageryProvider({
+        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        minimumLevel: 0, maximumLevel: 19,
+        credit: '© OpenStreetMap contributors',
+      }),
+      baseLayerPicker:   false,
+      geocoder:          false,
+      homeButton:        false,
+      sceneModePicker:   false,
+      navigationHelpButton: false,
+      animation:         false,
+      timeline:          false,
+      fullscreenButton:  false,
+      infoBox:           false,
+      selectionIndicator:false,
+      creditContainer:   document.createElement('div'),  // hide credit
+    });
+
+    // Dark space background
+    cesiumViewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#06080e');
+    cesiumViewer.scene.globe.baseColor  = Cesium.Color.fromCssColorString('#0d1117');
+
+    // Enable lighting for globe sphere depth cues
+    cesiumViewer.scene.globe.enableLighting = true;
+
+    // Cache satellite img element
+    _globeSatImg = document.getElementById('globe-sat-img');
+
+    // postRender hook — called every frame, projects corners to screen and warps img
+    _globePostRender = cesiumViewer.scene.postRender.addEventListener(updateGlobeSatTransform);
+
+    // Click handling for track placement on globe
+    cesiumViewer.screenSpaceEventHandler.setInputAction(movement => {
+      if (!document.body.classList.contains('track-mode')) return;
+      const cartesian = cesiumViewer.camera.pickEllipsoid(movement.position, cesiumViewer.scene.globe.ellipsoid);
+      if (!cartesian) return;
+      const carto = Cesium.Cartographic.fromCartesian(cartesian);
+      const lat   = Cesium.Math.toDegrees(carto.latitude);
+      const lon   = Cesium.Math.toDegrees(carto.longitude);
+      selectTrackPoint(lat, lon);
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    // Fly to current sector
+    flyToSector(sector);
+    updateGlobeSat();
+
+  } catch (e) {
+    console.error('Cesium init failed:', e);
+  }
+}
+
+/** Toggle between 2D Leaflet map and 3D CesiumJS globe. */
+function toggleGlobe() {
+  globe3d = !globe3d;
+  const btn     = document.getElementById('tl-3d');
+  const mapEl   = document.getElementById('map');
+  const globeEl = document.getElementById('globe');
+
+  if (globe3d) {
+    btn.classList.add('on');
+    mapEl.style.display   = 'none';
+    globeEl.classList.add('active');
+
+    if (!_cesiumLoaded) {
+      btn.textContent = '⏳';
+      loadCesium(() => {
+        btn.textContent = '3D';
+        initGlobe();
+        updateGlobeTracks();
+      });
+    } else {
+      if (!cesiumViewer) {
+        initGlobe();
+      } else {
+        flyToSector(sector);
+        updateGlobeSat();
+      }
+      updateGlobeTracks();
+    }
+  } else {
+    btn.classList.remove('on');
+    btn.textContent = '3D';
+    globeEl.classList.remove('active');
+    mapEl.style.display = '';
+    setTimeout(() => { if (map) map.invalidateSize(); }, 100);
+  }
+}
+
+function switchSat(sat) {
+  if (!SAT_DEF[sat]) return;
+  activeSat = sat;
+  // Switch to first sector of new satellite
+  sector = Object.keys(SAT_DEF[sat].sectors)[0];
+  document.querySelectorAll('.sat-btn').forEach(b => b.classList.toggle('on', b.dataset.sat === sat));
+  _satMemo.clear();
+  renderSectorGrid();
+  const bounds = sectorBounds(sector);
+  map.fitBounds(bounds, { padding: [10, 10], animate: true });
+  genFrames();
+  // Refresh all sat overlays for new satellite + sector
+  LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
+    const layer = _leafletLayers[def.id];
+    if (!layer) return;
+    try {
+      layer.setUrl(`${getSatBase()}/${sector}/${def.band}/latest.jpg`);
+      layer.setBounds(bounds);
+    } catch {}
+  });
+  if (ghostLayer) {
+    try {
+      ghostLayer.setUrl(`${getSatBase()}/${sector}/GEOCOLOR/latest.jpg`);
+      ghostLayer.setBounds(bounds);
+    } catch {}
+  }
+  // 3D globe — fly camera to new satellite's first sector
+  if (globe3d && cesiumViewer) {
+    flyToSector(sector);
+    updateGlobeSat();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
 // SECTOR SWITCH (Leaflet API)
 // ════════════════════════════════════════════════════════════════════════
 function switchSector(s) {
-  if (!SECTORS[s]) return;
+  if (!getSectors()[s]) return;
   sector = s;
   document.querySelectorAll('.sec-btn').forEach(b => b.classList.toggle('on', b.dataset.sector === s));
   const bounds = sectorBounds(s);
   map.fitBounds(bounds, { padding: [20, 20], animate: true });
+  _satMemo.clear();
   genFrames();
   // Refresh satellite overlays for new sector bounds
   LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
     const layer = _leafletLayers[def.id];
     if (!layer) return;
-    const url = `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${s}/${def.band}/latest.jpg`;
+    const url = `${getSatBase()}/${s}/${def.band}/latest.jpg`;
     try {
       layer.setUrl(url);
       layer.setBounds(bounds);
     } catch {}
   });
+  // Update ghost layer bounds & URL for new sector
+  if (ghostLayer) {
+    try {
+      ghostLayer.setUrl(`${getSatBase()}/${s}/GEOCOLOR/latest.jpg`);
+      ghostLayer.setBounds(bounds);
+    } catch {}
+  }
+  // 3D globe — fly camera to new sector using ECEF vector coordinates
+  if (globe3d && cesiumViewer) {
+    flyToSector(s);
+    updateGlobeSat();
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -1209,10 +1656,15 @@ document.querySelectorAll('.ps-hd').forEach(hd => {
   });
 });
 
-// Sector buttons
-document.querySelectorAll('.sec-btn').forEach(btn => {
-  btn.addEventListener('click', () => switchSector(btn.dataset.sector));
+// Satellite picker buttons
+document.querySelectorAll('.sat-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchSat(btn.dataset.sat));
 });
+
+// Sector buttons — wired dynamically by renderSectorGrid()
+
+// 3D perspective tilt toggle
+document.getElementById('tl-3d').addEventListener('click', toggleGlobe);
 
 // Timeline controls
 document.getElementById('tl-play').addEventListener('click', togglePlay);
@@ -1382,6 +1834,26 @@ async function fetchModelTrack(lat, lon) {
       }).addTo(map);
 
       _trackLayers.push(line, end);
+
+      // 3D globe — add Cesium polyline using ECEF Cartesian3 vector coords
+      if (cesiumViewer && globe3d) {
+        try {
+          const cesiumPts = pts.map(([ptLat, ptLon]) =>
+            Cesium.Cartesian3.fromDegrees(ptLon, ptLat, 500)
+          );
+          const ent = cesiumViewer.entities.add({
+            polyline: {
+              positions:  cesiumPts,
+              width:      3,
+              material:   new Cesium.ColorMaterialProperty(
+                Cesium.Color.fromCssColorString(mdl.color).withAlpha(0.85)
+              ),
+              clampToGround: false,
+            },
+          });
+          _cesiumTrackEnts.push(ent);
+        } catch (e) { console.warn('Cesium track:', e); }
+      }
     } catch (err) {
       console.warn(`Track ${mdl.id}:`, err);
     }
@@ -1487,6 +1959,12 @@ if (map) {
     // Start UTC clock
     tickClock();
     setInterval(tickClock, 1000);
+
+    // Render sector grid for initial satellite
+    renderSectorGrid();
+
+    // Fit map to initial sector bounds
+    try { map.fitBounds(sectorBounds(sector), { padding: [10, 10], animate: false }); } catch {}
 
     // Generate frame list synchronously (inline, no worker)
     genFrames();
