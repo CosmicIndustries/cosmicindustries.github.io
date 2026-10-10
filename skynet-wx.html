@@ -1,0 +1,1138 @@
+<title>SKYNET WX</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* ── Leaflet essentials (inlined — external CSS blocked by artifact CSP) ── */
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;background:#06080e}
+.basemap-dark{filter:invert(100%) hue-rotate(180deg) brightness(90%) contrast(85%) saturate(80%)}
+.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+.leaflet-tile::selection,.leaflet-tile::-moz-selection{background:transparent}
+.leaflet-container.leaflet-touch-zoom{touch-action:pan-x pan-y}
+.leaflet-container.leaflet-touch-drag{touch-action:none;touch-action:pinch-zoom}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{touch-action:none}
+.leaflet-container{-webkit-tap-highlight-color:transparent}
+.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}
+.leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800}
+.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}
+.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}
+.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
+.leaflet-control{position:relative;z-index:800;pointer-events:auto}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}
+.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}
+.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}
+.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{-webkit-transition:none;transition:none}
+.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}
+.leaflet-marker-icon.leaflet-interactive,.leaflet-image-layer.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive{pointer-events:auto}
+.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}
+.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}
+.leaflet-bar a{background-color:#161b22;border-bottom:1px solid #0d1117;width:28px;height:28px;line-height:28px;display:block;text-align:center;text-decoration:none;color:#94a3b8;font-size:18px}
+.leaflet-bar a:hover{background-color:#21262d;color:#e2e8f0}
+.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}
+.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}
+.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#0d1117;color:#475569}
+.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px monospace;text-indent:1px}
+.leaflet-control-attribution{padding:0 5px;color:#94a3b8;line-height:1.4;background:rgba(13,17,23,.75);font-size:10px}
+.leaflet-control-attribution a{color:#7bb;text-decoration:none}
+.leaflet-container .leaflet-control-attribution{background:rgba(13,17,23,.75);margin:0}
+.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:10px}
+.leaflet-container .leaflet-control-zoom,.leaflet-container .leaflet-bar,.leaflet-container .leaflet-control{margin:10px}
+.leaflet-grab{cursor:-webkit-grab;cursor:grab}
+.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:grabbing}
+.leaflet-interactive{cursor:pointer}
+.leaflet-image-layer{max-width:none!important}
+.leaflet-container img{max-width:none!important;max-height:none!important}
+
+/* ── Design tokens — dark-first single theme ── */
+:root {
+  --bg:      #06080e;
+  --bg1:     #0d1117;
+  --bg2:     #161b22;
+  --bg3:     #21262d;
+  --bg4:     #2d333b;
+  --accent:  #0ea5e9;
+  --accent2: #38bdf8;
+  --glow:    rgba(14,165,233,.22);
+  --ok:      #22c55e;
+  --warn:    #f59e0b;
+  --danger:  #ef4444;
+  --tornado: #e879f9;
+  --text:    #e2e8f0;
+  --text2:   #94a3b8;
+  --text3:   #475569;
+  --border:  rgba(255,255,255,.07);
+  --border2: rgba(255,255,255,.13);
+  --r:       8px;
+  --rs:      4px;
+  color-scheme: dark;
+}
+
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Space Grotesk',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);overflow:hidden}
+
+/* ── App shell ── */
+#shell{display:flex;flex-direction:column;height:100%;overflow:hidden}
+
+/* ── Top bar ── */
+#topbar{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  height:50px;padding:0 16px;
+  background:var(--bg1);border-bottom:1px solid var(--border);
+  z-index:100
+}
+.logo{font-size:14px;font-weight:700;letter-spacing:.09em;color:var(--accent);white-space:nowrap}
+.topbar-mid{flex:1}
+#utc-clock{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--text2);white-space:nowrap;font-variant-numeric:tabular-nums
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--ok);flex-shrink:0;
+  animation:pulse 2s ease infinite
+}
+.live-dot.error{background:var(--danger);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.icon-btn{
+  background:none;border:none;color:var(--text2);cursor:pointer;
+  padding:4px 8px;font-size:17px;line-height:1;border-radius:var(--rs);
+  transition:color .15s
+}
+.icon-btn:hover{color:var(--text)}
+
+/* ── Alert ticker ── */
+#alert-ticker{
+  flex-shrink:0;height:26px;display:flex;align-items:center;
+  background:var(--danger);font-size:12px;font-weight:600;overflow:hidden
+}
+#alert-ticker[hidden]{display:none!important}
+.tick-label{
+  flex-shrink:0;padding:0 10px;height:100%;display:flex;align-items:center;
+  gap:5px;background:rgba(0,0,0,.35);letter-spacing:.06em
+}
+.tick-scroll-wrap{flex:1;overflow:hidden;position:relative}
+.tick-scroll{white-space:nowrap;padding:0 16px;animation:ticker 35s linear infinite}
+@keyframes ticker{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+
+/* ── Main area ── */
+#main{display:flex;flex:1;overflow:hidden;min-height:0}
+
+/* ── Sidebar ── */
+#sidebar{
+  width:272px;min-width:272px;flex-shrink:0;
+  background:var(--bg1);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:width .25s ease,min-width .25s ease
+}
+#sidebar.closed{width:0;min-width:0;border-right:none}
+#sb-inner{flex:1;overflow-y:auto;overflow-x:hidden}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Panel sections */
+.ps{border-bottom:1px solid var(--border);overflow:hidden}
+.ps:last-child{border-bottom:none}
+.ps-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 13px;cursor:pointer;user-select:none;
+  font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text2);background:var(--bg1)
+}
+.ps-hd:hover{background:var(--bg2)}
+.ps-hd .chev{font-size:9px;transition:transform .2s}
+.ps-hd.open .chev{transform:rotate(90deg)}
+.ps-bd{padding:8px;background:var(--bg)}
+
+/* Sector grid */
+.sec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.sec-btn{
+  padding:5px 2px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--rs);color:var(--text2);font-size:11px;font-weight:600;
+  font-family:inherit;cursor:pointer;text-align:center;transition:all .15s
+}
+.sec-btn:hover{background:var(--bg3);color:var(--text)}
+.sec-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Layer items */
+.lyr{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);
+  margin-bottom:4px;overflow:hidden
+}
+.lyr-row{display:flex;align-items:center;gap:8px;padding:8px 8px 4px}
+.tog{
+  flex-shrink:0;width:32px;height:18px;border-radius:9px;
+  background:var(--bg3);border:1px solid var(--border2);cursor:pointer;
+  position:relative;transition:background .2s
+}
+.tog.on{background:var(--accent);border-color:var(--accent)}
+.tog::after{
+  content:'';position:absolute;width:12px;height:12px;border-radius:50%;
+  background:#fff;top:2px;left:2px;transition:left .18s;
+  box-shadow:0 1px 3px rgba(0,0,0,.5)
+}
+.tog.on::after{left:16px}
+.lyr-name{flex:1;font-size:12px;font-weight:600;min-width:0;line-height:1.3}
+.lyr-sub{font-size:10px;color:var(--text3);font-weight:400}
+.lyr-ctrls{padding:0 8px 8px;display:flex;flex-direction:column;gap:3px}
+.ctrl-row{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text3)}
+.ctrl-row .cl{min-width:44px}
+.sl{
+  flex:1;-webkit-appearance:none;appearance:none;height:3px;border-radius:2px;
+  background:var(--bg3);outline:none;cursor:pointer
+}
+.sl::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:2px solid var(--bg);
+  box-shadow:0 0 0 2px var(--accent)
+}
+.bsel{
+  flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);
+  color:var(--text2);font-size:10px;padding:2px 4px;outline:none;font-family:inherit
+}
+.cv{min-width:28px;text-align:right}
+
+/* Fusion panel */
+.fus-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:8px}
+.fus-cell{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);
+  padding:7px 8px;display:flex;flex-direction:column;gap:1px
+}
+.fus-lbl{font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;font-weight:700}
+.fus-val{
+  font-size:19px;font-weight:700;font-family:'JetBrains Mono',monospace;
+  color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.15
+}
+.fus-unit{font-size:10px;color:var(--text2)}
+.fus-ts{
+  padding:5px 8px;font-size:9.5px;font-family:'JetBrains Mono',monospace;
+  color:var(--text3);border-top:1px solid var(--border)
+}
+
+/* Alert list */
+.al-item{
+  display:flex;gap:6px;padding:7px 8px;border-radius:var(--rs);
+  margin-bottom:3px;background:var(--bg2);border-left:3px solid var(--text3);
+  font-size:11px
+}
+.al-item.tornado{border-color:var(--tornado);background:rgba(232,121,249,.07)}
+.al-item.severe {border-color:var(--danger);background:rgba(239,68,68,.07)}
+.al-item.watch  {border-color:var(--warn);background:rgba(245,158,11,.07)}
+.al-item.advisory{border-color:var(--accent);background:rgba(14,165,233,.07)}
+.al-ev{font-weight:700;color:var(--text);font-size:11.5px;line-height:1.3}
+.al-area{color:var(--text2);font-size:10px;margin-top:1px}
+
+/* ── Map wrapper ── */
+#map-wrap{flex:1;position:relative;overflow:hidden}
+#map{position:absolute;inset:0}
+
+/* Loading overlay */
+#map-load{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;background:var(--bg);
+  z-index:200;gap:14px;font-size:13px;color:var(--text2);
+  transition:opacity .4s
+}
+#map-load.gone{opacity:0;pointer-events:none}
+.spin{
+  width:38px;height:38px;border:3px solid var(--border2);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Sidebar toggle (floating) */
+#sb-tog{
+  position:absolute;top:11px;left:11px;z-index:10;
+  width:32px;height:32px;border-radius:var(--rs);
+  background:rgba(13,17,23,.85);border:1px solid var(--border2);
+  color:var(--text2);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:13px;backdrop-filter:blur(6px);
+  transition:color .15s
+}
+#sb-tog:hover{color:var(--text)}
+
+/* Cursor readout */
+#cursor-info{
+  position:absolute;bottom:72px;right:11px;
+  background:rgba(13,17,23,.85);border:1px solid var(--border2);
+  border-radius:var(--rs);padding:5px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);
+  backdrop-filter:blur(6px);pointer-events:none;z-index:10;
+  font-variant-numeric:tabular-nums
+}
+
+/* ── Timeline ── */
+#timeline{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(13,17,23,.93);border-top:1px solid var(--border);
+  padding:9px 14px calc(9px + env(safe-area-inset-bottom,0px));
+  backdrop-filter:blur(10px);z-index:10
+}
+.tl-ctl{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.tl-btn{
+  width:28px;height:28px;border-radius:var(--rs);background:var(--bg2);
+  border:1px solid var(--border2);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;flex-shrink:0;transition:all .15s
+}
+.tl-btn:hover{background:var(--bg3);color:var(--text)}
+.tl-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+#tl-ts{
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);
+  min-width:125px;font-variant-numeric:tabular-nums
+}
+.tl-sp{flex:1}
+.spd-btn{
+  padding:3px 7px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--rs);color:var(--text2);font-size:10px;
+  font-family:inherit;cursor:pointer;transition:all .15s
+}
+.spd-btn.on{background:var(--bg3);color:var(--accent);border-color:var(--accent)}
+.tl-track{display:flex;align-items:center;gap:2px;height:18px}
+.tf{
+  flex:1;height:5px;border-radius:2px;background:var(--bg3);
+  border:1px solid var(--border);cursor:pointer;transition:background .15s;
+  position:relative
+}
+.tf:hover{background:var(--bg4)}
+.tf.past{background:rgba(14,165,233,.35);border-color:rgba(14,165,233,.2)}
+.tf.now{
+  background:var(--accent);border-color:var(--accent);
+  box-shadow:0 0 6px var(--glow)
+}
+
+/* ── Mobile ── */
+@media(max-width:640px){
+  #sidebar{
+    position:absolute;left:0;top:0;bottom:0;
+    width:272px!important;min-width:272px!important;
+    z-index:200;box-shadow:4px 0 24px rgba(0,0,0,.6);
+    transform:translateX(0);transition:transform .25s ease
+  }
+  #sidebar.closed{transform:translateX(-272px)!important}
+  #topbar{padding:0 12px}
+  #main{flex-direction:column}
+}
+</style>
+
+<!-- ════════════════════════ HTML STRUCTURE ════════════════════════ -->
+<div id="shell">
+
+  <header id="topbar">
+    <span class="logo">📡&nbsp;SKYNET WX</span>
+    <div class="live-dot" id="sat-dot" title="Satellite feed"></div>
+    <div class="topbar-mid"></div>
+    <div id="utc-clock">00:00:00 UTC</div>
+    <button class="icon-btn" id="menu-btn" title="Toggle sidebar" aria-label="Menu">☰</button>
+  </header>
+
+  <div id="alert-ticker" hidden>
+    <div class="tick-label"><span>⚠</span><span>NWS</span></div>
+    <div class="tick-scroll-wrap"><div class="tick-scroll" id="tick-text"></div></div>
+  </div>
+
+  <div id="main">
+
+    <aside id="sidebar">
+      <div id="sb-inner">
+
+        <!-- SECTOR -->
+        <div class="ps">
+          <div class="ps-hd open" data-tgt="ps-sec">
+            <span>SECTOR / VIEW</span><span class="chev">▶</span>
+          </div>
+          <div class="ps-bd" id="ps-sec">
+            <div class="sec-grid">
+              <button class="sec-btn on" data-sector="se">SE</button>
+              <button class="sec-btn" data-sector="gm">Gulf</button>
+              <button class="sec-btn" data-sector="nr">NE</button>
+              <button class="sec-btn" data-sector="psw">SW</button>
+              <button class="sec-btn" data-sector="CONUS">CONUS</button>
+              <button class="sec-btn" data-sector="FD">Full Disk</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAYERS -->
+        <div class="ps">
+          <div class="ps-hd open" data-tgt="ps-lyr">
+            <span>LAYERS</span><span class="chev">▶</span>
+          </div>
+          <div class="ps-bd" id="ps-lyr"><!-- populated by JS --></div>
+        </div>
+
+        <!-- DATA FUSION -->
+        <div class="ps">
+          <div class="ps-hd open" data-tgt="ps-fus">
+            <span>🔀 DATA FUSION</span><span class="chev">▶</span>
+          </div>
+          <div id="ps-fus" style="background:var(--bg)">
+            <div class="fus-grid">
+              <div class="fus-cell">
+                <div class="fus-lbl">TEMP</div>
+                <div class="fus-val" id="f-temp">--</div>
+                <div class="fus-unit">°C</div>
+              </div>
+              <div class="fus-cell">
+                <div class="fus-lbl">WIND</div>
+                <div class="fus-val" id="f-wind">--</div>
+                <div class="fus-unit">km/h &nbsp;<span id="f-wdir">↑</span></div>
+              </div>
+              <div class="fus-cell">
+                <div class="fus-lbl">PRECIP %</div>
+                <div class="fus-val" id="f-precip">--</div>
+                <div class="fus-unit">probability</div>
+              </div>
+              <div class="fus-cell">
+                <div class="fus-lbl">CAPE</div>
+                <div class="fus-val" id="f-cape">--</div>
+                <div class="fus-unit">J/kg</div>
+              </div>
+            </div>
+            <div class="fus-ts" id="f-ts">Click map to fetch fusion data</div>
+          </div>
+        </div>
+
+        <!-- NWS ALERTS -->
+        <div class="ps">
+          <div class="ps-hd open" data-tgt="ps-alr">
+            <span>⚠ NWS ALERTS</span><span class="chev">▶</span>
+          </div>
+          <div class="ps-bd" id="ps-alr">
+            <div id="al-list" style="font-size:11px;color:var(--text3)">Fetching alerts…</div>
+          </div>
+        </div>
+
+      </div><!-- /sb-inner -->
+    </aside>
+
+    <!-- MAP -->
+    <div id="map-wrap">
+      <div id="map"></div>
+
+      <div id="map-load">
+        <div class="spin"></div>
+        <div>Initializing SKYNET WX…</div>
+      </div>
+
+      <button id="sb-tog" title="Toggle panels">⊞</button>
+
+      <div id="cursor-info">Lat — &nbsp; Lon —</div>
+
+      <div id="timeline">
+        <div class="tl-ctl">
+          <button class="tl-btn" id="tl-prev" title="Step back">◁</button>
+          <button class="tl-btn on" id="tl-play" title="Play / Pause">⏸</button>
+          <button class="tl-btn" id="tl-next" title="Step forward">▷</button>
+          <span id="tl-ts">-- UTC</span>
+          <span class="tl-sp"></span>
+          <span style="font-size:10px;color:var(--text3);margin-right:2px">SPEED</span>
+          <button class="spd-btn" data-fps="0.5">½×</button>
+          <button class="spd-btn on" data-fps="1">1×</button>
+          <button class="spd-btn" data-fps="2">2×</button>
+          <button class="spd-btn" data-fps="4">4×</button>
+        </div>
+        <div class="tl-track" id="tl-track"></div>
+      </div>
+    </div><!-- /map-wrap -->
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+'use strict';
+// ════════════════════════════════════════════════════════════════════════
+// SKYNET WX — GOES-19 × NWP model data fusion × NWS alerts
+// Map engine: Leaflet.js 1.9.4 (no internal workers — CSP compatible)
+// ════════════════════════════════════════════════════════════════════════
+
+// ── Config ───────────────────────────────────────────────────────────────
+const SECTORS = {
+  se:    {label:'Southeast',     w:-105,e:-55, s:15,  n:47.5, cx:-80,  cy:31,  z:5  },
+  gm:    {label:'Gulf of Mexico',w:-100,e:-77, s:17,  n:35,   cx:-88,  cy:26,  z:5.5},
+  nr:    {label:'Northeast',     w:-82, e:-62, s:35,  n:48,   cx:-72,  cy:42,  z:6  },
+  psw:   {label:'Pacific SW',    w:-130,e:-105,s:25,  n:45,   cx:-118, cy:35,  z:5.5},
+  CONUS: {label:'CONUS',         w:-130,e:-60, s:20,  n:50,   cx:-95,  cy:37,  z:4  },
+  FD:    {label:'Full Disk',     w:-155,e:-15, s:-5,  n:60,   cx:-77,  cy:25,  z:3  },
+};
+
+const LAYERS_DEF = [
+  {id:'sat-geo',  icon:'🛰️', label:'GeoColor RGB',    sub:'True color composite',      type:'sat', band:'GEOCOLOR',opacity:.9, blend:'normal',   on:true },
+  {id:'sat-ir',   icon:'🌡️', label:'IR / Band 13',    sub:'10.3 μm thermal window',    type:'sat', band:'13',      opacity:.8, blend:'multiply',  on:false},
+  {id:'sat-vis',  icon:'👁️', label:'Visible / Band 02',sub:'0.64 μm daytime',          type:'sat', band:'02',      opacity:.8, blend:'normal',   on:false},
+  {id:'sat-wv',   icon:'💧', label:'Water Vapor',     sub:'Band 09 — 6.9 μm mid WV',  type:'sat', band:'09',      opacity:.75,blend:'screen',    on:false},
+  {id:'nc-ir',    icon:'📡', label:'nowcoast WMS',    sub:'NWS reprojected GOES IR',   type:'wms', wms:'nc', opacity:.7,  blend:'normal',   on:false},
+  {id:'nexrad',   icon:'🌦️', label:'NEXRAD Radar',    sub:'Base reflectivity (CONUS)', type:'wms', wms:'nx', opacity:.8,  blend:'normal',   on:false},
+  {id:'nhc',      icon:'🌀', label:'NHC Tropical',    sub:'Tracks, cones, invests',    type:'wms', wms:'nh', opacity:.9,  blend:'normal',   on:true },
+  {id:'nws-wind', icon:'💨', label:'NWS Wind 10m',    sub:'NCEP NAM model',            type:'wms', wms:'wn', opacity:.6,  blend:'normal',   on:false},
+  {id:'nws-temp', icon:'🌡️', label:'NWS Temp 2m',     sub:'NCEP NAM model',            type:'wms', wms:'wt', opacity:.6,  blend:'normal',   on:false},
+  {id:'alerts',   icon:'⚠️', label:'Alert Zones',     sub:'Watch/Warning polygons',    type:'geo',           opacity:.5,  blend:'normal',   on:true },
+];
+
+const ALERT_AREAS = 'AL,FL,GA,LA,MS,NC,SC,TN,TX,AR,OK,VA';
+const FRAME_COUNT = 12;
+const FRAME_MS    = 5 * 60 * 1000;
+
+// WMS base URLs and layer names
+const WMS_URLS = {
+  nc: 'https://nowcoast.noaa.gov/arcgis/services/nowcoast/sat_meteo_imagery_goes_east_time/MapServer/WMSServer',
+  nx: 'https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows',
+  nh: 'https://mapservices.weather.noaa.gov/tropical/services/tropical/NHC_tropical_weather/MapServer/WMSServer',
+  wn: 'https://opengeo.ncep.noaa.gov/geoserver/nam/nam_wind_10m/ows',
+  wt: 'https://opengeo.ncep.noaa.gov/geoserver/nam/nam_t2m/ows',
+};
+const WMS_LAYERS = {
+  nc: '1',
+  nx: 'conus_bref_qcd',
+  nh: '0,1,2,3,4,5,6',
+  wn: 'nam_wind_10m',
+  wt: 'nam_t2m',
+};
+
+// ── State ─────────────────────────────────────────────────────────────────
+let sector    = 'se';
+let frame     = FRAME_COUNT - 1;
+let playing   = true;
+let animFps   = 1;
+let animTimer = null;
+let frames    = [];
+let modelData = null;
+const layerSt = {};
+LAYERS_DEF.forEach(d => { layerSt[d.id] = {...d}; });
+
+// Leaflet layer references
+const _leafletLayers = {};
+
+// ════════════════════════════════════════════════════════════════════════
+// INLINE MEMOIZED SAT DATA (CSP-safe — no blob URL workers)
+// ════════════════════════════════════════════════════════════════════════
+const _satMemo = new Map();
+const _SAT_TTL = 5 * 60 * 1000;
+
+function _julianDay(d) {
+  const s = new Date(Date.UTC(d.getUTCFullYear(), 0, 0));
+  return Math.floor((d - s) / 86400000);
+}
+
+function _toStarTs(date) {
+  const d = new Date(date);
+  d.setUTCMinutes(Math.floor(d.getUTCMinutes() / 5) * 5, 0, 0);
+  const y   = d.getUTCFullYear();
+  const day = String(_julianDay(d)).padStart(3, '0');
+  const h   = String(d.getUTCHours()).padStart(2, '0');
+  const m   = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${y}${day}${h}${m}00`;
+}
+
+function satGetFrames(sec, band, count) {
+  const key = `${sec}:${band}:${count}`;
+  const c   = _satMemo.get(key);
+  if (c && Date.now() - c.ts < _SAT_TTL) return c.data;
+  const out  = [];
+  const now  = Date.now();
+  const base = 'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR';
+  for (let i = count - 1; i >= 0; i--) {
+    const t   = new Date(now - i * FRAME_MS);
+    const ts  = _toStarTs(t);
+    out.push({
+      idx:       count - 1 - i,
+      ts,
+      iso:       t.toISOString(),
+      wmsTime:   t.toISOString().slice(0, 19) + 'Z',
+      starUrl:   `${base}/${sec}/${band}/${ts}_GOES19-ABI-${sec}-${band}-1000x1000.jpg`,
+      latestUrl: `${base}/${sec}/${band}/latest.jpg`,
+    });
+  }
+  _satMemo.set(key, { ts: Date.now(), data: out });
+  return out;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// INLINE MEMOIZED MODEL + FUSION (CSP-safe — no blob URL workers)
+// ════════════════════════════════════════════════════════════════════════
+const _mdlMemo = new Map();
+const _MDL_TTL = 60 * 60 * 1000;
+const _FUS_TTL = 30 * 60 * 1000;
+
+async function modelFetchModel(lat, lon) {
+  const key = `m:${lat.toFixed(1)}:${lon.toFixed(1)}`;
+  const c   = _mdlMemo.get(key);
+  if (c && Date.now() - c.ts < _MDL_TTL) return c.data;
+  const url = 'https://api.open-meteo.com/v1/forecast'
+    + `?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}`
+    + '&hourly=temperature_2m,windspeed_10m,winddirection_10m,precipitation_probability,cape'
+    + '&forecast_days=2&timezone=UTC&timeformat=unixtime';
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
+  const data = await res.json();
+  _mdlMemo.set(key, { ts: Date.now(), data });
+  return data;
+}
+
+function modelFuse(satIso, mdl) {
+  const key = `f:${satIso}:${mdl.latitude.toFixed(1)}:${mdl.longitude.toFixed(1)}`;
+  const c   = _mdlMemo.get(key);
+  if (c && Date.now() - c.ts < _FUS_TTL) return c.data;
+  const satMs = new Date(satIso).getTime();
+  const times = (mdl.hourly.time || []).map(t => t * 1000);
+  let ci = 0, minD = Infinity;
+  times.forEach((t, i) => { const d = Math.abs(t - satMs); if (d < minD) { minD = d; ci = i; } });
+  const hr = mdl.hourly;
+  const u  = mdl.hourly_units || {};
+  const fusion = {
+    modelUnix: times[ci],
+    temp:      hr.temperature_2m?.[ci]            ?? null,
+    tempUnit:  u.temperature_2m                   || '°C',
+    wind:      hr.windspeed_10m?.[ci]             ?? null,
+    wdir:      hr.winddirection_10m?.[ci]         ?? null,
+    precip:    hr.precipitation_probability?.[ci] ?? null,
+    cape:      hr.cape?.[ci]                      ?? null,
+    lat:       mdl.latitude,
+    lon:       mdl.longitude,
+  };
+  _mdlMemo.set(key, { ts: Date.now(), data: fusion });
+  return fusion;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SECTOR BOUNDS HELPER
+// ════════════════════════════════════════════════════════════════════════
+function sectorBounds(s) {
+  const sec = SECTORS[s];
+  return L.latLngBounds([sec.s, sec.w], [sec.n, sec.e]);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// LOADER CONTROL — decoupled from data fetch promises
+// ════════════════════════════════════════════════════════════════════════
+let _initDone = false;
+function finishInit() {
+  if (_initDone) return;
+  _initDone = true;
+  const loader = document.getElementById('map-load');
+  if (loader) {
+    loader.classList.add('gone');
+    setTimeout(() => { loader.hidden = true; }, 440);
+  }
+}
+// Hard failsafe — always fires even if map never loads
+setTimeout(finishInit, 8000);
+
+// ════════════════════════════════════════════════════════════════════════
+// MAP INIT — Leaflet.js (no internal workers, img-element tiles)
+// ════════════════════════════════════════════════════════════════════════
+let map;
+try {
+  map = L.map('map', {
+    center:            [31, -80],
+    zoom:              5,
+    zoomControl:       true,
+    attributionControl: true,
+  });
+
+  // Dark basemap — OSM tiles inverted to dark (no API key needed)
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+    maxZoom:     19,
+    tileSize:    256,
+    className:   'basemap-dark',
+  }).addTo(map);
+
+} catch (mapErr) {
+  console.error('Leaflet init failed:', mapErr);
+  const loader = document.getElementById('map-load');
+  if (loader) loader.querySelector('div:last-child').textContent = 'Map failed to initialize.';
+  finishInit();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// ADD LAYERS TO MAP (Leaflet API)
+// ════════════════════════════════════════════════════════════════════════
+function addMapLayers() {
+  // Satellite image overlays — georeferenced to sector bounds
+  LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
+    const url    = `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/${def.band}/latest.jpg`;
+    const bounds = sectorBounds(sector);
+    const layer  = L.imageOverlay(url, bounds, {
+      opacity:     def.on ? def.opacity : 0,
+      interactive: false,
+      crossOrigin: true,
+    });
+    if (def.on) layer.addTo(map);
+    _leafletLayers[def.id] = layer;
+  });
+
+  // WMS tile layers
+  LAYERS_DEF.filter(d => d.type === 'wms').forEach(def => {
+    const layer = L.tileLayer.wms(WMS_URLS[def.wms], {
+      layers:      WMS_LAYERS[def.wms],
+      format:      'image/png',
+      transparent: true,
+      version:     '1.3.0',
+      opacity:     def.on ? def.opacity : 0,
+      tileSize:    512,
+    });
+    if (def.on) layer.addTo(map);
+    _leafletLayers[def.id] = layer;
+  });
+
+  // NWS alerts GeoJSON layer
+  const alertsLayer = L.geoJSON(null, {
+    style: feature => ({
+      color:       feature.properties.color || '#64748b',
+      fillColor:   feature.properties.color || '#64748b',
+      weight:      1.4,
+      opacity:     layerSt.alerts.on ? 0.8 : 0,
+      fillOpacity: layerSt.alerts.on ? layerSt.alerts.opacity : 0,
+    }),
+  });
+  if (layerSt.alerts.on) alertsLayer.addTo(map);
+  _leafletLayers.alerts = alertsLayer;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// APPLY LAYER VISIBILITY / OPACITY (Leaflet API)
+// ════════════════════════════════════════════════════════════════════════
+function applyLayer(id) {
+  const s     = layerSt[id];
+  const layer = _leafletLayers[id];
+  if (!layer) return;
+
+  if (id === 'alerts') {
+    if (s.on) {
+      if (!map.hasLayer(layer)) layer.addTo(map);
+      layer.setStyle({ opacity: 0.8, fillOpacity: s.opacity });
+    } else {
+      layer.setStyle({ opacity: 0, fillOpacity: 0 });
+    }
+    return;
+  }
+
+  if (s.on) {
+    if (!map.hasLayer(layer)) layer.addTo(map);
+    layer.setOpacity(s.opacity);
+  } else {
+    layer.setOpacity(0);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// LAYER PANEL
+// ════════════════════════════════════════════════════════════════════════
+function renderLayerPanel() {
+  const el = document.getElementById('ps-lyr');
+  el.innerHTML = '';
+  LAYERS_DEF.forEach(def => {
+    const st  = layerSt[def.id];
+    const div = document.createElement('div');
+    div.className = 'lyr';
+    div.innerHTML = `
+      <div class="lyr-row">
+        <button class="tog${st.on ? ' on' : ''}" data-lid="${def.id}" title="Toggle"></button>
+        <div class="lyr-name">
+          ${def.icon} ${def.label}
+          <div class="lyr-sub">${def.sub}</div>
+        </div>
+      </div>
+      <div class="lyr-ctrls">
+        <div class="ctrl-row">
+          <span class="cl">Opacity</span>
+          <input type="range" class="sl" min="0" max="1" step="0.05"
+            value="${st.opacity}" data-lid="${def.id}" data-c="opacity">
+          <span class="cv">${Math.round(st.opacity*100)}%</span>
+        </div>
+        <div class="ctrl-row">
+          <span class="cl">Blend</span>
+          <select class="bsel" data-lid="${def.id}" data-c="blend">
+            ${['normal','multiply','screen','overlay','lighten','darken','color-dodge'].map(b =>
+              `<option value="${b}"${st.blend===b?' selected':''}>${b}</option>`).join('')}
+          </select>
+        </div>
+      </div>`;
+    el.appendChild(div);
+  });
+
+  el.querySelectorAll('.tog').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.lid;
+      layerSt[id].on = !layerSt[id].on;
+      btn.classList.toggle('on', layerSt[id].on);
+      applyLayer(id);
+    });
+  });
+
+  el.querySelectorAll('.sl').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const id  = inp.dataset.lid;
+      const val = parseFloat(inp.value);
+      layerSt[id].opacity = val;
+      inp.nextElementSibling.textContent = Math.round(val * 100) + '%';
+      applyLayer(id);
+    });
+  });
+
+  el.querySelectorAll('.bsel').forEach(sel => {
+    sel.addEventListener('change', () => {
+      layerSt[sel.dataset.lid].blend = sel.value;
+      // Note: true per-layer CSS blend modes require multi-canvas — stored for future enhancement
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// FRAMES & ANIMATION
+// ════════════════════════════════════════════════════════════════════════
+function genFrames() {
+  try {
+    frames = satGetFrames(sector, 'GEOCOLOR', FRAME_COUNT);
+  } catch {
+    frames = [];
+    const now = Date.now();
+    for (let i = FRAME_COUNT - 1; i >= 0; i--) {
+      const t = new Date(now - i * FRAME_MS);
+      frames.push({
+        idx: FRAME_COUNT - 1 - i,
+        iso: t.toISOString(),
+        wmsTime: t.toISOString().slice(0, 19) + 'Z',
+        latestUrl: `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/GEOCOLOR/latest.jpg`,
+      });
+    }
+  }
+  renderTrack();
+}
+
+function renderTrack() {
+  const track = document.getElementById('tl-track');
+  track.innerHTML = '';
+  frames.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.className = 'tf' + (i < frame ? ' past' : '') + (i === frame ? ' now' : '');
+    div.title = new Date(f.iso).toUTCString();
+    div.addEventListener('click', () => goFrame(i));
+    track.appendChild(div);
+  });
+  syncTimestamp();
+}
+
+function syncTimestamp() {
+  if (!frames[frame]) return;
+  const t   = new Date(frames[frame].iso);
+  const h   = String(t.getUTCHours()).padStart(2, '0');
+  const m   = String(t.getUTCMinutes()).padStart(2, '0');
+  const mon = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][t.getUTCMonth()];
+  const d   = String(t.getUTCDate()).padStart(2, '0');
+  document.getElementById('tl-ts').textContent = `${d} ${mon} ${h}:${m} UTC`;
+  document.querySelectorAll('.tf').forEach((el, i) => {
+    el.className = 'tf' + (i < frame ? ' past' : '') + (i === frame ? ' now' : '');
+  });
+}
+
+function goFrame(i) {
+  frame = Math.max(0, Math.min(FRAME_COUNT - 1, i));
+  syncTimestamp();
+  applyFrame();
+}
+
+function applyFrame() {
+  if (!frames[frame]) return;
+  const f = frames[frame];
+
+  // Update sat image overlays — prefer timestamped URL, fall back to latest
+  LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
+    const layer = _leafletLayers[def.id];
+    if (!layer) return;
+    const url = (def.band === 'GEOCOLOR' && f.starUrl)
+      ? f.starUrl
+      : (f.latestUrl || `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${sector}/${def.band}/latest.jpg`);
+    try { layer.setUrl(url); } catch {}
+  });
+
+  // Update nowcoast WMS time parameter
+  const ncLayer = _leafletLayers['nc-ir'];
+  if (ncLayer) {
+    try { ncLayer.setParams({ TIME: f.wmsTime }); } catch {}
+  }
+
+  // Trigger data fusion with current satellite frame timestamp
+  if (modelData) runFusion(f.iso);
+}
+
+function startAnim() {
+  stopAnim();
+  animTimer = setInterval(() => {
+    frame = (frame + 1) % FRAME_COUNT;
+    syncTimestamp();
+    applyFrame();
+  }, 1000 / animFps);
+}
+
+function stopAnim() {
+  if (animTimer) { clearInterval(animTimer); animTimer = null; }
+}
+
+function togglePlay() {
+  playing = !playing;
+  const btn = document.getElementById('tl-play');
+  if (playing) {
+    btn.textContent = '⏸'; btn.classList.add('on'); startAnim();
+  } else {
+    btn.textContent = '▶'; btn.classList.remove('on'); stopAnim();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// NWS ALERTS
+// ════════════════════════════════════════════════════════════════════════
+function alertColor(ev) {
+  const e = (ev || '').toLowerCase();
+  if (e.includes('tornado'))   return '#e879f9';
+  if (e.includes('warning'))   return '#ef4444';
+  if (e.includes('watch'))     return '#f59e0b';
+  if (e.includes('advisory'))  return '#0ea5e9';
+  return '#64748b';
+}
+function alertClass(ev) {
+  const e = (ev || '').toLowerCase();
+  if (e.includes('tornado'))  return 'tornado';
+  if (e.includes('warning'))  return 'severe';
+  if (e.includes('watch'))    return 'watch';
+  if (e.includes('advisory')) return 'advisory';
+  return '';
+}
+
+async function fetchAlerts() {
+  try {
+    const res  = await fetch(`https://api.weather.gov/alerts/active?area=${ALERT_AREAS}`, {
+      headers: { Accept: 'application/geo+json' },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data  = await res.json();
+    const feats = (data.features || []);
+
+    // Update Leaflet GeoJSON layer
+    const alertsLayer = _leafletLayers.alerts;
+    if (alertsLayer) {
+      alertsLayer.clearLayers();
+      const geojson = {
+        type: 'FeatureCollection',
+        features: feats.filter(f => f.geometry).map(f => ({
+          ...f,
+          properties: { ...f.properties, color: alertColor(f.properties.event) },
+        })),
+      };
+      alertsLayer.addData(geojson);
+    }
+
+    // Sidebar alert list
+    const listEl = document.getElementById('al-list');
+    if (!feats.length) {
+      listEl.innerHTML = '<span style="color:var(--ok)">✓ No active alerts</span>';
+      document.getElementById('alert-ticker').hidden = true;
+      return;
+    }
+
+    const rank = ev => {
+      const e = (ev || '').toLowerCase();
+      return e.includes('tornado') ? 0 : e.includes('warning') ? 1 : e.includes('watch') ? 2 : 3;
+    };
+    feats.sort((a, b) => rank(a.properties.event) - rank(b.properties.event));
+
+    listEl.innerHTML = feats.slice(0, 18).map(f => {
+      const p   = f.properties;
+      const cls = alertClass(p.event);
+      const area = (p.areaDesc || '').split(';').slice(0, 3).join('; ');
+      return `<div class="al-item${cls ? ' ' + cls : ''}">
+        <div><div class="al-ev">${p.event}</div><div class="al-area">${area}</div></div>
+      </div>`;
+    }).join('');
+
+    // Alert ticker
+    const ticker = document.getElementById('alert-ticker');
+    document.getElementById('tick-text').textContent = feats.slice(0, 6).map(f => f.properties.event).join(' • ');
+    ticker.style.background = alertColor(feats[0].properties.event);
+    ticker.hidden = false;
+
+    document.getElementById('sat-dot').classList.remove('error');
+  } catch (err) {
+    console.warn('Alert fetch error:', err);
+    document.getElementById('al-list').innerHTML = '<span style="color:var(--text3)">Alert data unavailable</span>';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// SECTOR SWITCH (Leaflet API)
+// ════════════════════════════════════════════════════════════════════════
+function switchSector(s) {
+  if (!SECTORS[s]) return;
+  sector = s;
+  document.querySelectorAll('.sec-btn').forEach(b => b.classList.toggle('on', b.dataset.sector === s));
+  const bounds = sectorBounds(s);
+  map.fitBounds(bounds, { padding: [20, 20], animate: true });
+  genFrames();
+  // Refresh satellite overlays for new sector bounds
+  LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
+    const layer = _leafletLayers[def.id];
+    if (!layer) return;
+    const url = `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/${s}/${def.band}/latest.jpg`;
+    try {
+      layer.setUrl(url);
+      layer.setBounds(bounds);
+    } catch {}
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// DATA FUSION
+// ════════════════════════════════════════════════════════════════════════
+async function fetchModel(lat, lon) {
+  document.getElementById('f-ts').textContent = `Fetching model @ ${lat.toFixed(2)}°, ${lon.toFixed(2)}°…`;
+  try {
+    modelData = await modelFetchModel(lat, lon);
+    if (frames[frame]) runFusion(frames[frame].iso);
+  } catch (err) {
+    document.getElementById('f-ts').textContent = `Model error: ${err.message}`;
+  }
+}
+
+function runFusion(satIso) {
+  if (!modelData) return;
+  try {
+    const r = modelFuse(satIso, modelData);
+    paintFusion(r);
+  } catch (err) { console.warn('Fusion error:', err); }
+}
+
+const WDIR_ARROWS = ['↑','↗','→','↘','↓','↙','←','↖'];
+function wdirArrow(deg) {
+  return deg != null ? WDIR_ARROWS[Math.round(deg / 45) % 8] : '?';
+}
+
+function paintFusion(f) {
+  const fmt = (v, dp = 0) => v != null ? (+v).toFixed(dp) : '--';
+  document.getElementById('f-temp').textContent   = fmt(f.temp, 1);
+  document.getElementById('f-wind').textContent   = fmt(f.wind, 0);
+  document.getElementById('f-wdir').textContent   = wdirArrow(f.wdir);
+  document.getElementById('f-precip').textContent = fmt(f.precip, 0);
+  document.getElementById('f-cape').textContent   = fmt(f.cape, 0);
+  const t = f.modelUnix ? new Date(f.modelUnix).toUTCString().replace(/:\d\d GMT/, ' UTC') : '?';
+  document.getElementById('f-ts').textContent = `Model: ${t} • ${(f.lat||0).toFixed(2)}°, ${(f.lon||0).toFixed(2)}°`;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// UTC CLOCK
+// ════════════════════════════════════════════════════════════════════════
+function tickClock() {
+  const n = new Date();
+  const p = (v, l=2) => String(v).padStart(l,'0');
+  const m = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('utc-clock').textContent =
+    `${p(n.getUTCHours())}:${p(n.getUTCMinutes())}:${p(n.getUTCSeconds())} UTC  •  ${p(n.getUTCDate())} ${m[n.getUTCMonth()]} ${n.getUTCFullYear()}`;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// UI WIRING
+// ════════════════════════════════════════════════════════════════════════
+
+// Section collapse
+document.querySelectorAll('.ps-hd').forEach(hd => {
+  hd.addEventListener('click', () => {
+    const body = document.getElementById(hd.dataset.tgt);
+    const open = hd.classList.contains('open');
+    hd.classList.toggle('open', !open);
+    if (body) body.style.display = open ? 'none' : '';
+  });
+});
+
+// Sector buttons
+document.querySelectorAll('.sec-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchSector(btn.dataset.sector));
+});
+
+// Timeline controls
+document.getElementById('tl-play').addEventListener('click', togglePlay);
+document.getElementById('tl-prev').addEventListener('click', () => {
+  playing = false;
+  stopAnim();
+  document.getElementById('tl-play').textContent = '▶';
+  document.getElementById('tl-play').classList.remove('on');
+  goFrame(frame - 1);
+});
+document.getElementById('tl-next').addEventListener('click', () => {
+  playing = false;
+  stopAnim();
+  document.getElementById('tl-play').textContent = '▶';
+  document.getElementById('tl-play').classList.remove('on');
+  goFrame(frame + 1);
+});
+
+// Speed buttons
+document.querySelectorAll('.spd-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    animFps = parseFloat(btn.dataset.fps);
+    document.querySelectorAll('.spd-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    if (playing) startAnim();
+  });
+});
+
+// Sidebar toggle — use invalidateSize() for Leaflet
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('closed');
+  setTimeout(() => { if (map) map.invalidateSize(); }, 280);
+}
+document.getElementById('menu-btn').addEventListener('click', toggleSidebar);
+document.getElementById('sb-tog').addEventListener('click', toggleSidebar);
+
+// Map mouse / click — Leaflet uses e.latlng (not e.lngLat)
+if (map) {
+  map.on('mousemove', e => {
+    const { lat, lng } = e.latlng;
+    document.getElementById('cursor-info').textContent =
+      `${lat >= 0 ? lat.toFixed(4)+'°N' : (-lat).toFixed(4)+'°S'}  ${lng >= 0 ? lng.toFixed(4)+'°E' : (-lng).toFixed(4)+'°W'}`;
+  });
+
+  map.on('click', e => {
+    const { lat, lng } = e.latlng;
+    fetchModel(lat, lng);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// MAP READY → BOOTSTRAP (Leaflet: whenReady fires synchronously once DOM is ready)
+// ════════════════════════════════════════════════════════════════════════
+if (map) {
+  map.whenReady(() => {
+    // Add all overlay layers — wrapped so a bad URL can't crash init
+    try { addMapLayers(); } catch (e) { console.warn('addMapLayers:', e); }
+
+    // Render sidebar layer controls
+    renderLayerPanel();
+
+    // Hide loading overlay — map is ready
+    finishInit();
+
+    // Start UTC clock
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // Generate frame list synchronously (inline, no worker)
+    genFrames();
+    startAnim();
+
+    // Background data fetches — fire and forget
+    fetchAlerts();
+    fetchModel(31, -80);
+
+    // Periodic refresh
+    setInterval(fetchAlerts, 5 * 60 * 1000);
+    setInterval(genFrames,   5 * 60 * 1000);
+  });
+}
+</script>
