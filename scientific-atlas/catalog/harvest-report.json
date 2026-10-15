@@ -1,13 +1,18 @@
 {
-  "harvested_at": "2026-10-10T12:43:33Z",
-  "records_seen": 9100,
-  "records_written": 9100,
+  "harvested_at": "2026-10-15T11:44:05Z",
+  "records_seen": 6100,
+  "records_written": 6100,
   "duplicates_removed": 0,
-  "errors": [],
+  "errors": [
+    {
+      "source": "usgs-sciencebase-data-releases",
+      "error": "TimeoutError('The read operation timed out')",
+      "time": "2026-10-15T11:44:04Z"
+    }
+  ],
   "sources": [
     "datacite-datasets",
     "nasa-cmr-collections",
-    "noaa-ncei-search",
-    "usgs-sciencebase-data-releases"
+    "noaa-ncei-search"
   ]
 }
