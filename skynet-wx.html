@@ -445,6 +445,8 @@ body.track-mode #map,body.track-mode #map *{cursor:crosshair!important}
               <button class="sat-btn on" data-sat="GOES19">GOES-19 East</button>
               <button class="sat-btn" data-sat="GOES18">GOES-18 West</button>
               <button class="sat-btn" data-sat="HIMAWARI9">Himawari-9</button>
+              <button class="sat-btn" data-sat="METEOSAT11">Meteosat-11</button>
+              <button class="sat-btn" id="btn-global" title="Stitch all GEO satellites into a seamless global composite">🌍 Global</button>
             </div>
             <div class="sec-grid" id="sec-grid">
               <!-- populated by renderSectorGrid() -->
@@ -610,18 +612,31 @@ const SAT_DEF = {
       aus: {label:'Australia',   w:105, e:160, s:-45, n:-10, cx:132,  cy:-27, z:4.5},
     },
   },
+  // Meteosat-11 (EUMETSAT, 0°E) — Europe / Africa / Indian Ocean
+  // Open imagery via EUMETSAT EUMETView WMS (free, no auth for quicklooks)
+  METEOSAT11: {
+    label: 'Meteosat-11 (EU)', satNum: 11, meteosat: true,
+    sectors: {
+      eu:  {label:'Europe/Africa', w:-30, e:60,  s:-60, n:60,  cx:15,   cy:10,  z:3  },
+      eur: {label:'Europe',        w:-20, e:40,  s:30,  n:72,  cx:10,   cy:50,  z:4  },
+      afr: {label:'Africa',        w:-20, e:55,  s:-40, n:40,  cx:20,   cy:5,   z:4  },
+      ind: {label:'Indian Ocean',  w:40,  e:100, s:-40, n:25,  cx:70,   cy:-5,  z:4  },
+    },
+  },
 };
 function getSectors() { return SAT_DEF[activeSat].sectors; }
-function isHimawari() { return !!(SAT_DEF[activeSat] && SAT_DEF[activeSat].himawari); }
+function isHimawari()  { return !!(SAT_DEF[activeSat] && SAT_DEF[activeSat].himawari); }
+function isMeteosat()  { return !!(SAT_DEF[activeSat] && SAT_DEF[activeSat].meteosat); }
 function getSatBase() {
-  if (isHimawari()) return 'https://himawari8.nict.go.jp/img/D531106';
+  if (isHimawari())  return 'https://himawari8.nict.go.jp/img/D531106';
+  if (isMeteosat())  return null;  // Meteosat uses WMS — no simple base path
   return `https://cdn.star.nesdis.noaa.gov/GOES${SAT_DEF[activeSat].satNum}/ABI/SECTOR`;
 }
 function getSatId() { return isHimawari() ? 'HIM9' : `GOES${SAT_DEF[activeSat].satNum}`; }
+
 /** Build Himawari-9 URL for a given Date and band (currently Full-Disk at 550px segments). */
 function himawariUrl(date, band) {
   // NICT real-time tiles: /img/D531106/1d/550/YYYY/MM/DD/HHmm00_0_0.png (1×1 tile)
-  // For simplicity we use the pre-composited 1100×1100 band image where available
   const d  = new Date(date);
   const YY = d.getUTCFullYear();
   const MM = String(d.getUTCMonth()+1).padStart(2,'0');
@@ -630,6 +645,73 @@ function himawariUrl(date, band) {
   const mi = String(Math.floor(d.getUTCMinutes()/10)*10).padStart(2,'0');
   return `https://himawari8.nict.go.jp/img/D531106/1d/550/${YY}/${MM}/${DD}/${HH}${mi}00_0_0.png`;
 }
+
+/**
+ * Returns the latest Himawari-9 full-disk URL rounded back to the nearest 10-min mark.
+ * NICT serves imagery about 10 min after acquisition.
+ */
+function himawariLatestFDUrl() {
+  const now = new Date(Date.now() - 15 * 60 * 1000);   // offset 15 min for latency
+  return himawariUrl(now, 'B03');
+}
+
+/**
+ * Full-disk GEO satellite imagery definitions used for the global composite stitching.
+ * Each entry describes one geostationary satellite's full-disk image source.
+ *
+ * Geographic extents are approximate — GEO full-disk images are in satellite projection,
+ * but stretching to a lat/lon rectangle is accurate enough for visual display purposes.
+ * Overlap zones blend via screen mix-blend-mode so cloud detail comes through from any sat.
+ *
+ * Satellite longitudes: GOES-19 = 75.2°W, GOES-18 = 136.5°W, Himawari-9 = 140°E, Meteosat-11 = 0°
+ * Visible hemisphere radius: ±~81° from sub-satellite point in both lat and lon.
+ */
+const GEO_COMPOSITE = [
+  {
+    id: 'GOES18_FD',
+    label: 'GOES-18 West',
+    getUrl: () => `https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg`,
+    // Centered at -136.5°, visible ±81°: roughly 145°E → -55°W crossing antimeridian
+    fdBounds: [[-81.3, -180], [81.3, -55]],         // Leaflet bounds (clip at -180 edge)
+    fdBoundsE: [[-81.3, 145], [81.3, 180]],          // Leaflet east-of-antimeridian piece
+    cesRect: { w: 145, s: -81.3, e: -55, n: 81.3 }, // Cesium rectangle (crosses antimeridian)
+  },
+  {
+    id: 'HIM9_FD',
+    label: 'Himawari-9',
+    getUrl: himawariLatestFDUrl,
+    // Centered at 140°E, visible ±81°: roughly 59°E → 221°E (=-139°W)
+    fdBounds: [[-81.3, 59], [81.3, 180]],
+    fdBoundsE: [[-81.3, -180], [81.3, -139]],        // wrap-around portion
+    cesRect: { w: 59, s: -81.3, e: -139, n: 81.3 },  // crosses antimeridian
+  },
+  {
+    id: 'MET11_FD',
+    label: 'Meteosat-11',
+    // EUMETSAT EUMETView WMS — free anonymous quicklook access
+    // Returns a JPEG of Meteosat natural colour (HRV-based) for the visible hemisphere
+    getUrl: () => {
+      const w = -81, s = -81, e = 81, n = 81;
+      const base = 'https://eumetview.eumetsat.int/geoserv/wms';
+      return `${base}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
+             `&LAYERS=EO%3AEUM%3ADAT%3AMSG%3AMSG15-RSS` +
+             `&FORMAT=image%2Fjpeg&CRS=EPSG%3A4326` +
+             `&BBOX=${s},${w},${n},${e}&WIDTH=1200&HEIGHT=1200&STYLES=`;
+    },
+    fdBounds: [[-81, -81], [81, 81]],
+    fdBoundsE: null,
+    cesRect: { w: -81, s: -81, e: 81, n: 81 },
+  },
+  {
+    id: 'GOES19_FD',
+    label: 'GOES-19 East',
+    getUrl: () => `https://cdn.star.nesdis.noaa.gov/GOES19/ABI/FD/GEOCOLOR/latest.jpg`,
+    // Centered at -75.2°, visible ±81°: roughly -156°W → +6°E
+    fdBounds: [[-81.3, -156], [81.3, 6]],
+    fdBoundsE: null,
+    cesRect: { w: -156, s: -81.3, e: 6, n: 81.3 },
+  },
+];
 
 const LAYERS_DEF = [
   {id:'sat-geo',  icon:'🛰️', label:'GeoColor RGB',    sub:'True color composite',      type:'sat', band:'GEOCOLOR',opacity:.9, blend:'normal',   on:true },
@@ -699,6 +781,11 @@ let activeModels = new Set(['gfs','ecmwf','icon']);
 
 // Leaflet layer references
 const _leafletLayers = {};
+
+// Global composite mode (stitch all GEO sats)
+let globalComposite = false;
+const _globalLeafletLayers = [];   // imageOverlay instances for composite
+let   _globeImageryLayers  = [];   // Cesium ImageryLayer instances for composite
 
 // ── 3D Globe state ──────────────────────────────────────────────────────
 let globe3d          = false;
@@ -1247,8 +1334,19 @@ async function fetchAlerts() {
 function renderSectorGrid() {
   const grid = document.getElementById('sec-grid');
   if (!grid) return;
-  const secs = getSectors();
+
   grid.innerHTML = '';
+
+  if (globalComposite) {
+    // Global mode: show informational blurb instead of sector buttons
+    const info = document.createElement('div');
+    info.style.cssText = 'padding:6px 8px;font-size:10px;color:var(--text2);line-height:1.5';
+    info.textContent   = 'GOES-19 · GOES-18 · Himawari-9 · Meteosat-11 — stitched into a seamless global composite.';
+    grid.appendChild(info);
+    return;
+  }
+
+  const secs = getSectors();
   Object.entries(secs).forEach(([key, sec]) => {
     const btn = document.createElement('button');
     btn.className   = 'sec-btn' + (key === sector ? ' on' : '');
@@ -1382,6 +1480,14 @@ function getGlobeSatUrl() {
   if (!frames[frame]) return '';
   const f = frames[frame];
   if (isHimawari()) return himawariUrl(f.iso, 'B13');
+  if (isMeteosat()) {
+    // Meteosat full-disk WMS for the globe overlay
+    const sd  = SAT_DEF.METEOSAT11.sectors[sector] || SAT_DEF.METEOSAT11.sectors.eu;
+    const base = 'https://eumetview.eumetsat.int/geoserv/wms';
+    return `${base}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
+           `&LAYERS=EO%3AEUM%3ADAT%3AMSG%3AMSG15-RSS&FORMAT=image%2Fjpeg&CRS=EPSG%3A4326` +
+           `&BBOX=${sd.s},${sd.w},${sd.n},${sd.e}&WIDTH=1200&HEIGHT=1200&STYLES=`;
+  }
   const base  = getSatBase();
   const satId = getSatId();
   return f.ts
@@ -1395,6 +1501,127 @@ function updateGlobeSat() {
   if (!_globeSatImg) return;
   const url = getGlobeSatUrl();
   if (_globeSatImg.src !== url) _globeSatImg.src = url;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// GLOBAL COMPOSITE — stitch all GEO satellites into a seamless world view
+// ════════════════════════════════════════════════════════════════════════
+
+/**
+ * Toggle the global composite view on/off.
+ * When active, all four GEO satellites are layered on both the 2D map
+ * and the 3D globe simultaneously using their full-disk images.
+ */
+function toggleGlobalComposite() {
+  globalComposite = !globalComposite;
+  document.getElementById('btn-global').classList.toggle('on', globalComposite);
+
+  if (globalComposite) {
+    // Deactivate individual sat button highlights
+    document.querySelectorAll('.sat-btn[data-sat]').forEach(b => b.classList.remove('on'));
+    // Hide the sector grid — global mode has no per-sector buttons
+    renderSectorGrid();
+    // Build composite overlays
+    buildGlobalLeafletOverlays();
+    // Zoom 2D map to show the whole world
+    map.setView([10, 0], 2, { animate: true });
+    // Build globe composite if globe is active
+    if (globe3d && cesiumViewer) buildGlobeCesiumComposite();
+  } else {
+    // Tear down composite overlays
+    destroyGlobalLeafletOverlays();
+    destroyGlobeCesiumComposite();
+    // Restore individual sat highlighting
+    document.querySelectorAll('.sat-btn').forEach(b =>
+      b.classList.toggle('on', b.dataset.sat === activeSat));
+    renderSectorGrid();
+    // Re-zoom to active sector
+    const bounds = sectorBounds(sector);
+    map.fitBounds(bounds, { padding: [20, 20], animate: true });
+    if (globe3d && cesiumViewer) { flyToSector(sector); updateGlobeSat(); }
+  }
+}
+
+/** Build L.imageOverlay instances for each GEO full-disk on the Leaflet map. */
+function buildGlobalLeafletOverlays() {
+  destroyGlobalLeafletOverlays();
+  GEO_COMPOSITE.forEach(sat => {
+    const url = sat.getUrl();
+    const opts = { opacity: 0.85, crossOrigin: true, className: 'global-sat-overlay' };
+
+    // Primary bounds
+    const ov = L.imageOverlay(url, L.latLngBounds(sat.fdBounds), opts).addTo(map);
+    // Override style for screen blend to merge clouds
+    ov.getElement && ov.on('load', () => {
+      const el = ov.getElement();
+      if (el) { el.style.mixBlendMode = 'screen'; el.style.imageRendering = 'auto'; }
+    });
+    _globalLeafletLayers.push(ov);
+
+    // East-of-antimeridian wrap piece (for GOES-18 and Himawari which cross 180°)
+    if (sat.fdBoundsE) {
+      const ov2 = L.imageOverlay(url, L.latLngBounds(sat.fdBoundsE), opts).addTo(map);
+      ov2.on('load', () => {
+        const el = ov2.getElement();
+        if (el) { el.style.mixBlendMode = 'screen'; el.style.imageRendering = 'auto'; }
+      });
+      _globalLeafletLayers.push(ov2);
+    }
+  });
+}
+
+/** Remove all global composite overlays from the Leaflet map. */
+function destroyGlobalLeafletOverlays() {
+  while (_globalLeafletLayers.length) {
+    try { map.removeLayer(_globalLeafletLayers.pop()); } catch {}
+  }
+}
+
+/**
+ * Add one Cesium SingleTileImageryProvider per GEO satellite to the globe,
+ * replacing the CSS-warp overlay while in global mode.
+ */
+function buildGlobeCesiumComposite() {
+  destroyGlobeCesiumComposite();
+
+  // Hide the CSS matrix3d overlay — globe shows proper imagery layers instead
+  if (_globeSatImg) { _globeSatImg.style.opacity = '0'; }
+
+  GEO_COMPOSITE.forEach(sat => {
+    try {
+      const url  = sat.getUrl();
+      const rect = Cesium.Rectangle.fromDegrees(
+        sat.cesRect.w, sat.cesRect.s, sat.cesRect.e, sat.cesRect.n);
+
+      // Use Cesium 1.x API: SingleTileImageryProvider constructor with options object
+      let provider;
+      try {
+        // Cesium 1.111 may use static fromUrl; try both patterns
+        provider = new Cesium.SingleTileImageryProvider({ url, rectangle: rect });
+      } catch {
+        provider = Cesium.SingleTileImageryProvider.fromUrl(url, { rectangle: rect });
+      }
+
+      const layer = cesiumViewer.imageryLayers.addImageryProvider(provider);
+      layer.alpha           = 0.88;
+      layer.brightness      = 1.0;
+      layer.contrast        = 1.05;
+      _globeImageryLayers.push(layer);
+    } catch (e) {
+      console.warn(`Cesium composite layer failed for ${sat.id}:`, e);
+    }
+  });
+}
+
+/** Remove Cesium composite imagery layers and restore CSS overlay. */
+function destroyGlobeCesiumComposite() {
+  while (_globeImageryLayers.length) {
+    try { cesiumViewer.imageryLayers.remove(_globeImageryLayers.pop(), true); } catch {}
+  }
+  // Restore the CSS overlay opacity when leaving global mode
+  if (_globeSatImg && !globalComposite) {
+    _globeSatImg.style.opacity = '0.82';
+  }
 }
 
 /** Position the Cesium camera over the active sector using WGS84 ECEF vectors. */
@@ -1480,9 +1707,17 @@ function initGlobe() {
       selectTrackPoint(lat, lon);
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
-    // Fly to current sector
-    flyToSector(sector);
-    updateGlobeSat();
+    // If global composite is active, build it; otherwise fly to sector
+    if (globalComposite) {
+      buildGlobeCesiumComposite();
+      cesiumViewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(0, 20, 22000000),
+        orientation: { heading: 0, pitch: Cesium.Math.toRadians(-90), roll: 0 },
+      });
+    } else {
+      flyToSector(sector);
+      updateGlobeSat();
+    }
 
   } catch (e) {
     console.error('Cesium init failed:', e);
@@ -1512,8 +1747,16 @@ function toggleGlobe() {
       if (!cesiumViewer) {
         initGlobe();
       } else {
-        flyToSector(sector);
-        updateGlobeSat();
+        if (globalComposite) {
+          buildGlobeCesiumComposite();
+          cesiumViewer.camera.setView({
+            destination: Cesium.Cartesian3.fromDegrees(0, 20, 22000000),
+            orientation: { heading: 0, pitch: Cesium.Math.toRadians(-90), roll: 0 },
+          });
+        } else {
+          flyToSector(sector);
+          updateGlobeSat();
+        }
       }
       updateGlobeTracks();
     }
@@ -1528,6 +1771,15 @@ function toggleGlobe() {
 
 function switchSat(sat) {
   if (!SAT_DEF[sat]) return;
+
+  // Exit global composite mode when switching to a specific satellite
+  if (globalComposite) {
+    globalComposite = false;
+    document.getElementById('btn-global').classList.remove('on');
+    destroyGlobalLeafletOverlays();
+    destroyGlobeCesiumComposite();
+  }
+
   activeSat = sat;
   // Switch to first sector of new satellite
   sector = Object.keys(SAT_DEF[sat].sectors)[0];
@@ -1538,19 +1790,22 @@ function switchSat(sat) {
   map.fitBounds(bounds, { padding: [10, 10], animate: true });
   genFrames();
   // Refresh all sat overlays for new satellite + sector
-  LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
-    const layer = _leafletLayers[def.id];
-    if (!layer) return;
-    try {
-      layer.setUrl(`${getSatBase()}/${sector}/${def.band}/latest.jpg`);
-      layer.setBounds(bounds);
-    } catch {}
-  });
-  if (ghostLayer) {
-    try {
-      ghostLayer.setUrl(`${getSatBase()}/${sector}/GEOCOLOR/latest.jpg`);
-      ghostLayer.setBounds(bounds);
-    } catch {}
+  // Meteosat uses WMS rather than NOAA CDN — skip the sector-based URL update
+  if (!isMeteosat()) {
+    LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
+      const layer = _leafletLayers[def.id];
+      if (!layer) return;
+      try {
+        layer.setUrl(`${getSatBase()}/${sector}/${def.band}/latest.jpg`);
+        layer.setBounds(bounds);
+      } catch {}
+    });
+    if (ghostLayer) {
+      try {
+        ghostLayer.setUrl(`${getSatBase()}/${sector}/GEOCOLOR/latest.jpg`);
+        ghostLayer.setBounds(bounds);
+      } catch {}
+    }
   }
   // 3D globe — fly camera to new satellite's first sector
   if (globe3d && cesiumViewer) {
@@ -1570,23 +1825,35 @@ function switchSector(s) {
   map.fitBounds(bounds, { padding: [20, 20], animate: true });
   _satMemo.clear();
   genFrames();
-  // Refresh satellite overlays for new sector bounds
-  LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
-    const layer = _leafletLayers[def.id];
-    if (!layer) return;
-    const url = `${getSatBase()}/${s}/${def.band}/latest.jpg`;
-    try {
-      layer.setUrl(url);
-      layer.setBounds(bounds);
-    } catch {}
-  });
-  // Update ghost layer bounds & URL for new sector
-  if (ghostLayer) {
-    try {
-      ghostLayer.setUrl(`${getSatBase()}/${s}/GEOCOLOR/latest.jpg`);
-      ghostLayer.setBounds(bounds);
-    } catch {}
+
+  if (isMeteosat()) {
+    // Meteosat: update sector sat overlays with a WMS URL for the selected sector bounds
+    const sd  = SAT_DEF.METEOSAT11.sectors[s];
+    const wms = `https://eumetview.eumetsat.int/geoserv/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
+                `&LAYERS=EO%3AEUM%3ADAT%3AMSG%3AMSG15-RSS&FORMAT=image%2Fjpeg&CRS=EPSG%3A4326` +
+                `&BBOX=${sd.s},${sd.w},${sd.n},${sd.e}&WIDTH=1200&HEIGHT=1200&STYLES=`;
+    LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
+      const layer = _leafletLayers[def.id];
+      if (!layer) return;
+      try { layer.setUrl(wms); layer.setBounds(bounds); } catch {}
+    });
+  } else {
+    // Refresh satellite overlays for new sector bounds
+    LAYERS_DEF.filter(d => d.type === 'sat').forEach(def => {
+      const layer = _leafletLayers[def.id];
+      if (!layer) return;
+      const url = `${getSatBase()}/${s}/${def.band}/latest.jpg`;
+      try { layer.setUrl(url); layer.setBounds(bounds); } catch {}
+    });
+    // Update ghost layer bounds & URL for new sector
+    if (ghostLayer) {
+      try {
+        ghostLayer.setUrl(`${getSatBase()}/${s}/GEOCOLOR/latest.jpg`);
+        ghostLayer.setBounds(bounds);
+      } catch {}
+    }
   }
+
   // 3D globe — fly camera to new sector using ECEF vector coordinates
   if (globe3d && cesiumViewer) {
     flyToSector(s);
@@ -1656,10 +1923,11 @@ document.querySelectorAll('.ps-hd').forEach(hd => {
   });
 });
 
-// Satellite picker buttons
-document.querySelectorAll('.sat-btn').forEach(btn => {
+// Satellite picker buttons — [data-sat] buttons call switchSat; #btn-global calls toggleGlobalComposite
+document.querySelectorAll('.sat-btn[data-sat]').forEach(btn => {
   btn.addEventListener('click', () => switchSat(btn.dataset.sat));
 });
+document.getElementById('btn-global').addEventListener('click', toggleGlobalComposite);
 
 // Sector buttons — wired dynamically by renderSectorGrid()
 
