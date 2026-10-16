@@ -1,0 +1,1606 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>FlightGear Rock 5B+</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500&display=swap">
+<style>
+:root {
+  --bg:#0a0e14;--surface:#111720;--card:#161d28;--border:#1f2d3d;
+  --accent:#00e5a0;--accent2:#0096ff;--warn:#ffb300;--danger:#ff4444;
+  --fg:#d0e8f5;--fg-muted:#7a9ab0;
+  --mono:'Share Tech Mono',monospace;--head:'Rajdhani',sans-serif;--body:'Inter',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px;min-height:100vh;
+  padding-top:52px;
+  padding-left:max(0px,env(safe-area-inset-left,0px));
+  padding-right:max(0px,env(safe-area-inset-right,0px));
+  padding-bottom:max(20px,env(safe-area-inset-bottom,0px));}
+
+/* ── TOP NAV ── */
+#topnav{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,14,20,0.96);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:4px;
+  padding:8px max(16px,env(safe-area-inset-left,0px)) 8px;
+  padding-top:calc(8px + env(safe-area-inset-top,0px));}
+#topnav .logo{font-family:var(--head);font-size:15px;font-weight:700;
+  color:var(--accent);letter-spacing:.08em;margin-right:12px;white-space:nowrap;}
+.top-btn{background:transparent;border:1px solid var(--border);color:var(--fg-muted);
+  font-family:var(--head);font-size:13px;font-weight:600;letter-spacing:.06em;
+  padding:5px 14px;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.top-btn:hover{border-color:var(--accent);color:var(--accent);}
+.top-btn.active{background:rgba(0,229,160,0.12);border-color:var(--accent);color:var(--accent);}
+
+/* ── SECTION PANELS ── */
+.main-section{display:none;padding:20px max(16px,env(safe-area-inset-left,0px));}
+.main-section.active{display:block;}
+
+/* ── SHARED CARD STYLES ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;}
+.card.green{border-left:3px solid var(--accent);}
+.card.blue{border-left:3px solid var(--accent2);}
+.card.yellow{border-left:3px solid var(--warn);}
+.card.red{border-left:3px solid var(--danger);}
+.card-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--fg-muted);text-transform:uppercase;margin-bottom:4px;}
+.card-title{font-family:var(--head);font-size:17px;font-weight:700;color:var(--fg);margin-bottom:8px;letter-spacing:.03em;}
+.card p{color:var(--fg-muted);font-size:13px;line-height:1.5;margin-bottom:8px;}
+.cmd-block{position:relative;background:#070b11;border:1px solid var(--border);border-radius:6px;padding:10px 38px 10px 12px;margin-top:6px;overflow-x:auto;}
+.cmd-block code{font-family:var(--mono);font-size:12px;color:var(--accent);white-space:pre;display:block;}
+.copy-btn{position:absolute;top:6px;right:6px;background:var(--surface);border:1px solid var(--border);
+  color:var(--fg-muted);font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  padding:3px 7px;border-radius:3px;cursor:pointer;transition:all .15s;}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.copy-btn.copied{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,0.08);}
+.warn-block{background:rgba(255,179,0,0.08);border:1px solid rgba(255,179,0,0.3);border-radius:5px;
+  padding:10px 12px;font-size:12.5px;color:#e8c97a;margin-top:8px;}
+.warn-block code{background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px;font-family:var(--mono);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+h2.section-head{font-family:var(--head);font-size:22px;font-weight:700;color:var(--accent);
+  letter-spacing:.06em;margin-bottom:4px;}
+.section-sub{color:var(--fg-muted);font-size:13px;margin-bottom:18px;}
+
+/* ══════════════════════════════════════════════
+   LAUNCH SECTION
+══════════════════════════════════════════════ */
+.ac-bar{display:flex;align-items:center;gap:12px;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:18px;flex-wrap:wrap;}
+.ac-bar label{font-family:var(--head);font-size:13px;font-weight:600;color:var(--fg-muted);
+  letter-spacing:.06em;white-space:nowrap;}
+.ac-bar select{background:var(--card);border:1px solid var(--border);color:var(--fg);
+  font-family:var(--mono);font-size:13px;padding:6px 10px;border-radius:5px;cursor:pointer;flex:1;min-width:180px;}
+.ac-bar select:focus{outline:none;border-color:var(--accent);}
+.ac-tip{font-size:12px;color:var(--fg-muted);margin-left:auto;}
+.loc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.loc-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;
+  display:flex;flex-direction:column;gap:8px;}
+.loc-card:hover{border-color:var(--border);background:#1a2130;}
+.loc-name{font-family:var(--head);font-size:15px;font-weight:700;color:var(--fg);}
+.loc-desc{font-size:12px;color:var(--fg-muted);}
+.loc-cmd{position:relative;background:#070b11;border:1px solid var(--border);border-radius:5px;
+  padding:8px 38px 8px 10px;overflow-x:auto;}
+.loc-cmd code{font-family:var(--mono);font-size:11px;color:var(--accent);white-space:pre;}
+
+/* ══════════════════════════════════════════════
+   FFB SECTION
+══════════════════════════════════════════════ */
+.ffb-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;}
+@media(max-width:640px){.ffb-wrap{grid-template-columns:1fr;}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.panel-title{font-family:var(--head);font-size:13px;font-weight:700;color:var(--fg-muted);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+.mode-row{display:flex;flex-wrap:wrap;gap:6px;}
+.mode-btn{background:var(--card);border:1px solid var(--border);color:var(--fg-muted);
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:6px 12px;
+  border-radius:4px;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.mode-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+.mode-btn.active{background:rgba(0,150,255,0.15);border-color:var(--accent2);color:var(--accent2);}
+.params-panel{display:none;flex-direction:column;gap:10px;margin-top:12px;}
+.param-row{display:flex;flex-direction:column;gap:4px;}
+.param-row label{font-size:11.5px;color:var(--fg-muted);display:flex;justify-content:space-between;}
+.param-row label span{color:var(--fg);font-family:var(--mono);}
+input[type=range]{width:100%;height:4px;appearance:none;background:var(--border);border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;
+  background:var(--accent2);cursor:pointer;}
+.dir-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;}
+#dirCanvas{background:#070b11;border:1px solid var(--border);border-radius:50%;cursor:crosshair;touch-action:none;}
+.dir-label{font-family:var(--mono);font-size:11px;color:var(--fg-muted);}
+#waveCanvas{width:100%;height:70px;background:#070b11;border:1px solid var(--border);border-radius:5px;display:block;}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.preset-card{background:var(--card);border:1px solid var(--border);border-radius:5px;
+  padding:8px 10px;cursor:pointer;transition:all .15s;}
+.preset-card:hover{border-color:var(--accent);background:rgba(0,229,160,0.05);}
+.preset-card.fired{border-color:var(--accent);background:rgba(0,229,160,0.12);}
+.preset-name{font-family:var(--head);font-size:12px;font-weight:700;color:var(--fg);}
+.preset-desc{font-size:11px;color:var(--fg-muted);}
+.tab-row{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
+.tab-btn{background:var(--card);border:1px solid var(--border);color:var(--fg-muted);
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:4px 10px;
+  border-radius:3px;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.tab-btn:hover{border-color:var(--accent2);}
+.tab-btn.active{background:rgba(0,150,255,0.15);border-color:var(--accent2);color:var(--accent2);}
+.code-panel{display:none;}
+.code-panel.active{display:block;}
+.code-out{background:#070b11;border:1px solid var(--border);border-radius:5px;
+  padding:10px 38px 10px 10px;max-height:280px;overflow-y:auto;position:relative;}
+.code-out pre{font-family:var(--mono);font-size:11px;color:var(--accent);white-space:pre-wrap;word-break:break-all;}
+.copy-code-btn{position:absolute;top:6px;right:6px;background:var(--surface);border:1px solid var(--border);
+  color:var(--fg-muted);font-family:var(--mono);font-size:10px;padding:3px 7px;border-radius:3px;cursor:pointer;transition:all .15s;}
+.copy-code-btn:hover,.copy-code-btn.copied{border-color:var(--accent);color:var(--accent);}
+
+/* ══════════════════════════════════════════════
+   DOSSIER SECTION
+══════════════════════════════════════════════ */
+.dos-nav{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:18px;}
+.nav-btn{background:var(--card);border:1px solid var(--border);color:var(--fg-muted);
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:6px 12px;
+  border-radius:4px;cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.nav-btn.active{background:rgba(0,229,160,0.12);border-color:var(--accent);color:var(--accent);}
+.dos-section{display:none;}
+.dos-section.active{display:block;}
+.dos-section h3{font-family:var(--head);font-size:14px;color:var(--accent2);letter-spacing:.06em;
+  text-transform:uppercase;margin:16px 0 10px;}
+.priority-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.priority-table th{background:var(--surface);color:var(--fg-muted);font-family:var(--mono);
+  font-size:11px;letter-spacing:.08em;padding:8px 10px;text-align:left;border:1px solid var(--border);}
+.priority-table td{padding:7px 10px;border:1px solid var(--border);color:var(--fg);vertical-align:top;}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+</style>
+
+<!-- ════════════════════════════════════════════════
+     TOP NAV
+════════════════════════════════════════════════ -->
+<nav id="topnav">
+  <span class="logo">✈ FG/R5B+</span>
+  <button class="top-btn active" data-main="launch">🚀 LAUNCH</button>
+  <button class="top-btn" data-main="ffb">🎮 FFB</button>
+  <button class="top-btn" data-main="dossier">📋 DOSSIER</button>
+</nav>
+
+<!-- ════════════════════════════════════════════════
+     SECTION: LAUNCH
+════════════════════════════════════════════════ -->
+<div id="main-launch" class="main-section active">
+  <h2 class="section-head">LAUNCH</h2>
+  <p class="section-sub">FlightGear 2024.1 · Rock 5B+ ARM64 · /usr/local/bin/fgfs</p>
+
+  <div class="ac-bar">
+    <label>AIRCRAFT</label>
+    <select id="acSelect" onchange="updateAllCmds()">
+      <option value="PA28-161-160">PA28-161-160 (Cherokee Warrior II)</option>
+      <option value="PA28-181">PA28-181 (Archer III)</option>
+      <option value="PA28R-200">PA28R-200 (Arrow)</option>
+      <option value="c172r">c172r (Cessna 172R)</option>
+      <option value="c172p">c172p (Cessna 172P)</option>
+      <option value="AT-802">AT-802 (Air Tractor)</option>
+      <option value="ag-cat">ag-cat (Grumman AgCat)</option>
+    </select>
+    <span class="ac-tip">Select aircraft → all cards update</span>
+  </div>
+
+  <div class="loc-grid" id="locGrid">
+    <!-- cards injected by JS -->
+  </div>
+
+  <div class="warn-block" style="margin-top:16px">
+    <strong>⚠ ALWAYS use /usr/local/bin/fgfs</strong> — not /usr/games/fgfs (old 2020.3 apt version).<br>
+    Kernel must be <code>6.1.84-8-rk2410-pidff-6</code>. Verify: <code>uname -r</code> · <code>grep ^default /boot/extlinux/extlinux.conf</code> → must show <code>default l3</code>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     SECTION: FFB TESTER
+════════════════════════════════════════════════ -->
+<div id="main-ffb" class="main-section">
+  <h2 class="section-head">FFB TESTER</h2>
+  <p class="section-sub">Saitek Cyborg Evo Force · /dev/input/event0 · hid-pidff (built-in)</p>
+
+  <div class="ffb-wrap">
+
+    <!-- LEFT: Mode + Params + Direction -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Effect Mode</div>
+        <div class="mode-row">
+          <button class="mode-btn active" data-mode="rumble">Rumble</button>
+          <button class="mode-btn" data-mode="constant">Constant</button>
+          <button class="mode-btn" data-mode="spring">Spring</button>
+          <button class="mode-btn" data-mode="damper">Damper</button>
+          <button class="mode-btn" data-mode="sine">Sine</button>
+          <button class="mode-btn" data-mode="square">Square</button>
+          <button class="mode-btn" data-mode="triangle">Triangle</button>
+        </div>
+
+        <!-- RUMBLE -->
+        <div id="params-rumble" class="params-panel" style="display:flex">
+          <div class="param-row">
+            <label>Strong Magnitude <span id="val-strong">50%</span></label>
+            <input type="range" id="sld-strong" min="0" max="100" value="50" oninput="updateParam('strong',+this.value,'%')">
+          </div>
+          <div class="param-row">
+            <label>Weak Magnitude <span id="val-weak">30%</span></label>
+            <input type="range" id="sld-weak" min="0" max="100" value="30" oninput="updateParam('weak',+this.value,'%')">
+          </div>
+          <div class="param-row">
+            <label>Duration <span id="val-dur">500ms</span></label>
+            <input type="range" id="sld-dur" min="50" max="5000" value="500" oninput="updateParam('dur',+this.value,'ms')">
+          </div>
+        </div>
+
+        <!-- CONSTANT -->
+        <div id="params-constant" class="params-panel">
+          <div class="param-row">
+            <label>Magnitude <span id="val-cmag">50%</span></label>
+            <input type="range" id="sld-cmag" min="0" max="100" value="50" oninput="updateParam('cmag',+this.value,'%')">
+          </div>
+          <div class="param-row">
+            <label>Direction <span id="val-cdir">0°</span></label>
+            <input type="range" id="sld-cdir" min="0" max="360" value="0" oninput="updateParam('cdir',+this.value,'°')">
+          </div>
+          <div class="param-row">
+            <label>Duration <span id="val-cdur">500ms</span></label>
+            <input type="range" id="sld-cdur" min="50" max="5000" value="500" oninput="updateParam('cdur',+this.value,'ms')">
+          </div>
+          <div class="param-row">
+            <label>Attack <span id="val-attack">0ms</span></label>
+            <input type="range" id="sld-attack" min="0" max="2000" value="0" oninput="updateParam('attack',+this.value,'ms')">
+          </div>
+          <div class="param-row">
+            <label>Fade <span id="val-fade">0ms</span></label>
+            <input type="range" id="sld-fade" min="0" max="2000" value="0" oninput="updateParam('fade',+this.value,'ms')">
+          </div>
+        </div>
+
+        <!-- SPRING -->
+        <div id="params-spring" class="params-panel">
+          <div class="param-row">
+            <label>Stiffness <span id="val-stiff">60%</span></label>
+            <input type="range" id="sld-stiff" min="0" max="100" value="60" oninput="updateParam('stiff',+this.value,'%')">
+          </div>
+          <div class="param-row">
+            <label>Saturation <span id="val-sat">80%</span></label>
+            <input type="range" id="sld-sat" min="0" max="100" value="80" oninput="updateParam('sat',+this.value,'%')">
+          </div>
+        </div>
+
+        <!-- DAMPER -->
+        <div id="params-damper" class="params-panel">
+          <div class="param-row">
+            <label>Damping <span id="val-damp">50%</span></label>
+            <input type="range" id="sld-damp" min="0" max="100" value="50" oninput="updateParam('damp',+this.value,'%')">
+          </div>
+        </div>
+
+        <!-- PERIODIC (sine/square/triangle share) -->
+        <div id="params-sine" class="params-panel">
+          <div class="param-row">
+            <label>Magnitude <span id="val-pmag">60%</span></label>
+            <input type="range" id="sld-pmag" min="0" max="100" value="60" oninput="updateParam('pmag',+this.value,'%')">
+          </div>
+          <div class="param-row">
+            <label>Period <span id="val-period">200ms</span></label>
+            <input type="range" id="sld-period" min="20" max="2000" value="200" oninput="updateParam('period',+this.value,'ms')">
+          </div>
+          <div class="param-row">
+            <label>Offset <span id="val-offset">0%</span></label>
+            <input type="range" id="sld-offset" min="-100" max="100" value="0" oninput="updateParam('offset',+this.value,'%')">
+          </div>
+          <div class="param-row">
+            <label>Duration <span id="val-pdur">1000ms</span></label>
+            <input type="range" id="sld-pdur" min="50" max="10000" value="1000" oninput="updateParam('pdur',+this.value,'ms')">
+          </div>
+          <div class="param-row">
+            <label>Attack <span id="val-attack2">0ms</span></label>
+            <input type="range" id="sld-attack2" min="0" max="2000" value="0" oninput="S.attack=+this.value;document.getElementById('val-attack2').textContent=this.value+'ms';genCode();drawWave();">
+          </div>
+          <div class="param-row">
+            <label>Fade <span id="val-fade2">0ms</span></label>
+            <input type="range" id="sld-fade2" min="0" max="2000" value="0" oninput="S.fade=+this.value;document.getElementById('val-fade2').textContent=this.value+'ms';genCode();drawWave();">
+          </div>
+        </div>
+      </div>
+
+      <!-- Direction Wheel (constant mode) -->
+      <div id="dirPanel" class="panel" style="display:none;margin-top:12px">
+        <div class="panel-title">Direction</div>
+        <div class="dir-wrap">
+          <canvas id="dirCanvas" width="120" height="120"></canvas>
+          <div class="dir-label" id="dirDeg">0°</div>
+        </div>
+      </div>
+
+      <!-- Waveform Preview -->
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-title">Waveform Preview</div>
+        <canvas id="waveCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- RIGHT: Presets + Code Gen -->
+    <div>
+      <div class="panel">
+        <div class="panel-title">Aviation Presets</div>
+        <div class="preset-grid">
+          <div class="preset-card" onclick="applyPreset('stall')">
+            <div class="preset-name">Stall Buffet</div>
+            <div class="preset-desc">Sine 80ms · 70%</div>
+          </div>
+          <div class="preset-card" onclick="applyPreset('runway')">
+            <div class="preset-name">Runway Roll</div>
+            <div class="preset-desc">Rumble low · continuous</div>
+          </div>
+          <div class="preset-card" onclick="applyPreset('chop')">
+            <div class="preset-name">Light Chop</div>
+            <div class="preset-desc">Rumble · 200ms bursts</div>
+          </div>
+          <div class="preset-card" onclick="applyPreset('turbulence')">
+            <div class="preset-name">Turbulence</div>
+            <div class="preset-desc">Rumble hi · 500ms</div>
+          </div>
+          <div class="preset-card" onclick="applyPreset('spring')">
+            <div class="preset-name">Stick Force</div>
+            <div class="preset-desc">Spring 80% · continuous</div>
+          </div>
+          <div class="preset-card" onclick="applyPreset('landing')">
+            <div class="preset-name">Touchdown</div>
+            <div class="preset-desc">Rumble 100% · 300ms</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-title">Code Generator</div>
+        <div class="tab-row">
+          <button class="tab-btn active" data-codetab="python">Python</button>
+          <button class="tab-btn" data-codetab="shell">Shell</button>
+          <button class="tab-btn" data-codetab="fgxml">FG XML</button>
+          <button class="tab-btn" data-codetab="setup">Setup</button>
+        </div>
+        <div class="code-panel active" id="codepanel-python">
+          <div class="code-out"><pre id="pyCode"></pre><button class="copy-code-btn" onclick="copyCode('pyCode',this)">COPY</button></div>
+        </div>
+        <div class="code-panel" id="codepanel-shell">
+          <div class="code-out"><pre id="shCode"></pre><button class="copy-code-btn" onclick="copyCode('shCode',this)">COPY</button></div>
+        </div>
+        <div class="code-panel" id="codepanel-fgxml">
+          <div class="code-out"><pre id="fgCode"></pre><button class="copy-code-btn" onclick="copyCode('fgCode',this)">COPY</button></div>
+        </div>
+        <div class="code-panel" id="codepanel-setup">
+          <div class="code-out"><pre id="setupCode">#!/bin/bash
+# FFB Setup — Rock 5B+ pidff-6 kernel
+
+# 1. Verify kernel
+uname -r
+# Must be: 6.1.84-8-rk2410-pidff-6
+
+# 2. Load joystick module
+sudo modprobe joydev
+ls /dev/input/js*       # Should show js0
+ls /dev/input/event*    # Find event node
+
+# 3. Install tools
+sudo apt install -y joystick evtest python3-evdev
+
+# 4. Quick FFB test
+fftest /dev/input/event0
+
+# 5. Check FF capabilities
+python3 - <<'EOF'
+import evdev
+d = evdev.InputDevice('/dev/input/event0')
+caps = d.capabilities(verbose=True)
+ff = caps.get(('EV_FF', 21), [])
+print(f"Device: {d.name}")
+for c in ff: print(' -', c)
+EOF
+
+# 6. Fix extlinux after any dpkg -i linux-image-*
+sudo sed -i 's/^default l0/default l3/' \
+  /boot/extlinux/extlinux.conf</pre>
+            <button class="copy-code-btn" onclick="copyCode('setupCode',this)">COPY</button></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end ffb-wrap -->
+</div>
+
+<!-- ════════════════════════════════════════════════
+     SECTION: DOSSIER
+════════════════════════════════════════════════ -->
+<div id="main-dossier" class="main-section">
+  <h2 class="section-head">DOSSIER</h2>
+  <p class="section-sub">FlightGear 2024.1 · Rock 5B+ ARM64 · RK3588 · Panfrost OpenGL 3.1</p>
+
+  <div class="dos-nav">
+    <button class="nav-btn active" data-tab="a">A · Joystick</button>
+    <button class="nav-btn" data-tab="b">B · Aircraft</button>
+    <button class="nav-btn" data-tab="c">C · Scenery</button>
+    <button class="nav-btn" data-tab="d">D · Realism</button>
+    <button class="nav-btn" data-tab="e">E · Performance</button>
+    <button class="nav-btn" data-tab="f">F · Launcher</button>
+    <button class="nav-btn" data-tab="g">G · Training</button>
+    <button class="nav-btn" data-tab="h">H · Kernel/HW</button>
+  </div>
+
+  <!-- ── A: JOYSTICK ── -->
+  <div id="tab-a" class="dos-section active">
+    <div class="card green">
+      <div class="card-label">Step 1 · Verify</div>
+      <div class="card-title">Confirm /dev/input/js0</div>
+      <p>After booting pidff-6 kernel (l3), joydev must load before js0 appears.</p>
+      <div class="cmd-block"><code>sudo modprobe joydev
+ls /dev/input/js*
+# Expected: /dev/input/js0  (Evo Force)
+# If missing: dmesg | grep -E "hid|input|joy"
+uname -r  # Must show: 6.1.84-8-rk2410-pidff-6</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Step 2 · Calibrate</div>
+      <div class="card-title">jstest Axis Check</div>
+      <div class="cmd-block"><code>sudo apt install -y joystick
+jstest /dev/input/js0
+# Move all axes — verify roll, pitch, throttle, twist
+# Note deadzone near center on axes 0 and 1
+# Ctrl+C when done
+
+# For calibration:
+jscal /dev/input/js0</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Step 3 · FG Config</div>
+      <div class="card-title">Joystick XML Location</div>
+      <p>FlightGear looks in <code>~/.fgfs/Input/Joysticks/</code> first, then system paths. Use FFB tab to generate the full XML.</p>
+      <div class="cmd-block"><code>mkdir -p ~/.fgfs/Input/Joysticks/
+# File: ~/.fgfs/Input/Joysticks/Saitek-Cyborg-Evo-Force.xml
+# Name must match: fgfs --show-joystick output
+fgfs --show-joystick 2>&amp;1 | grep -i saitek</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Step 4 · FFB Effects</div>
+      <div class="card-title">Verify Force Feedback</div>
+      <div class="cmd-block"><code>sudo apt install -y evtest
+# Find event node (Evo Force is usually event0):
+evtest --query /dev/input/event0 EV_FF 0
+# Exit code 10 = FF_RUMBLE supported ✓
+
+# Quick rumble test:
+python3 -c "
+import evdev; from evdev import ecodes, ff
+d = evdev.InputDevice('/dev/input/event0')
+r = ff.Rumble(strong_magnitude=0x7FFF, weak_magnitude=0x7FFF)
+e = ff.Effect(ecodes.FF_RUMBLE,-1,0,ff.Trigger(0,0),ff.Replay(500,0),ff.EffectType(ff_rumble_effect=r))
+eid = d.upload_effect(e); d.write(ecodes.EV_FF,eid,1)
+import time; time.sleep(0.6); d.erase_effect(eid)
+print('FFB OK')
+"</code></div>
+    </div>
+    <div class="card yellow">
+      <div class="card-label">Step 5 · Throttle</div>
+      <div class="card-title">Saitek Gold as Throttle</div>
+      <p>Plug Gold quadrant into second USB port. After <code>modprobe joydev</code> it appears as js1. Bind its axis 0 to throttle in FG XML or via FG's joystick dialog (Equipment → Joysticks).</p>
+      <div class="cmd-block"><code>ls /dev/input/js*  # js0=Evo, js1=Gold
+jstest /dev/input/js1  # Verify throttle axis moves</code></div>
+    </div>
+    <div class="warn-block">
+      <strong>CONFIG_HID_PID=y</strong> — compiled into kernel, NOT a module. <code>modprobe hid-pidff</code> will fail with "not found" — this is correct. The driver loads automatically on USB plug-in.
+    </div>
+  </div>
+
+  <!-- ── B: AIRCRAFT ── -->
+  <div id="tab-b" class="dos-section">
+    <div class="card green">
+      <div class="card-label">Installed</div>
+      <div class="card-title">PA28-161-160 (Cherokee Warrior II)</div>
+      <p>JSBSim FDM · Lycoming O-320-D2A · Full cockpit. Installed via FGAddon SVN. This is your primary trainer.</p>
+      <div class="cmd-block"><code># Verify installed:
+ls ~/.fgfs/Aircraft/PA28-161-160/
+# Launch:
+/usr/local/bin/fgfs --aircraft=PA28-161-160 --airport=KMCN</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Priority Add — PA28 Series</div>
+      <div class="card-title">Arrow, Archer III, Turbo Arrow</div>
+      <div class="cmd-block"><code># PA28R-200 (Arrow) — retractable gear training:
+svn checkout \
+  https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft/PA28R-200 \
+  ~/.fgfs/Aircraft/PA28R-200
+
+# PA28-181 (Archer III):
+svn checkout \
+  https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft/PA28-181 \
+  ~/.fgfs/Aircraft/PA28-181
+
+# PA28R-201 (Turbo Arrow):
+svn checkout \
+  https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft/PA28R-201 \
+  ~/.fgfs/Aircraft/PA28R-201</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Career Aircraft</div>
+      <div class="card-title">AT-802 Air Tractor (Ag Operations)</div>
+      <p>Primary career target — Ag application flying. Low-level at 200ft AGL, obstacle avoidance, GPS swaths.</p>
+      <div class="cmd-block"><code>svn checkout \
+  https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft/AT-802 \
+  ~/.fgfs/Aircraft/AT-802
+
+# Test launch:
+/usr/local/bin/fgfs --aircraft=AT-802 --airport=KAYS</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Bulk Install</div>
+      <div class="card-title">Full Fleet via SVN Loop</div>
+      <div class="cmd-block"><code>#!/bin/bash
+# Run from ~ to install full fleet
+BASE="https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft"
+DEST="$HOME/.fgfs/Aircraft"
+mkdir -p "$DEST"
+
+for ac in PA28R-200 PA28-181 PA28R-201 c172r c172p \
+          AT-802 ag-cat bo105 Bonanza-V35B PA34-200T C208B; do
+  echo "=== Installing $ac ==="
+  svn checkout "$BASE/$ac" "$DEST/$ac" 2>&amp;1 | tail -3
+done
+echo "Done."</code></div>
+    </div>
+    <div class="card yellow">
+      <div class="card-label">Note</div>
+      <div class="card-title">FGAddon vs GitHub</div>
+      <p>Always use <strong>FGAddon SVN</strong>, not fgmembers GitHub. GitHub repos are incomplete — PA28 showed as yellow glider without FDM files. SVN has the complete aircraft.</p>
+      <div class="cmd-block"><code># Verify aircraft has FDM:
+ls ~/.fgfs/Aircraft/PA28-161-160/Systems/
+# Should contain: PA28-161.xml (JSBSim FDM file)</code></div>
+    </div>
+  </div>
+
+  <!-- ── C: SCENERY ── -->
+  <div id="tab-c" class="dos-section">
+    <div class="card green">
+      <div class="card-label">Essential</div>
+      <div class="card-title">TerraSync (Auto-download Terrain)</div>
+      <p>Add to every launch command. Downloads terrain tiles as you fly. Cache in ~/.fgfs/TerraSync/ (needs ~10GB free).</p>
+      <div class="cmd-block"><code># Add to fgfs command:
+--enable-terrasync
+
+# Set cache size in ~/.fgfs/fgfsrc:
+--terrasync-dir=/home/USER/.fgfs/TerraSync
+
+# Check download progress:
+tail -f ~/.fgfs/flightgear.log | grep -i terra</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">SE USA Pre-cache</div>
+      <div class="card-title">Georgia Tile Set</div>
+      <p>Pre-download tiles for Middle Georgia, coast, and Florida to avoid in-flight stutter.</p>
+      <div class="cmd-block"><code># Manual TerraSync for SE US region:
+fgfs --enable-terrasync \
+  --airport=KMCN --lat=32.69 --lon=-83.65 \
+  --aircraft=ufo --fg-scenery=/dev/null &amp;
+# Let run for 30-60 min, cancel, terrain cached
+
+# Tile dirs: ~/.fgfs/TerraSync/Terrain/
+# SE US tiles named: w090n30/ through w080n30/</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Airport Data</div>
+      <div class="card-title">Nav/Airport Database Update</div>
+      <div class="cmd-block"><code># FG 2024.1 includes current AIRAC data
+# Verify airports exist:
+grep KMCN ~/.fgfs/apt.dat.gz 2>/dev/null || \
+  grep KMCN /usr/local/share/flightgear/Airports/apt.dat.gz
+
+# Check nav data:
+ls /usr/local/share/flightgear/Navaids/</code></div>
+    </div>
+    <div class="card yellow">
+      <div class="card-label">Advanced · Future</div>
+      <div class="card-title">osm2city (3D Buildings)</div>
+      <p>Generates 3D buildings from OpenStreetMap. CPU-intensive build but tiles reused. Not needed for training but adds immersion.</p>
+      <div class="cmd-block"><code>sudo apt install -y python3-pip osmium-tool
+pip3 install osm2city
+
+# Download Georgia OSM extract from geofabrik.de
+# Run osm2city for KMCN region (~30-60 min)
+# Add output path to fgfs --fg-scenery=</code></div>
+    </div>
+  </div>
+
+  <!-- ── D: REALISM ── -->
+  <div id="tab-d" class="dos-section">
+    <div class="card green">
+      <div class="card-label">High Value · Easy</div>
+      <div class="card-title">Real Weather (METAR)</div>
+      <p>One flag — downloads live METAR for your airport and sets wind, vis, clouds, temp automatically.</p>
+      <div class="cmd-block"><code># Add to fgfs command:
+--enable-real-weather-fetch
+
+# Verify working: FG menus → Environment → Weather
+# Should show "Real Weather" with METAR decoded
+# KMCN METAR: weather.gov/aviation/metar/KMCN</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Radio Discipline</div>
+      <div class="card-title">FGCom VoIP ATC</div>
+      <p>Real pilots on FlightGear multiplayer use FGCom on real frequencies. Invaluable for radio discipline training.</p>
+      <div class="cmd-block"><code>sudo apt install -y fgcom
+
+# Auto-starts with FG multiplayer. Manual:
+fgcom -s fgcom.flightgear.org -f 119.675
+# KMCN CTAF: 119.675 (Unicom/CTAF Macon)
+
+# Add to fgfs command for auto FGCom:
+--fgcom</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Traffic</div>
+      <div class="card-title">AI Traffic</div>
+      <div class="cmd-block"><code># Enable AI traffic (GA and commercial):
+--enable-ai-traffic
+--prop:/sim/traffic-manager/enabled=true
+
+# Or traffic file approach:
+--prop:/ai/models/enabled=true
+
+# FG includes traffic scenarios in:
+ls /usr/local/share/flightgear/AI/Traffic/</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Community</div>
+      <div class="card-title">Multiplayer</div>
+      <div class="cmd-block"><code># Add to fgfs command:
+--multiplay=out,10,mpserver01.flightgear.org,5000 \
+--multiplay=in,10,,5000 \
+--callsign=N-YOURTAIL
+
+# Primary EU server (low ping from US East):
+# mpserver01.flightgear.org:5000
+# US server: mpserver06.flightgear.org:5000
+
+# FG menus → Multiplayer → Pilot List</code></div>
+    </div>
+    <div class="card yellow">
+      <div class="card-label">Immersion</div>
+      <div class="card-title">Engine Failure Simulation (Nasal)</div>
+      <div class="cmd-block"><code># Paste into FG Nasal console (Help → Nasal):
+# Simulate carb ice / partial power loss
+setprop("/fdm/jsbsim/propulsion/engine/set-running", 1);
+setprop("/controls/engines/engine/mixture", 0.7);
+# Restore:
+setprop("/controls/engines/engine/mixture", 1.0);</code></div>
+    </div>
+  </div>
+
+  <!-- ── E: PERFORMANCE ── -->
+  <div id="tab-e" class="dos-section">
+    <div class="card green">
+      <div class="card-label">Optimized Launch</div>
+      <div class="card-title">Full Performance Command</div>
+      <p>All flags tuned for Mali-G610 / Panfrost OpenGL 3.1 on RK3588. Targeting ~25-30fps.</p>
+      <div class="cmd-block"><code>/usr/local/bin/fgfs \
+  --aircraft=PA28-161-160 \
+  --airport=KMCN \
+  --enable-terrasync \
+  --enable-real-weather-fetch \
+  --prop:/sim/rendering/shader-level=1 \
+  --prop:/sim/rendering/shadows/enabled=false \
+  --prop:/sim/rendering/draw-mask/clouds=false \
+  --visibility=20000 \
+  --prop:/sim/frame-rate-throttle-hz=30 \
+  --prop:/sim/rendering/multithreading-mode=2</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">CPU Affinity</div>
+      <div class="card-title">Pin to A76 Big Cores</div>
+      <p>RK3588 big.LITTLE: CPUs 4-7 are A76 (2.4GHz big cores). Pin FG to them for best single-thread perf.</p>
+      <div class="cmd-block"><code># Set performance governor first:
+for cpu in 4 5 6 7; do
+  echo performance | sudo tee \
+    /sys/devices/system/cpu/cpu${cpu}/cpufreq/scaling_governor
+done
+
+# Launch with affinity:
+taskset -c 4-7 /usr/local/bin/fgfs \
+  --aircraft=PA28-161-160 --airport=KMCN \
+  [... other flags ...]</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Persistent Config</div>
+      <div class="card-title">~/.fgfs/fgfsrc</div>
+      <p>Put persistent flags here so you don't repeat them every launch. fgfs reads it automatically.</p>
+      <div class="cmd-block"><code># ~/.fgfs/fgfsrc — one flag per line:
+--enable-terrasync
+--enable-real-weather-fetch
+--prop:/sim/rendering/shader-level=1
+--prop:/sim/rendering/shadows/enabled=false
+--prop:/sim/rendering/draw-mask/clouds=false
+--visibility=20000
+--prop:/sim/frame-rate-throttle-hz=30
+--prop:/sim/rendering/multithreading-mode=2</code></div>
+    </div>
+    <div class="card yellow">
+      <div class="card-label">Monitor</div>
+      <div class="card-title">FPS / Thermal Watch</div>
+      <div class="cmd-block"><code># In FG: press Shift+F3 for FPS overlay
+# Or from terminal (separate window):
+watch -n 2 "
+  echo '-- Temps --'
+  cat /sys/class/thermal/thermal_zone*/temp \
+    | awk '{printf \"%.1f°C \", \$1/1000}'; echo
+  echo '-- A76 Freq --'
+  cat /sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq
+"
+# RK3588 throttles at ~80°C
+# If FPS drops: reduce --visibility or add --fog-exp2</code></div>
+    </div>
+  </div>
+
+  <!-- ── F: LAUNCHER ── -->
+  <div id="tab-f" class="dos-section">
+    <div class="card green">
+      <div class="card-label">Quick Launch</div>
+      <div class="card-title">xterm Direct Spawn</div>
+      <div class="cmd-block"><code># Launch in xterm (keeps terminal for log output):
+xterm -e "/usr/local/bin/fgfs \
+  --aircraft=PA28-161-160 \
+  --airport=KMCN \
+  $(cat ~/.fgfs/fgfsrc | tr '\n' ' ')" &amp;
+
+# Or create alias in ~/.bashrc:
+alias fgmcn='/usr/local/bin/fgfs --aircraft=PA28-161-160 --airport=KMCN'</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Desktop Integration</div>
+      <div class="card-title">.desktop File</div>
+      <div class="cmd-block"><code># ~/.local/share/applications/flightgear-kmcn.desktop
+[Desktop Entry]
+Name=FlightGear KMCN
+Exec=/usr/local/bin/fgfs --aircraft=PA28-161-160 --airport=KMCN
+Icon=flightgear
+Type=Application
+Categories=Game;Simulation;</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Aircraft Auto-detect</div>
+      <div class="card-title">Dynamic Selector Script</div>
+      <div class="cmd-block"><code>#!/bin/bash
+# Auto-detect installed aircraft and present menu
+AC_DIR="$HOME/.fgfs/Aircraft"
+ACS=$(ls -d "$AC_DIR"/*/  2>/dev/null | xargs -I{} basename {})
+CHOICE=$(echo "$ACS" | fzf --prompt="Aircraft> " --height=15)
+[ -z "$CHOICE" ] && exit 0
+/usr/local/bin/fgfs --aircraft="$CHOICE" \
+  --airport=${FG_AIRPORT:-KMCN} \
+  $(cat ~/.fgfs/fgfsrc | tr '\n' ' ')</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">This Launcher</div>
+      <div class="card-title">Deploy fg-combined.html</div>
+      <div class="cmd-block"><code># Copy to home:
+cp fg-combined.html ~/fg-launcher.html
+
+# Open in browser:
+xdg-open ~/fg-launcher.html
+
+# Or set as browser homepage:
+# chromium --app=file:///home/USER/fg-launcher.html</code></div>
+    </div>
+  </div>
+
+  <!-- ── G: TRAINING ── -->
+  <div id="tab-g" class="dos-section">
+    <div class="card green">
+      <div class="card-label">ILS · KMCN</div>
+      <div class="card-title">ILS RWY 01 · 110.3 MHz</div>
+      <p>Macon Downtown — ILS 01. Spawn 10nm out on final, set NAV1 to 110.3, intercept localizer.</p>
+      <div class="cmd-block"><code>/usr/local/bin/fgfs \
+  --aircraft=PA28-161-160 \
+  --airport=KMCN --runway=01 \
+  --offset-distance=10 --offset-azimuth=0 \
+  --altitude=2500 --heading=010 \
+  --vc=90 \
+  --prop:/instrumentation/nav[0]/radials/selected-deg=010 \
+  $(cat ~/.fgfs/fgfsrc | tr '\n' ' ')
+# Set NAV1=110.3, CDI on — fly the needles down to minimums</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">VOR Tracking · KSAV</div>
+      <div class="card-title">SAV VOR · 115.1 MHz</div>
+      <div class="cmd-block"><code>/usr/local/bin/fgfs \
+  --aircraft=PA28-161-160 \
+  --airport=KSAV --runway=10 \
+  --altitude=3500 --heading=270 --vc=100 \
+  $(cat ~/.fgfs/fgfsrc | tr '\n' ' ')
+# SAV VOR 115.1 — track inbound on 090 radial
+# Cross-check with DME, hold at VOR, then outbound</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">GNS 430 · Flight Plan</div>
+      <div class="card-title">KMCN → KBQK → KVLD .fgfp</div>
+      <div class="cmd-block"><code># Save as ~/.fgfs/Export/flight-plan.fgfp:
+cat > ~/.fgfs/Export/tour-ga.fgfp &lt;&lt;'EOF'
+&lt;?xml version="1.0"?&gt;
+&lt;PropertyList&gt;
+  &lt;version type="int"&gt;2&lt;/version&gt;
+  &lt;departure&gt;&lt;airport&gt;KMCN&lt;/airport&gt;&lt;runway&gt;01&lt;/runway&gt;&lt;/departure&gt;
+  &lt;destination&gt;&lt;airport&gt;KVLD&lt;/airport&gt;&lt;runway&gt;04&lt;/runway&gt;&lt;/destination&gt;
+  &lt;route&gt;
+    &lt;wp type="navaid"&gt;&lt;ident&gt;MCN&lt;/ident&gt;&lt;/wp&gt;
+    &lt;wp type="airport"&gt;&lt;ident&gt;KBQK&lt;/ident&gt;&lt;/wp&gt;
+    &lt;wp type="airport"&gt;&lt;ident&gt;KVLD&lt;/ident&gt;&lt;/wp&gt;
+  &lt;/route&gt;
+&lt;/PropertyList&gt;
+EOF
+
+/usr/local/bin/fgfs --aircraft=PA28-161-160 \
+  --airport=KMCN --flight-plan=~/.fgfs/Export/tour-ga.fgfp</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">AT-802 · Ag Profile</div>
+      <div class="card-title">Low-Level at KAYS (Waycross)</div>
+      <div class="cmd-block"><code>/usr/local/bin/fgfs \
+  --aircraft=AT-802 \
+  --airport=KAYS \
+  --altitude=800 --heading=090 --vc=120 \
+  $(cat ~/.fgfs/fgfsrc | tr '\n' ' ')
+# KAYS CTAF: 122.8
+# Practice: descend to 200ft AGL over flat farmland
+# Swath width ~60ft, turn at field edge, climb to 500ft
+# Watch obstacle alerts — power lines critical</code></div>
+    </div>
+    <div class="card yellow">
+      <div class="card-label">IMC Training</div>
+      <div class="card-title">Zero-Zero Spawn · KMCN</div>
+      <div class="cmd-block"><code>/usr/local/bin/fgfs \
+  --aircraft=PA28-161-160 \
+  --airport=KMCN --runway=01 \
+  --prop:/environment/visibility-m=100 \
+  --prop:/environment/clouds/layer[0]/coverage=overcast \
+  --prop:/environment/clouds/layer[0]/elevation-ft=100 \
+  $(cat ~/.fgfs/fgfsrc | tr '\n' ' ')
+# Full IMC on ground — no visual references
+# Practice: cockpit scan, attitude flying, ILS intercept blind</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Reference</div>
+      <div class="card-title">Georgia Airport Frequencies</div>
+      <div style="overflow-x:auto;margin-top:8px">
+      <table class="priority-table">
+        <thead><tr><th>ICAO</th><th>Name</th><th>CTAF/Tower</th><th>ATIS/ASOS</th><th>ILS</th></tr></thead>
+        <tbody>
+          <tr><td>KMCN</td><td>Macon Downtown</td><td>119.675</td><td>125.500</td><td>110.3 Rwy01</td></tr>
+          <tr><td>KBQK</td><td>Brunswick Golden Isles</td><td>135.025</td><td>120.500</td><td>—</td></tr>
+          <tr><td>KVLD</td><td>Valdosta Regional</td><td>128.025</td><td>119.500</td><td>—</td></tr>
+          <tr><td>KAYS</td><td>Waycross Ware Co.</td><td>122.800</td><td>—</td><td>—</td></tr>
+          <tr><td>KSAV</td><td>Savannah/Hilton Head</td><td>119.100</td><td>135.375</td><td>109.9 Rwy10</td></tr>
+          <tr><td>PAHO</td><td>Homer AK</td><td>119.025</td><td>122.800</td><td>—</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── H: KERNEL/HW ── -->
+  <div id="tab-h" class="dos-section">
+    <div class="card red">
+      <div class="card-label">IMMEDIATE · Verify</div>
+      <div class="card-title">pidff-6 Kernel Status</div>
+      <p>Running 6.1.84-8-rk2410-pidff-6. Boot config must show <code>default l3</code>.</p>
+      <div class="cmd-block"><code>uname -r
+# Must output: 6.1.84-8-rk2410-pidff-6
+
+cat /boot/extlinux/extlinux.conf | grep "^default"
+# Must output: default l3
+
+# Verify joystick:
+sudo modprobe joydev
+ls /dev/input/js*
+# If empty: dmesg | grep -E "hid|joystick|input"</code></div>
+      <div class="warn-block" style="margin-top:8px">
+        <strong>⚠ extlinux resets on dpkg!</strong> After ANY <code>dpkg -i linux-image-*</code>, run immediately:<br>
+        <code>sudo sed -i 's/^default l0/default l3/' /boot/extlinux/extlinux.conf</code><br>
+        Verify: <code>grep '^default' /boot/extlinux/extlinux.conf</code>
+      </div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Alternative</div>
+      <div class="card-title">nocsf-ffb Kernel (l1) Test</div>
+      <p>Pre-built <code>6.1.84-18-rk2410-nocsf-ffb</code> at l1 may have everything needed. Worth testing — more stable than custom build.</p>
+      <div class="cmd-block"><code># SAFE test — temporarily switch default:
+sudo sed -i 's/^default l3/default l1/' \
+  /boot/extlinux/extlinux.conf
+sudo reboot
+# Test FFB: fftest /dev/input/event0
+
+# After testing, restore to pidff-6:
+sudo sed -i 's/^default l1/default l3/' \
+  /boot/extlinux/extlinux.conf
+# Note: l1 has no initrd line; U-Boot 10s timeout to l2 if fail</code></div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Future · GPU</div>
+      <div class="card-title">Panthor Driver (Mali-G610 Next-Gen)</div>
+      <p>Panfrost = OpenGL 3.1 today. <strong>Panthor</strong> (kernel 6.8+) will unlock full GPU performance and higher OpenGL + Vulkan via NVK-style path. Major FPS improvement expected.</p>
+      <div class="cmd-block"><code># Track Panthor on Rock 5B+:
+# https://forum.radxa.com → search "Panthor"
+# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests
+
+# When available (~kernel 6.9+ Radxa):
+# mesa 24.1+ with Panthor → OpenGL 3.3+
+# Enables --prop:/sim/rendering/shader-level=2 in FG
+# Expected: 40-50fps vs current ~25fps</code></div>
+    </div>
+    <div class="card blue">
+      <div class="card-label">Optimization</div>
+      <div class="card-title">CPU Governor for Sim</div>
+      <div class="cmd-block"><code># Set performance governor for A76 cores (4-7):
+for cpu in 4 5 6 7; do
+  echo performance | sudo tee \
+    /sys/devices/system/cpu/cpu${cpu}/cpufreq/scaling_governor
+done
+
+# Verify 2.4GHz:
+cat /sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq
+# Should show: 2400000 (2.4GHz)
+
+# Persist (optional):
+echo 'GOVERNOR="performance"' | sudo tee /etc/default/cpufrequtils</code></div>
+    </div>
+    <div class="card yellow">
+      <div class="card-label">Monitor</div>
+      <div class="card-title">Thermal Throttle Watch</div>
+      <div class="cmd-block"><code>watch -n 2 "cat /sys/class/thermal/thermal_zone*/temp \
+  | awk '{printf \"%.1f°C \", \$1/1000}'; echo"
+# RK3588 throttles at ~80°C
+# If temps hit 85°C:
+#   Reduce --prop:/sim/rendering/shader-level to 0
+#   Add heatsink/fan to Rock 5B+
+#   Reduce --visibility to 10000</code></div>
+    </div>
+    <hr class="divider">
+    <h3>UPGRADE PRIORITY MATRIX</h3>
+    <div style="overflow-x:auto">
+    <table class="priority-table">
+      <thead><tr><th>Priority</th><th>Upgrade</th><th>Impact</th><th>Effort</th></tr></thead>
+      <tbody>
+        <tr><td>🔴 NOW</td><td>Verify /dev/input/js0 on pidff-6 boot</td><td>BLOCKER</td><td>2 min</td></tr>
+        <tr><td>🔴 NOW</td><td>jstest axis calibration</td><td>BLOCKER</td><td>10 min</td></tr>
+        <tr><td>🟡 WK1</td><td>Real weather (METAR flag)</td><td>High</td><td>1 flag</td></tr>
+        <tr><td>🟡 WK1</td><td>AT-802 install (SVN)</td><td>High</td><td>5 min</td></tr>
+        <tr><td>🟡 WK1</td><td>TerraSync pre-cache SE US</td><td>High</td><td>30 min</td></tr>
+        <tr><td>🟢 MO1</td><td>PA28R Arrow (retractable)</td><td>Med</td><td>SVN checkout</td></tr>
+        <tr><td>🟢 MO1</td><td>FGCom VoIP ATC</td><td>High</td><td>apt install</td></tr>
+        <tr><td>🟢 MO1</td><td>ILS KMCN spawns practiced</td><td>High</td><td>—</td></tr>
+        <tr><td>🔵 LATER</td><td>osm2city Georgia</td><td>Med</td><td>1hr generate</td></tr>
+        <tr><td>🔵 LATER</td><td>Panthor GPU driver</td><td>High</td><td>kernel upgrade</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+</div><!-- end main-dossier -->
+
+<!-- ════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════ -->
+<script>
+// ── LAUNCH LOCATIONS ──
+const LOCATIONS = [
+  { id:'kmcn_ils',   name:'KMCN · ILS Rwy 01', desc:'10nm final, 2500ft — ILS 110.3 MHz',
+    extra:'--runway=01 --offset-distance=10 --offset-azimuth=0 --altitude=2500 --heading=010 --vc=90' },
+  { id:'kmcn_pat',   name:'KMCN · Pattern Rwy 01', desc:'Downwind 1200ft — VFR pattern work',
+    extra:'--runway=01 --altitude=1200 --heading=190 --vc=80' },
+  { id:'kmcn_dep',   name:'KMCN · Rwy 19 Departure', desc:'Rolling takeoff south, climb VFR',
+    extra:'--runway=19 --altitude=900 --heading=190 --vc=0' },
+  { id:'kbqk_vfr',  name:'KBQK · Brunswick', desc:'VFR coastal — Golden Isles, ocean views',
+    extra:'--airport=KBQK --runway=25 --altitude=800 --heading=250 --vc=90' },
+  { id:'kvld_vfr',  name:'KVLD · Valdosta', desc:'South Georgia VFR — pine flatlands',
+    extra:'--airport=KVLD --runway=04 --altitude=900 --heading=040 --vc=90' },
+  { id:'ksav_app',  name:'KSAV · Savannah', desc:'Coastal approach — ILS Rwy 10, 109.9 MHz',
+    extra:'--airport=KSAV --runway=10 --offset-distance=8 --altitude=2000 --heading=100 --vc=90' },
+  { id:'kays_ag',   name:'KAYS · Waycross (Ag)', desc:'Low-level ag ops training at 200ft AGL',
+    extra:'--airport=KAYS --altitude=800 --heading=090 --vc=110' },
+  { id:'kcsg_xc',   name:'KCSG · Columbus', desc:'Cross-country leg — VFR W/SW Georgia',
+    extra:'--airport=KCSG --runway=13 --altitude=2500 --heading=130 --vc=100' },
+  { id:'paho_sc',   name:'PAHO · Homer AK', desc:'Scenic coastal departure — Kachemak Bay',
+    extra:'--airport=PAHO --runway=03 --altitude=500 --heading=030 --vc=80' },
+  { id:'kmcn_imc',  name:'KMCN · IMC Zero-Zero', desc:'IFR training — no visual references',
+    extra:'--runway=01 --altitude=900 --prop:/environment/visibility-m=100 --prop:/environment/clouds/layer[0]/coverage=overcast' },
+];
+
+const BASE_FLAGS = `--enable-terrasync --prop:/sim/rendering/shader-level=1 --prop:/sim/rendering/shadows/enabled=false --prop:/sim/rendering/draw-mask/clouds=false --visibility=20000 --prop:/sim/frame-rate-throttle-hz=30 --prop:/sim/rendering/multithreading-mode=2`;
+
+function buildCmd(loc, aircraft) {
+  const airport = loc.extra.includes('--airport=') ? '' : ' --airport=KMCN';
+  return `/usr/local/bin/fgfs \\\n  --aircraft=${aircraft}${airport} \\\n  ${loc.extra.replace(/\s+--/g,' \\\n  --')} \\\n  ${BASE_FLAGS.replace(/\s+--/g,' \\\n  --')}`;
+}
+
+function renderLocCards() {
+  const ac = document.getElementById('acSelect').value;
+  const grid = document.getElementById('locGrid');
+  grid.innerHTML = '';
+  LOCATIONS.forEach(loc => {
+    const div = document.createElement('div');
+    div.className = 'loc-card';
+    div.innerHTML = `<div class="loc-name">${loc.name}</div>
+      <div class="loc-desc">${loc.desc}</div>
+      <div class="loc-cmd" id="cmd-${loc.id}"><code>${buildCmd(loc,ac)}</code></div>
+      <button class="copy-btn" style="position:static;align-self:flex-end" onclick="copyLocCmd('${loc.id}',this)">COPY</button>`;
+    grid.appendChild(div);
+  });
+  try { localStorage.setItem('fg_last_ac', ac); } catch(e) {}
+}
+
+function updateAllCmds() { renderLocCards(); }
+
+function copyLocCmd(id, btn) {
+  const code = document.querySelector(`#cmd-${id} code`);
+  if (!code) return;
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    btn.textContent = 'COPIED'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1500);
+  }).catch(() => {
+    const r = document.createRange(); r.selectNodeContents(code);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r);
+  });
+}
+
+// ── MAIN TAB SWITCHING ──
+document.querySelectorAll('.top-btn[data-main]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.main;
+    document.querySelectorAll('.top-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.main-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('main-' + tab).classList.add('active');
+    try { localStorage.setItem('fg_main_tab', tab); } catch(e) {}
+    if (tab === 'ffb') { setTimeout(() => { drawWave(); updateDirViz(); }, 50); }
+  });
+});
+
+// ── DOSSIER TAB SWITCHING ──
+document.querySelectorAll('.nav-btn[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.nav-btn[data-tab]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.dos-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    try { localStorage.setItem('fg_dossier_tab', tab); } catch(e) {}
+  });
+});
+
+// ── CMD-BLOCK COPY BUTTONS ──
+document.querySelectorAll('.cmd-block').forEach(block => {
+  const code = block.querySelector('code');
+  if (!code) return;
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn'; btn.textContent = 'COPY';
+  block.appendChild(btn);
+  btn.addEventListener('click', () => {
+    navigator.clipboard.writeText(code.textContent).then(() => {
+      btn.textContent = 'COPIED'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1500);
+    }).catch(() => {
+      const r = document.createRange(); r.selectNodeContents(code);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+    });
+  });
+});
+
+// ── FFB STATE ──
+const S = {
+  mode:'rumble',
+  strong:50, weak:30, dur:500,
+  cmag:50, cdir:0, cdur:500,
+  stiff:60, sat:80,
+  damp:50,
+  pmag:60, period:200, offset:0, pdur:1000,
+  attack:0, fade:0,
+};
+
+// ── FFB HELPERS ──
+function pct(v,lo,hi){ return lo + (hi-lo)*(v/100); }
+function hex16(pct){ return Math.round(pct/100 * 0x7FFF); }
+function hex(v){ return '0x'+v.toString(16).toUpperCase().padStart(4,'0'); }
+
+function updateSliderBg(el) {
+  const min=+el.min||0, max=+el.max||100, val=+el.value;
+  const pct2 = (val-min)/(max-min)*100;
+  el.style.background = `linear-gradient(to right, var(--accent2) ${pct2}%, var(--border) ${pct2}%)`;
+}
+
+document.querySelectorAll('input[type=range]').forEach(el => {
+  updateSliderBg(el);
+  el.addEventListener('input', () => updateSliderBg(el));
+});
+
+function updateParam(key, val, unit) {
+  S[key] = val;
+  const vEl = document.getElementById('val-'+key);
+  if (vEl) vEl.textContent = val + unit;
+  genCode(); drawWave(); updateDirViz();
+}
+
+// ── FFB MODE SWITCHING ──
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const m = btn.dataset.mode;
+    S.mode = m;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    ['rumble','constant','spring','damper','sine'].forEach(pm => {
+      const el = document.getElementById('params-'+pm);
+      if (el) el.style.display = 'none';
+    });
+    const target = ['sine','square','triangle'].includes(m) ? 'sine' : m;
+    const panel = document.getElementById('params-'+target);
+    if (panel) { panel.style.display = 'flex'; panel.style.flexDirection = 'column'; panel.style.gap = '10px'; }
+    const dirP = document.getElementById('dirPanel');
+    if (dirP) dirP.style.display = (m === 'constant') ? 'block' : 'none';
+    genCode(); drawWave(); updateDirViz();
+  });
+});
+
+// ── FFB CODE GEN TABS ──
+document.querySelectorAll('.tab-btn[data-codetab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.codetab;
+    document.querySelectorAll('.tab-btn[data-codetab]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('codepanel-'+tab);
+    if (panel) panel.classList.add('active');
+  });
+});
+
+function copyCode(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    btn.textContent = 'COPIED'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1500);
+  }).catch(() => {
+    const r = document.createRange(); r.selectNodeContents(el);
+    window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+  });
+}
+
+// ── DIRECTION WHEEL ──
+const dirCanvas = document.getElementById('dirCanvas');
+const dirCtx = dirCanvas ? dirCanvas.getContext('2d') : null;
+
+function drawDir(deg, mag) {
+  if (!dirCtx) return;
+  const w=dirCanvas.width, h=dirCanvas.height, cx=w/2, cy=h/2, r=50;
+  dirCtx.clearRect(0,0,w,h);
+  // Outer ring
+  dirCtx.strokeStyle = '#1f2d3d'; dirCtx.lineWidth = 1;
+  dirCtx.beginPath(); dirCtx.arc(cx,cy,r,0,Math.PI*2); dirCtx.stroke();
+  // Cardinal marks
+  ['N','E','S','W'].forEach((l,i) => {
+    const a = i*Math.PI/2 - Math.PI/2;
+    const tx = cx + (r+12)*Math.cos(a), ty = cy + (r+12)*Math.sin(a);
+    dirCtx.fillStyle='#7a9ab0'; dirCtx.font='9px Share Tech Mono'; dirCtx.textAlign='center'; dirCtx.textBaseline='middle';
+    dirCtx.fillText(l,tx,ty);
+  });
+  // Force arrow
+  const a = deg * Math.PI/180 - Math.PI/2;
+  const len = r * (mag||S.cmag) / 100;
+  const ex = cx + len*Math.cos(a), ey = cy + len*Math.sin(a);
+  dirCtx.strokeStyle = '#0096ff'; dirCtx.lineWidth = 2;
+  dirCtx.beginPath(); dirCtx.moveTo(cx,cy); dirCtx.lineTo(ex,ey); dirCtx.stroke();
+  // Arrowhead
+  const ah=8, aw=4, ha=Math.atan2(ey-cy,ex-cx);
+  dirCtx.fillStyle='#0096ff';
+  dirCtx.beginPath();
+  dirCtx.moveTo(ex,ey);
+  dirCtx.lineTo(ex-ah*Math.cos(ha-0.4), ey-ah*Math.sin(ha-0.4));
+  dirCtx.lineTo(ex-ah*Math.cos(ha+0.4), ey-ah*Math.sin(ha+0.4));
+  dirCtx.closePath(); dirCtx.fill();
+  // Center dot
+  dirCtx.fillStyle='#d0e8f5';
+  dirCtx.beginPath(); dirCtx.arc(cx,cy,3,0,Math.PI*2); dirCtx.fill();
+  const dEl = document.getElementById('dirDeg');
+  if (dEl) dEl.textContent = deg + '°';
+}
+
+function updateDirViz() { drawDir(S.cdir, S.cmag); }
+
+function dirFromCanvas(e) {
+  const rect = dirCanvas.getBoundingClientRect();
+  const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  let angle = Math.atan2(clientY - cy, clientX - cx) * 180/Math.PI + 90;
+  if (angle < 0) angle += 360;
+  S.cdir = Math.round(angle) % 360;
+  const vEl = document.getElementById('val-cdir'); if (vEl) vEl.textContent = S.cdir + '°';
+  const sld = document.getElementById('sld-cdir'); if (sld) { sld.value = S.cdir; updateSliderBg(sld); }
+  drawDir(S.cdir, S.cmag); genCode();
+}
+
+if (dirCanvas) {
+  let dragging = false;
+  dirCanvas.addEventListener('mousedown', e => { dragging=true; dirFromCanvas(e); });
+  dirCanvas.addEventListener('mousemove', e => { if(dragging) dirFromCanvas(e); });
+  window.addEventListener('mouseup', () => dragging=false);
+  dirCanvas.addEventListener('touchstart', e => { e.preventDefault(); dirFromCanvas(e); }, {passive:false});
+  dirCanvas.addEventListener('touchmove', e => { e.preventDefault(); dirFromCanvas(e); }, {passive:false});
+}
+
+// ── WAVEFORM ──
+const waveCanvas = document.getElementById('waveCanvas');
+const waveCtx = waveCanvas ? waveCanvas.getContext('2d') : null;
+let waveAnim = null;
+
+function drawWave() {
+  if (!waveCtx || !waveCanvas) return;
+  const W = waveCanvas.clientWidth || 400, H = 70;
+  waveCanvas.width = W; waveCanvas.height = H;
+  const m = S.mode, cy = H/2;
+  waveCtx.clearRect(0,0,W,H);
+  waveCtx.fillStyle = '#070b11'; waveCtx.fillRect(0,0,W,H);
+  // Center line
+  waveCtx.strokeStyle='#1f2d3d'; waveCtx.lineWidth=1;
+  waveCtx.beginPath(); waveCtx.moveTo(0,cy); waveCtx.lineTo(W,cy); waveCtx.stroke();
+
+  const mag = (['sine','square','triangle'].includes(m) ? S.pmag : S.strong)/100 * (cy-6);
+  const period = (['sine','square','triangle'].includes(m) ? S.period : 200);
+  const dur = (['sine','square','triangle'].includes(m) ? S.pdur : S.dur);
+  const totalMs = Math.max(dur, period*2);
+  const attack = S.attack, fade = S.fade;
+
+  function envelopAt(t) {
+    if (attack > 0 && t < attack) return t/attack;
+    if (fade > 0 && t > totalMs-fade) return Math.max(0,(totalMs-t)/fade);
+    return 1;
+  }
+
+  waveCtx.beginPath(); waveCtx.strokeStyle='#0096ff'; waveCtx.lineWidth=1.5;
+  for (let px=0; px<W; px++) {
+    const t = (px/W)*totalMs;
+    const env = envelopAt(t);
+    let y = cy;
+    if (m==='rumble') {
+      const sm=(S.strong/100)*(cy-6), wm=(S.weak/100)*(cy-6);
+      y = cy - (Math.sin(px/W*Math.PI*8)>0 ? sm : -wm)*env;
+    } else if (m==='constant') {
+      y = cy - mag*env;
+    } else if (m==='spring'||m==='damper') {
+      y = cy - (cy-6)*(m==='spring'?S.stiff:S.damp)/100 * Math.sin(px/W*Math.PI*2);
+    } else if (m==='sine') {
+      y = cy - mag*env * Math.sin(2*Math.PI*(t/period) + S.offset/100*Math.PI);
+    } else if (m==='square') {
+      y = cy - mag*env * (Math.sin(2*Math.PI*(t/period))>=0 ? 1 : -1);
+    } else if (m==='triangle') {
+      const phase = (t%period)/period;
+      y = cy - mag*env * (phase<0.5 ? 4*phase-1 : 3-4*phase);
+    }
+    px===0 ? waveCtx.moveTo(px,y) : waveCtx.lineTo(px,y);
+  }
+  waveCtx.stroke();
+
+  // Envelope overlay
+  if ((attack||fade) && ['sine','square','triangle','constant','rumble'].includes(m)) {
+    waveCtx.strokeStyle='rgba(255,179,0,0.4)'; waveCtx.lineWidth=1; waveCtx.setLineDash([3,3]);
+    waveCtx.beginPath();
+    for (let px=0; px<W; px++) {
+      const t=(px/W)*totalMs, env=envelopAt(t);
+      const y=cy-mag*env; px===0?waveCtx.moveTo(px,y):waveCtx.lineTo(px,y);
+    }
+    for (let px=W-1; px>=0; px--) {
+      const t=(px/W)*totalMs, env=envelopAt(t);
+      waveCtx.lineTo(px, cy+mag*env);
+    }
+    waveCtx.closePath(); waveCtx.fillStyle='rgba(255,179,0,0.04)'; waveCtx.fill();
+    waveCtx.stroke(); waveCtx.setLineDash([]);
+  }
+}
+
+// ── PRESETS ──
+const PRESETS = {
+  stall:      {mode:'sine',pmag:70,period:80,offset:0,pdur:3000,attack:200,fade:500},
+  runway:     {mode:'rumble',strong:25,weak:15,dur:99999},
+  chop:       {mode:'rumble',strong:20,weak:30,dur:200},
+  turbulence: {mode:'rumble',strong:70,weak:80,dur:500},
+  spring:     {mode:'spring',stiff:80,sat:90},
+  landing:    {mode:'rumble',strong:100,weak:80,dur:300},
+};
+
+function applyPreset(name) {
+  const p = PRESETS[name]; if (!p) return;
+  Object.assign(S,p);
+  for (const [k,v] of Object.entries(p)) {
+    if (k==='mode') {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      const b = document.querySelector(`[data-mode="${v}"]`);
+      if (b) b.classList.add('active');
+      ['rumble','constant','spring','damper','sine'].forEach(pm => {
+        const el=document.getElementById('params-'+pm); if(el) el.style.display='none';
+      });
+      const target = ['sine','square','triangle'].includes(v)?'sine':v;
+      const el = document.getElementById('params-'+target);
+      if (el) { el.style.display='flex'; el.style.flexDirection='column'; el.style.gap='10px'; }
+      const dirP = document.getElementById('dirPanel');
+      if (dirP) dirP.style.display = (v==='constant')?'block':'none';
+      continue;
+    }
+    const unitMap={pmag:'%',strong:'%',weak:'%',dur:'ms',stiff:'%',sat:'%',damp:'%',
+      period:'ms',offset:'%',pdur:'ms',attack:'ms',fade:'ms',cmag:'%',cdir:'°',cdur:'ms'};
+    const u = unitMap[k]||'';
+    const vEl=document.getElementById('val-'+k); if(vEl) vEl.textContent=v+u;
+    const sEl=document.getElementById('sld-'+k); if(sEl){sEl.value=v;updateSliderBg(sEl);}
+  }
+  drawWave(); updateDirViz(); genCode();
+  document.querySelectorAll('.preset-card').forEach(c => {
+    if (c.getAttribute('onclick') && c.getAttribute('onclick').includes(name)) {
+      c.classList.add('fired'); setTimeout(()=>c.classList.remove('fired'),600);
+    }
+  });
+}
+
+// ── CODE GENERATION ──
+function genCode() {
+  const pyEl=document.getElementById('pyCode'); if(pyEl) pyEl.textContent=genPython();
+  const shEl=document.getElementById('shCode'); if(shEl) shEl.textContent=genShell();
+  const fgEl=document.getElementById('fgCode'); if(fgEl) fgEl.textContent=genFG();
+}
+
+function genPython() {
+  const m=S.mode;
+  const imports=`#!/usr/bin/env python3
+# Generated by COSMIC FFB Tester — Rock 5B+
+import evdev
+from evdev import ecodes, ff, InputDevice
+import time
+
+DEVICE = '/dev/input/event0'  # change if needed
+dev = InputDevice(DEVICE)
+print(f"Connected: {dev.name}")
+`;
+  if (m==='rumble') {
+    const sm=hex(hex16(S.strong)), wm=hex(hex16(S.weak));
+    return imports+`
+rumble = ff.Rumble(
+    strong_magnitude=${sm},  # ${S.strong}%
+    weak_magnitude=${wm}      # ${S.weak}%
+)
+effect = ff.Effect(
+    ecodes.FF_RUMBLE, -1, 0,
+    ff.Trigger(0, 0),
+    ff.Replay(${S.dur}, 0),   # ${S.dur}ms
+    ff.EffectType(ff_rumble_effect=rumble)
+)
+eid = dev.upload_effect(effect)
+dev.write(ecodes.EV_FF, eid, 1)
+print(f"Rumble playing ${S.dur}ms...")
+time.sleep(${(S.dur/1000+0.1).toFixed(2)})
+dev.erase_effect(eid)
+print("Done.")`;
+  }
+  if (m==='spring') {
+    const c=hex(hex16(S.stiff)), s=hex(hex16(S.sat));
+    return imports+`
+spring = ff.Condition(
+    right_saturation=${s},
+    left_saturation=${s},
+    right_coeff=${c},
+    left_coeff=${c},
+    deadband=0x0200, center=0x0000
+)
+effect = ff.Effect(
+    ecodes.FF_SPRING, -1, 0,
+    ff.Trigger(0, 0),
+    ff.Replay(0xFFFF, 0),  # indefinite
+    ff.EffectType(ff_condition_effect=[spring, spring])
+)
+eid = dev.upload_effect(effect)
+dev.write(ecodes.EV_FF, eid, 1)
+print("Spring active — Ctrl+C to stop")
+try:
+    while True: time.sleep(1)
+except KeyboardInterrupt:
+    dev.erase_effect(eid)`;
+  }
+  if (m==='damper') {
+    const c=hex(hex16(S.damp));
+    return imports+`
+damper = ff.Condition(
+    right_saturation=0x7FFF, left_saturation=0x7FFF,
+    right_coeff=${c}, left_coeff=${c},
+    deadband=0x0100, center=0x0000
+)
+effect = ff.Effect(
+    ecodes.FF_DAMPER, -1, 0,
+    ff.Trigger(0, 0), ff.Replay(0xFFFF, 0),
+    ff.EffectType(ff_condition_effect=[damper, damper])
+)
+eid = dev.upload_effect(effect)
+dev.write(ecodes.EV_FF, eid, 1)
+print("Damper active — Ctrl+C to stop")
+try:
+    while True: time.sleep(1)
+except KeyboardInterrupt:
+    dev.erase_effect(eid)`;
+  }
+  if (m==='constant') {
+    const mag=hex(hex16(S.cmag)), dir=hex(Math.round(S.cdir/360*0xFFFF));
+    return imports+`
+const_force = ff.Constant(level=${mag})  # ${S.cmag}%
+effect = ff.Effect(
+    ecodes.FF_CONSTANT, -1, ${dir},  # dir=${S.cdir}°
+    ff.Trigger(0, 0),
+    ff.Replay(${S.cdur}, 0),
+    ff.EffectType(ff_constant_effect=const_force),
+    ff.Envelope(attack_length=${S.attack}, attack_level=${mag},
+                fade_length=${S.fade}, fade_level=0)
+)
+eid = dev.upload_effect(effect)
+dev.write(ecodes.EV_FF, eid, 1)
+time.sleep(${(S.cdur/1000+0.1).toFixed(2)})
+dev.erase_effect(eid)`;
+  }
+  // Periodic
+  const typeMap={sine:'FF_SINE',square:'FF_SQUARE',triangle:'FF_TRIANGLE'};
+  const ffType=typeMap[m]||'FF_SINE';
+  const mag=hex(hex16(S.pmag));
+  return imports+`
+periodic = ff.Periodic(
+    waveform=ecodes.${ffType},
+    period=${S.period},       # ${S.period}ms
+    magnitude=${mag},          # ${S.pmag}%
+    offset=0, phase=0x0000
+)
+effect = ff.Effect(
+    ecodes.FF_PERIODIC, -1, 0,
+    ff.Trigger(0, 0),
+    ff.Replay(${S.pdur}, 0),  # ${S.pdur}ms
+    ff.EffectType(ff_periodic_effect=periodic),
+    ff.Envelope(attack_length=${S.attack}, attack_level=0,
+                fade_length=${S.fade},   fade_level=0)
+)
+eid = dev.upload_effect(effect)
+dev.write(ecodes.EV_FF, eid, 1)
+print(f"Playing ${m} for ${S.pdur}ms...")
+time.sleep(${(S.pdur/1000+0.1).toFixed(2)})
+dev.erase_effect(eid)`;
+}
+
+function genShell() {
+  return `# Shell FFB Test — Rock 5B+ / Evo Force
+sudo apt install -y joystick evtest python3-evdev
+
+# Interactive menu tester:
+fftest /dev/input/event0
+
+# Watch raw events:
+evtest /dev/input/event0
+
+# Check FF capabilities:
+evtest --query /dev/input/event0 EV_FF 0
+# Exit 10 = FF_RUMBLE supported
+
+# List all FF caps:
+python3 -c "
+import evdev
+d = evdev.InputDevice('/dev/input/event0')
+caps = d.capabilities(verbose=True)
+ff = caps.get(('EV_FF', 21), [])
+print(f'Device: {d.name}')
+for c in ff: print(' -', c)
+"
+
+# Kill stuck effects:
+python3 -c "
+import evdev
+d = evdev.InputDevice('/dev/input/event0')
+for i in range(16):
+    try: d.erase_effect(i)
+    except: pass
+print('Effects cleared.')
+"`;
+}
+
+function genFG() {
+  return `<!-- FlightGear Joystick XML — Saitek Cyborg Evo Force -->
+<!-- Save as: ~/.fgfs/Input/Joysticks/Saitek-Cyborg-Evo-Force.xml -->
+<!-- Current mode: ${S.mode} -->
+
+<PropertyList>
+  <name>Saitek Cyborg Evo Force</name>
+
+  <axis n="0">
+    <desc>Aileron (Roll)</desc>
+    <binding><command>property-scale</command>
+      <property>/controls/flight/aileron</property>
+      <factor>1.0</factor></binding>
+  </axis>
+  <axis n="1">
+    <desc>Elevator (Pitch)</desc>
+    <binding><command>property-scale</command>
+      <property>/controls/flight/elevator</property>
+      <factor>-1.0</factor></binding>
+  </axis>
+  <axis n="2">
+    <desc>Throttle</desc>
+    <binding><command>property-scale</command>
+      <property>/controls/engines/engine/throttle</property>
+      <offset>1.0</offset><factor>-0.5</factor></binding>
+  </axis>
+  <axis n="3">
+    <desc>Twist Rudder</desc>
+    <binding><command>property-scale</command>
+      <property>/controls/flight/rudder</property>
+      <factor>1.0</factor></binding>
+  </axis>
+
+  <!-- FFB Nasal script — stall buffet + ground roll -->
+  <nasal>
+    <load>
+var ff_timer = maketimer(0.05, func {
+    var aoa = getprop("/orientation/alpha-deg") or 0;
+    var ias = getprop("/velocities/airspeed-kt") or 0;
+    var gear = getprop("/gear/gear[1]/wow") or 0;
+    # Stall buffet above 12° AoA
+    if (aoa > 12) {
+        setprop("/sim/ff/strong", 0.4 + (aoa-12)*0.06);
+        setprop("/sim/ff/weak",   0.3);
+        setprop("/sim/ff/rumble", 1);
+    # Ground roll vibration
+    } elsif (gear and ias > 5 and ias < 80) {
+        setprop("/sim/ff/strong", ias/800);
+        setprop("/sim/ff/weak",   ias/600);
+        setprop("/sim/ff/rumble", 1);
+    } else {
+        setprop("/sim/ff/rumble", 0);
+    }
+});
+ff_timer.start();
+    </load>
+  </nasal>
+</PropertyList>`;
+}
+
+// ── RESTORE STATE ──
+(function init() {
+  // Restore main tab
+  try {
+    const mt = localStorage.getItem('fg_main_tab');
+    if (mt && ['launch','ffb','dossier'].includes(mt)) {
+      document.querySelectorAll('.top-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.main-section').forEach(s=>s.classList.remove('active'));
+      document.querySelector(`[data-main="${mt}"]`).classList.add('active');
+      document.getElementById('main-'+mt).classList.add('active');
+    }
+    // Restore dossier tab
+    const dt = localStorage.getItem('fg_dossier_tab');
+    if (dt) {
+      const nb=document.querySelector(`[data-tab="${dt}"]`), sec=document.getElementById('tab-'+dt);
+      if (nb&&sec) {
+        document.querySelectorAll('.nav-btn[data-tab]').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.dos-section').forEach(s=>s.classList.remove('active'));
+        nb.classList.add('active'); sec.classList.add('active');
+      }
+    }
+    // Restore aircraft
+    const la = localStorage.getItem('fg_last_ac');
+    if (la) { const s=document.getElementById('acSelect'); if(s) s.value=la; }
+  } catch(e) {}
+
+  renderLocCards();
+  genCode();
+  drawWave();
+  drawDir(0, 50);
+
+  // Redraw waveform on resize
+  window.addEventListener('resize', () => {
+    if (document.getElementById('main-ffb').classList.contains('active')) {
+      drawWave();
+    }
+  });
+})();
+</script>
+
+</body></html>
