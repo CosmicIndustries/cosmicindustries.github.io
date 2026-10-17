@@ -573,38 +573,132 @@ const LAUNCHER = 'http://localhost:8765';
 const FGFS    = '/usr/local/bin/fgfs';
 
 // ─── Aircraft Database ────────────────────────────────
+// MGA = Middle Georgia State University fleet (Piper Brand Ambassador)
 const AIRCRAFT = [
-  // GA Single
-  {id:'PA28-161-160', name:'Piper Warrior II',    cat:'ga',       icon:'🛩'},
-  {id:'PA28-181',     name:'Piper Archer III',     cat:'ga',       icon:'🛩'},
-  {id:'PA28R-200',    name:'Piper Arrow',          cat:'ga',       icon:'🛩'},
-  {id:'c172r',        name:'Cessna 172R Skyhawk',  cat:'ga',       icon:'🛩'},
-  {id:'c172p',        name:'Cessna 172P Skyhawk',  cat:'ga',       icon:'🛩'},
-  {id:'c150',         name:'Cessna 150',           cat:'ga',       icon:'🛩'},
-  {id:'c182t',        name:'Cessna 182T Skylane',  cat:'ga',       icon:'🛩'},
-  {id:'DR400-140B',   name:'Robin DR400-140B',     cat:'ga',       icon:'🛩'},
-  {id:'piper-j3cub',  name:'Piper J-3 Cub',        cat:'ga',       icon:'🛩'},
-  // Twin / Complex
-  {id:'c310',         name:'Cessna 310',           cat:'twin',     icon:'✈'},
-  {id:'beech99',      name:'Beechcraft 99',        cat:'twin',     icon:'✈'},
-  {id:'kingairc90',   name:'King Air C90',         cat:'twin',     icon:'✈'},
-  // Airliners
-  {id:'b737',         name:'Boeing 737',           cat:'airliner', icon:'🛫'},
-  {id:'b747',         name:'Boeing 747',           cat:'airliner', icon:'🛫'},
-  {id:'A320',         name:'Airbus A320',          cat:'airliner', icon:'🛫'},
-  {id:'dc3',          name:'Douglas DC-3',         cat:'airliner', icon:'🛫'},
+  // ★ MGA FLEET — top trainers
+  {id:'PA28-161-160', name:'Piper Warrior II',      cat:'mga',      icon:'🟣', note:'PA28-161 · Primary trainer'},
+  {id:'PA28-181',     name:'Piper Archer III',       cat:'mga',      icon:'🟣', note:'PA28-181 · Advanced trainer'},
+  {id:'PA28R-200',    name:'Piper Arrow',            cat:'mga',      icon:'🟣', note:'PA28R-200 · Complex/HP'},
+  {id:'PA34-200T',    name:'Piper Seneca II',        cat:'mga',      icon:'🟣', note:'PA34 · Multi-engine'},
+  {id:'PA44-180',     name:'Piper Seminole',         cat:'mga',      icon:'🟣', note:'PA44 · Multi-engine trainer'},
+  {id:'c182t',        name:'Cessna 182T Skylane',    cat:'mga',      icon:'🟣', note:'C182 · High-performance'},
+  // GA Singles
+  {id:'c172r',        name:'Cessna 172R Skyhawk',    cat:'ga',       icon:'🛩'},
+  {id:'c172p',        name:'Cessna 172P Skyhawk',    cat:'ga',       icon:'🛩'},
+  {id:'c182s',        name:'Cessna 182S Skylane',    cat:'ga',       icon:'🛩'},
+  {id:'c150',         name:'Cessna 150',             cat:'ga',       icon:'🛩'},
+  {id:'c172',         name:'Cessna 172 (Classic)',   cat:'ga',       icon:'🛩'},
+  {id:'piper-j3cub',  name:'Piper J-3 Cub',          cat:'ga',       icon:'🛩'},
+  {id:'PA28-161-160', name:'Piper Warrior II',        cat:'ga',       icon:'🛩'},
+  {id:'DR400-140B',   name:'Robin DR400-140B',       cat:'ga',       icon:'🛩'},
+  {id:'rallye',       name:'Rallye MS893E',           cat:'ga',       icon:'🛩'},
+  {id:'aerostar700',  name:'Aerostar 700',            cat:'ga',       icon:'🛩'},
+  {id:'comanche',     name:'Piper Comanche 250',     cat:'ga',       icon:'🛩'},
+  {id:'velocity-xl-rg',name:'Velocity XL RG',        cat:'ga',       icon:'🛩'},
+  // Twins / Multi-Engine
+  {id:'c310',         name:'Cessna 310',             cat:'twin',     icon:'✈'},
+  {id:'beech99',      name:'Beechcraft 99',          cat:'twin',     icon:'✈'},
+  {id:'kingairc90',   name:'King Air C90',           cat:'twin',     icon:'✈'},
+  {id:'PA34-200T',    name:'Piper Seneca II',         cat:'twin',     icon:'✈'},
+  {id:'PA44-180',     name:'Piper Seminole',          cat:'twin',     icon:'✈'},
+  // Airliners / Transports
+  {id:'737-300',      name:'Boeing 737-300',         cat:'airliner', icon:'🛫'},
+  {id:'b737',         name:'Boeing 737 (Classic)',   cat:'airliner', icon:'🛫'},
+  {id:'b747',         name:'Boeing 747-400',         cat:'airliner', icon:'🛫'},
+  {id:'b747-8i',      name:'Boeing 747-8i',          cat:'airliner', icon:'🛫'},
+  {id:'757',          name:'Boeing 757-200',         cat:'airliner', icon:'🛫'},
+  {id:'767',          name:'Boeing 767-300',         cat:'airliner', icon:'🛫'},
+  {id:'777',          name:'Boeing 777-200',         cat:'airliner', icon:'🛫'},
+  {id:'787',          name:'Boeing 787 Dreamliner',  cat:'airliner', icon:'🛫'},
+  {id:'b707',         name:'Boeing 707',             cat:'airliner', icon:'🛫'},
+  {id:'717',          name:'Boeing 717',             cat:'airliner', icon:'🛫'},
+  {id:'A320',         name:'Airbus A320',            cat:'airliner', icon:'🛫'},
+  {id:'A330-300',     name:'Airbus A330-300',        cat:'airliner', icon:'🛫'},
+  {id:'A340',         name:'Airbus A340-300',        cat:'airliner', icon:'🛫'},
+  {id:'concorde',     name:'Concorde',               cat:'airliner', icon:'🛫'},
+  {id:'dc3',          name:'Douglas DC-3',           cat:'airliner', icon:'🛫'},
+  {id:'dc10',         name:'McDonnell Douglas DC-10',cat:'airliner', icon:'🛫'},
+  {id:'md-80',        name:'McDonnell Douglas MD-80',cat:'airliner', icon:'🛫'},
+  {id:'crj700',       name:'Bombardier CRJ-700',     cat:'airliner', icon:'🛫'},
+  {id:'tu154b',       name:'Tupolev Tu-154B',        cat:'airliner', icon:'🛫'},
+  {id:'fokker50',     name:'Fokker 50',              cat:'airliner', icon:'🛫'},
+  {id:'B1900D',       name:'Beechcraft B1900D',      cat:'airliner', icon:'🛫'},
+  // Business Jets
+  {id:'CitationX',    name:'Cessna Citation X',      cat:'bizjet',   icon:'🛩'},
+  // Warbirds / WWII
+  {id:'p51d',         name:'P-51D Mustang',          cat:'warbird',  icon:'⚔️'},
+  {id:'spitfire',     name:'Supermarine Spitfire',   cat:'warbird',  icon:'⚔️'},
+  {id:'fw190',        name:'Focke-Wulf Fw 190',      cat:'warbird',  icon:'⚔️'},
+  {id:'bf109',        name:'Messerschmitt Bf 109',   cat:'warbird',  icon:'⚔️'},
+  {id:'f4u',          name:'F4U Corsair',            cat:'warbird',  icon:'⚔️'},
+  {id:'a6m2',         name:'A6M2 Zero',              cat:'warbird',  icon:'⚔️'},
+  {id:'ki84',         name:'Nakajima Ki-84',         cat:'warbird',  icon:'⚔️'},
+  {id:'camel',        name:'Sopwith Camel',          cat:'warbird',  icon:'⚔️'},
+  {id:'fokker-dr1',   name:'Fokker Dr.I Triplane',   cat:'warbird',  icon:'⚔️'},
+  {id:'bristol-beaufighter',name:'Bristol Beaufighter',cat:'warbird',icon:'⚔️'},
+  // Modern Military
+  {id:'f16',          name:'F-16 Fighting Falcon',   cat:'military', icon:'✈'},
+  {id:'f15',          name:'F-15C Eagle',            cat:'military', icon:'✈'},
+  {id:'f22',          name:'F-22 Raptor',            cat:'military', icon:'✈'},
+  {id:'a10',          name:'A-10 Thunderbolt II',    cat:'military', icon:'✈'},
+  {id:'b52',          name:'B-52 Stratofortress',    cat:'military', icon:'✈'},
+  {id:'harrier',      name:'BAe Harrier',            cat:'military', icon:'✈'},
+  {id:'mirage2000',   name:'Dassault Mirage 2000',   cat:'military', icon:'✈'},
+  {id:'mirageF1',     name:'Dassault Mirage F.1',    cat:'military', icon:'✈'},
+  {id:'mig29',        name:'MiG-29 Fulcrum',         cat:'military', icon:'✈'},
+  {id:'mig15',        name:'MiG-15',                 cat:'military', icon:'✈'},
+  {id:'f14b',         name:'F-14 Tomcat',            cat:'military', icon:'✈'},
+  {id:'f8',           name:'F-8 Crusader',           cat:'military', icon:'✈'},
+  {id:'a4',           name:'A-4 Skyhawk',            cat:'military', icon:'✈'},
+  {id:'a6',           name:'A-6E Intruder',          cat:'military', icon:'✈'},
+  {id:'t38',          name:'T-38 Talon',             cat:'military', icon:'✈'},
+  {id:'t37',          name:'T-37 Tweet',             cat:'military', icon:'✈'},
+  {id:'pc9',          name:'Pilatus PC-9M',          cat:'military', icon:'✈'},
+  {id:'tejas',        name:'HAL Tejas',              cat:'military', icon:'✈'},
+  {id:'draken',       name:'Saab J 35 Draken',       cat:'military', icon:'✈'},
+  {id:'ov10',         name:'OV-10A Bronco',          cat:'military', icon:'✈'},
+  {id:'v22',          name:'V-22 Osprey',            cat:'military', icon:'✈'},
   // Agricultural
-  {id:'AT-802',       name:'Air Tractor 802',      cat:'ag',       icon:'🌾'},
-  {id:'ag-cat',       name:'Grumman Ag-Cat',       cat:'ag',       icon:'🌾'},
+  {id:'AT-802',       name:'Air Tractor AT-802',     cat:'ag',       icon:'🌾'},
+  {id:'ag-cat',       name:'Grumman Ag-Cat',         cat:'ag',       icon:'🌾'},
   // Bush / Float
-  {id:'dhc2',         name:'de Havilland Beaver',  cat:'bush',     icon:'🌊'},
-  // Military
-  {id:'f16',          name:'F-16 Fighting Falcon', cat:'military', icon:'⚔️'},
-  // Special
-  {id:'ufo',          name:'UFO',                  cat:'special',  icon:'🛸'},
+  {id:'dhc2',         name:'de Havilland Beaver',    cat:'bush',     icon:'🌊'},
+  {id:'dhc3',         name:'de Havilland Otter',     cat:'bush',     icon:'🌊'},
+  // Helicopters
+  {id:'uh60',         name:'Sikorsky UH-60 Black Hawk',cat:'helo',  icon:'🚁'},
+  {id:'s76c',         name:'Sikorsky S-76C',         cat:'helo',     icon:'🚁'},
+  {id:'ec135',        name:'Eurocopter EC135',       cat:'helo',     icon:'🚁'},
+  {id:'bo105',        name:'MBB Bo 105',             cat:'helo',     icon:'🚁'},
+  {id:'r22',          name:'Robinson R22',           cat:'helo',     icon:'🚁'},
+  {id:'ah1',          name:'AH-1 Cobra',             cat:'helo',     icon:'🚁'},
+  {id:'chinook',      name:'CH-47 Chinook',          cat:'helo',     icon:'🚁'},
+  // Experimental / Rocketplanes
+  {id:'x15',          name:'X-15',                  cat:'experimental', icon:'🚀'},
+  {id:'x1',           name:'Bell X-1',              cat:'experimental', icon:'🚀'},
+  {id:'x29',          name:'X-29',                  cat:'experimental', icon:'🚀'},
+  {id:'yf23',         name:'YF-23 Black Widow II',  cat:'experimental', icon:'🚀'},
+  {id:'canardflap',   name:'Canard Flapper',         cat:'experimental', icon:'🔬'},
+  // Spacecraft
+  {id:'spaceshuttle', name:'Space Shuttle',          cat:'spacecraft', icon:'🚀'},
+  {id:'vostok',       name:'Vostok-1',               cat:'spacecraft', icon:'🚀'},
+  // Lighter Than Air
+  {id:'ZeppNT',       name:'Zeppelin NT',            cat:'lta',      icon:'🎈'},
+  {id:'hotairballoon',name:'Hot Air Balloon',        cat:'lta',      icon:'🎈'},
+  // Ornithopters & Bio-inspired
+  {id:'ornithopter',  name:'Ornithopter',            cat:'oddity',   icon:'🦅'},
+  {id:'flexwing',     name:'Rogallo Flexwing',       cat:'oddity',   icon:'🦅'},
+  // Drones / UAV
+  {id:'yasim-test',   name:'Generic UAV (YASim)',    cat:'drone',    icon:'🛰'},
+  // UFOs & Special
+  {id:'ufo',          name:'UFO',                    cat:'special',  icon:'🛸'},
+  {id:'blacklotus',   name:'Black Lotus Saucer',     cat:'special',  icon:'🛸'},
 ];
 
-const CATEGORIES = ['all','ga','twin','airliner','ag','bush','military','special'];
+const CATEGORIES = [
+  'all','mga','ga','twin','bizjet','airliner',
+  'warbird','military','helo','drone',
+  'bush','ag','experimental','spacecraft','lta','oddity','special'
+];
 
 // ─── Airport Database ─────────────────────────────────
 const AIRPORTS = [
@@ -692,7 +786,11 @@ function buildCats() {
   CATEGORIES.forEach(c => {
     const b = document.createElement('button');
     b.className = 'cat' + (c === 'all' ? ' on' : '');
-    b.textContent = c === 'all' ? 'All' : c.charAt(0).toUpperCase() + c.slice(1);
+    const labels = {all:'All',mga:'★ MGA',ga:'GA Single',twin:'Twin',bizjet:'Bizjet',
+      airliner:'Airliner',warbird:'Warbird',military:'Military',helo:'Helicopter',
+      drone:'Drone/UAV',bush:'Bush/Float',ag:'Agri',experimental:'Experimental',
+      spacecraft:'Spacecraft',lta:'Lighter-Air',oddity:'Oddity',special:'Special'};
+    b.textContent = labels[c] || (c.charAt(0).toUpperCase() + c.slice(1));
     b.onclick = () => { activeCat = c; document.querySelectorAll('.cat').forEach(x => x.classList.remove('on')); b.classList.add('on'); filterAc(); };
     row.appendChild(b);
   });
@@ -702,13 +800,29 @@ function filterAc() {
   const q = document.getElementById('acSearch').value.toLowerCase();
   const list = document.getElementById('acList');
   list.innerHTML = '';
-  AIRCRAFT.filter(a =>
+  let filtered = AIRCRAFT.filter(a =>
     (activeCat === 'all' || a.cat === activeCat) &&
-    (!q || a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q))
-  ).forEach(a => {
+    (!q || a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q) ||
+     (a.note && a.note.toLowerCase().includes(q)))
+  );
+  // Pin MGA fleet to top in 'all' view
+  if (activeCat === 'all' && !q) {
+    filtered = [...filtered.filter(a => a.cat === 'mga'), ...filtered.filter(a => a.cat !== 'mga')];
+  }
+  // Insert MGA header divider when showing mga section
+  let mgaHeaderShown = false;
+  filtered.forEach(a => {
+    if (a.cat === 'mga' && !mgaHeaderShown && (activeCat === 'all' || activeCat === 'mga')) {
+      const h = document.createElement('div');
+      h.style.cssText = 'font-size:8px;font-weight:800;letter-spacing:.12em;color:#a78bfa;padding:6px 10px 2px;text-transform:uppercase';
+      h.textContent = '★ MGA Fleet — Middle Georgia State';
+      list.appendChild(h);
+      mgaHeaderShown = true;
+    }
     const d = document.createElement('div');
     d.className = 'acCard' + (selAc === a.id ? ' sel' : '');
-    d.innerHTML = `<div class="acIcon">${a.icon}</div><div class="acInfo"><div class="acName">${a.name}</div><div class="acCat c-${a.cat}">${a.cat}</div></div>`;
+    const sub = a.note || a.cat;
+    d.innerHTML = `<div class="acIcon">${a.icon}</div><div class="acInfo"><div class="acName">${a.name}</div><div class="acCat c-${a.cat}">${sub}</div></div>`;
     d.onclick = () => selectAc(a.id);
     list.appendChild(d);
   });
