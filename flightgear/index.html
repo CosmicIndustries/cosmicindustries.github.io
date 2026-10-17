@@ -124,13 +124,22 @@ html, body {
 .acInfo { flex: 1; min-width: 0; }
 .acName { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.2; }
 .acCat  { font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
-.c-ga       { color: #4fc3f7; }
-.c-twin     { color: #81c784; }
-.c-airliner { color: #ce93d8; }
-.c-ag       { color: #ffb74d; }
-.c-military { color: #ef9a9a; }
-.c-special  { color: #80deea; }
-.c-bush     { color: #a5d6a7; }
+.c-mga          { color: #a78bfa; }
+.c-ga           { color: #4fc3f7; }
+.c-twin         { color: #81c784; }
+.c-bizjet       { color: #c084fc; }
+.c-airliner     { color: #ce93d8; }
+.c-warbird      { color: #f87171; }
+.c-military     { color: #ef9a9a; }
+.c-helo         { color: #34d399; }
+.c-drone        { color: #60a5fa; }
+.c-bush         { color: #a5d6a7; }
+.c-ag           { color: #ffb74d; }
+.c-experimental { color: #f59e0b; }
+.c-spacecraft   { color: #e879f9; }
+.c-lta          { color: #fbbf24; }
+.c-oddity       { color: #a3e635; }
+.c-special      { color: #80deea; }
 
 /* ─── Center: World Map ───────────────────────────── */
 #panelMap {
@@ -589,7 +598,6 @@ const AIRCRAFT = [
   {id:'c150',         name:'Cessna 150',             cat:'ga',       icon:'🛩'},
   {id:'c172',         name:'Cessna 172 (Classic)',   cat:'ga',       icon:'🛩'},
   {id:'piper-j3cub',  name:'Piper J-3 Cub',          cat:'ga',       icon:'🛩'},
-  {id:'PA28-161-160', name:'Piper Warrior II',        cat:'ga',       icon:'🛩'},
   {id:'DR400-140B',   name:'Robin DR400-140B',       cat:'ga',       icon:'🛩'},
   {id:'rallye',       name:'Rallye MS893E',           cat:'ga',       icon:'🛩'},
   {id:'aerostar700',  name:'Aerostar 700',            cat:'ga',       icon:'🛩'},
@@ -599,8 +607,6 @@ const AIRCRAFT = [
   {id:'c310',         name:'Cessna 310',             cat:'twin',     icon:'✈'},
   {id:'beech99',      name:'Beechcraft 99',          cat:'twin',     icon:'✈'},
   {id:'kingairc90',   name:'King Air C90',           cat:'twin',     icon:'✈'},
-  {id:'PA34-200T',    name:'Piper Seneca II',         cat:'twin',     icon:'✈'},
-  {id:'PA44-180',     name:'Piper Seminole',          cat:'twin',     icon:'✈'},
   // Airliners / Transports
   {id:'737-300',      name:'Boeing 737-300',         cat:'airliner', icon:'🛫'},
   {id:'b737',         name:'Boeing 737 (Classic)',   cat:'airliner', icon:'🛫'},
