@@ -233,6 +233,16 @@ html, body {
 }
 .ci:focus { border-color: var(--accent); }
 .ci::placeholder { color: var(--muted); }
+/* Weather panel */
+.wrow { display:flex; align-items:center; gap:5px; margin-bottom:5px; }
+.wlbl { font-size:9px; color:var(--dim); width:64px; flex-shrink:0; }
+.wlbl2 { font-size:9px; color:var(--muted); flex-shrink:0; }
+.wslider { flex:1; accent-color:var(--accent); height:3px; }
+.wnum { width:52px !important; flex-shrink:0; margin:0 !important; padding:4px 5px !important; }
+.wnum2 { flex:1; margin:0 !important; padding:4px 5px !important; }
+.wval { font-size:10px; color:var(--text); width:26px; text-align:right; flex-shrink:0; }
+#ceilOpts { margin-top:3px; padding-left:2px; border-left:2px solid var(--border); margin-left:2px; }
+#wxSection select.ci { margin:0; padding:5px 6px; }
 #rwSel {
   width: 100%; padding: 6px 9px;
   background: var(--card); border: 1px solid var(--border); border-radius: 2px;
@@ -422,6 +432,88 @@ html, body {
       <select id="rwSel"><option value="">Any runway</option></select>
     </div>
 
+    <!-- ── Weather ───────────────────────────────── -->
+    <div class="cs" id="wxSection">
+      <div class="cl">Weather</div>
+
+      <!-- Visibility -->
+      <div class="wrow">
+        <span class="wlbl">Visibility</span>
+        <input type="range" id="visSlider" class="wslider" min="100" max="9999" step="100" value="9999"
+               oninput="syncVis(this.value)">
+        <input class="ci wnum" id="visIn" type="number" min="100" max="99999" value="9999"
+               oninput="syncVis(this.value)" placeholder="m">
+      </div>
+
+      <!-- Wind -->
+      <div class="wrow">
+        <span class="wlbl">Wind</span>
+        <input class="ci wnum2" id="windDir" type="number" min="0" max="359" placeholder="Dir °">
+        <span class="wlbl2">@</span>
+        <input class="ci wnum2" id="windSpd" type="number" min="0" max="200" placeholder="kts">
+      </div>
+
+      <!-- Turbulence -->
+      <div class="wrow">
+        <span class="wlbl">Turbulence</span>
+        <input type="range" id="turbSlider" class="wslider" min="0" max="1" step="0.05" value="0"
+               oninput="syncTurb(this.value)">
+        <span class="wval" id="turbVal">0.00</span>
+      </div>
+
+      <!-- Cloud Coverage -->
+      <div style="margin-bottom:5px;">
+        <div style="font-size:9px;color:var(--dim);margin-bottom:3px;">Cloud Cover</div>
+        <select id="cloudCov" class="ci" onchange="updateCeiling()">
+          <option value="">Clear</option>
+          <option value="1">1 okta – Few</option>
+          <option value="2">2 oktas – Few</option>
+          <option value="3">3 oktas – Scattered</option>
+          <option value="4">4 oktas – Scattered</option>
+          <option value="5">5 oktas – Broken</option>
+          <option value="6">6 oktas – Broken</option>
+          <option value="7">7 oktas – Overcast</option>
+          <option value="8">8 oktas – Overcast</option>
+        </select>
+      </div>
+
+      <!-- Ceiling (shown when clouds selected) -->
+      <div id="ceilOpts" style="display:none;margin-bottom:5px;">
+        <div class="wrow">
+          <span class="wlbl">Ceiling</span>
+          <input class="ci wnum2" id="ceilAlt" type="number" min="0" max="50000" value="3000" placeholder="alt ft">
+          <span class="wlbl2">,</span>
+          <input class="ci wnum2" id="ceilThk" type="number" min="100" max="10000" value="1000" placeholder="thick ft">
+        </div>
+      </div>
+
+      <!-- Season -->
+      <div style="margin-bottom:5px;">
+        <div style="font-size:9px;color:var(--dim);margin-bottom:3px;">Season</div>
+        <div class="togRow">
+          <button class="togBtn on" id="btnSumm" onclick="setSeason('summer')">☀ Summer</button>
+          <button class="togBtn"    id="btnWint" onclick="setSeason('winter')">❄ Winter</button>
+        </div>
+      </div>
+
+      <!-- METAR override -->
+      <div style="margin-bottom:5px;">
+        <div style="font-size:9px;color:var(--dim);margin-bottom:3px;">METAR Override</div>
+        <input class="ci" id="metarIn" type="text" autocomplete="off"
+               placeholder="KMCN 171355Z 27012KT 10SM CLR"
+               style="font-size:9px;font-family:monospace;">
+        <div style="font-size:8px;color:var(--muted);margin-top:2px;">Overrides all weather fields above</div>
+      </div>
+
+      <!-- Multiplayer -->
+      <div>
+        <div style="font-size:9px;color:var(--dim);margin-bottom:3px;">Multiplayer Server</div>
+        <input class="ci" id="mpIn" type="text" autocomplete="off"
+               placeholder="mpserver01.flightgear.org"
+               style="font-size:9px;font-family:monospace;">
+      </div>
+    </div>
+
     <div class="cs">
       <div class="cl">Quick Flights</div>
       <div id="qfList"></div>
@@ -585,7 +677,7 @@ const FGFS    = '/usr/local/bin/fgfs';
 // MGA = Middle Georgia State University fleet (Piper Brand Ambassador)
 const AIRCRAFT = [
   // ★ MGA FLEET — top trainers
-  {id:'PA28-161-160', name:'Piper Warrior II',      cat:'mga',      icon:'🟣', note:'PA28-161 · Primary trainer'},
+  {id:'PA28-161',     name:'Piper Warrior II',      cat:'mga',      icon:'🟣', note:'PA28-161 · Primary trainer'},
   {id:'PA28-181',     name:'Piper Archer III',       cat:'mga',      icon:'🟣', note:'PA28-181 · Advanced trainer'},
   {id:'PA28R-200',    name:'Piper Arrow',            cat:'mga',      icon:'🟣', note:'PA28R-200 · Complex/HP'},
   {id:'PA34-200T',    name:'Piper Seneca II',        cat:'mga',      icon:'🟣', note:'PA34 · Multi-engine'},
@@ -742,7 +834,7 @@ const AIRPORTS = [
 
 // ─── Quick Flights ────────────────────────────────────
 const QF = [
-  {name:'KMCN ILS 31 · Dawn',    sub:'PA28-161 · PA28-161-160', ac:'PA28-161-160', ap:'KMCN', args:['--aircraft=PA28-161-160','--airport=KMCN','--runway=31','--timeofday=dawn']},
+  {name:'KMCN ILS 31 · Dawn',    sub:'PA28-161 · Warrior II',   ac:'PA28-161',     ap:'KMCN', args:['--aircraft=PA28-161','--airport=KMCN','--runway=31','--timeofday=dawn']},
   {name:'KMCN Pattern · Morn',   sub:'C172R · Touch & Go',      ac:'c172r',        ap:'KMCN', args:['--aircraft=c172r','--airport=KMCN','--runway=04','--timeofday=morning']},
   {name:'KBQK Brunswick',        sub:'PA28-181 · Afternoon',    ac:'PA28-181',     ap:'KBQK', args:['--aircraft=PA28-181','--airport=KBQK','--runway=25','--timeofday=afternoon']},
   {name:'IMC Zero-Zero',         sub:'PA28-181 · Night',        ac:'PA28-181',     ap:'KMCN', args:['--aircraft=PA28-181','--airport=KMCN','--runway=31','--timeofday=midnight','--visibility=100','--cloud-coverage=4']},
@@ -1019,6 +1111,32 @@ function updateSummary() {
   document.getElementById('flyBtn').disabled = !(selAc && selAp);
 }
 
+// ─── Weather Controls ─────────────────────────────────
+let curSeason = 'summer';
+function syncVis(v) {
+  v = Math.max(100, Math.min(99999, parseInt(v) || 9999));
+  const sl = document.getElementById('visSlider');
+  const inp = document.getElementById('visIn');
+  if (sl)  sl.value  = Math.min(v, 9999);
+  if (inp) inp.value = v;
+}
+function syncTurb(v) {
+  v = parseFloat(v).toFixed(2);
+  const sl  = document.getElementById('turbSlider');
+  const lbl = document.getElementById('turbVal');
+  if (sl)  sl.value       = v;
+  if (lbl) lbl.textContent = v;
+}
+function updateCeiling() {
+  const cv = document.getElementById('cloudCov').value;
+  document.getElementById('ceilOpts').style.display = cv ? 'block' : 'none';
+}
+function setSeason(v) {
+  curSeason = v;
+  document.getElementById('btnSumm').classList.toggle('on', v === 'summer');
+  document.getElementById('btnWint').classList.toggle('on', v === 'winter');
+}
+
 // ─── Build fgfs args ──────────────────────────────────
 function buildArgs() {
   const args = [FGFS];
@@ -1033,6 +1151,29 @@ function buildArgs() {
     const vc  = document.getElementById('vcIn').value;  if (vc)  args.push(`--vc=${vc}`);
     const hdg = document.getElementById('hdgIn').value; if (hdg) args.push(`--heading=${hdg}`);
   }
+  // ── Weather ───────────────────────────────────────
+  const metar = document.getElementById('metarIn').value.trim();
+  if (metar) {
+    args.push(`--metar=${metar}`);
+  } else {
+    const vis = parseInt(document.getElementById('visIn').value);
+    if (!isNaN(vis) && vis < 9999) args.push(`--visibility=${vis}`);
+    const wdir = document.getElementById('windDir').value;
+    const wspd = document.getElementById('windSpd').value;
+    if (wdir !== '' && wspd !== '') args.push(`--wind=${wdir}@${wspd}`);
+    const turb = parseFloat(document.getElementById('turbSlider').value);
+    if (turb > 0) args.push(`--turbulence=${turb.toFixed(2)}`);
+    const cov = document.getElementById('cloudCov').value;
+    if (cov) {
+      args.push(`--cloud-coverage=${cov}`);
+      const calt = document.getElementById('ceilAlt').value;
+      const cthk = document.getElementById('ceilThk').value;
+      if (calt) args.push(`--ceiling=${calt}${cthk ? ',' + cthk : ''}`);
+    }
+  }
+  args.push(`--season=${curSeason}`);
+  const mp = document.getElementById('mpIn').value.trim();
+  if (mp) args.push(`--multiplay=in,10,0.0.0.0,${mp},5000`);
   return args.slice(1); // strip FGFS binary — server prepends it
 }
 
