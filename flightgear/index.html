@@ -2,1010 +2,1093 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COSMIC FlightGear</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosmic FlightGear</title>
 <style>
+/* ─── Reset & Tokens ─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0a0c10;
-  --surface: #111318;
-  --card: #161b22;
-  --border: #21262d;
-  --accent: #1f6feb;
-  --accent2: #388bfd;
-  --green: #3fb950;
-  --yellow: #d29922;
-  --red: #f85149;
-  --orange: #db6d28;
-  --purple: #8b949e;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --tab-active: #1f6feb;
+  --bg:       #04080e;
+  --surf:     #090f18;
+  --card:     #0d1624;
+  --cardhov:  #131f30;
+  --border:   #18304d;
+  --border2:  #0f2035;
+  --accent:   #3aafef;
+  --accdim:   #16527a;
+  --text:     #ddeeff;
+  --dim:      #5a8aaa;
+  --muted:    #2a4a60;
+  --green:    #27c76f;
+  --red:      #e8453c;
+  --amber:    #f0a020;
+  --topH:     46px;
+  --botH:     62px;
+  --leftW:    248px;
+  --rightW:   228px;
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f0f4f8; --surface: #ffffff; --card: #f6f8fa;
-    --border: #d0d7de; --text: #1f2328; --muted: #636c76;
-  }
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg); color: var(--text);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg); color: var(--text); min-height: 100vh; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-/* ─── Header ─────────────────────────────────────── */
-.header { background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 20px; font-weight: 700; letter-spacing: .04em; color: var(--accent2); }
-.logo span { color: var(--text); }
-.server-badge { margin-left: auto; display: flex; align-items: center; gap: 6px;
-  font-size: 11px; color: var(--muted); cursor: pointer; border: 1px solid var(--border);
-  border-radius: 6px; padding: 4px 10px; background: var(--card); transition: border-color .2s; }
-.server-badge:hover { border-color: var(--accent); }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
-.dot.green { background: var(--green); }
-.dot.red { background: var(--red); }
+/* ─── Top Bar ─────────────────────────────────────── */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--topH);
+  background: rgba(4,8,14,0.97); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 14px; gap: 14px; z-index: 200;
+  backdrop-filter: blur(10px);
+}
+.logo {
+  font-size: 12px; font-weight: 800; letter-spacing: 0.18em;
+  color: var(--accent); text-transform: uppercase; flex-shrink: 0;
+}
+.topbar-sep { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+.nav-tabs { display: flex; gap: 2px; }
+.nav-tab {
+  padding: 5px 12px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: none; border: none; cursor: pointer;
+  color: var(--dim); border-radius: 3px; transition: all 0.15s;
+}
+.nav-tab:hover { color: var(--text); background: var(--card); }
+.nav-tab.active { color: var(--accent); background: rgba(58,175,239,0.1); }
+.topbar-fill { flex: 1; }
+#srvDot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--red);
+  flex-shrink: 0; transition: background 0.3s; box-shadow: 0 0 5px currentColor;
+}
+#srvDot.online { background: var(--green); }
+#srvLabel { font-size: 10px; color: var(--dim); letter-spacing: 0.05em; }
 
-/* ─── Tabs ────────────────────────────────────────── */
-.tabs { display: flex; gap: 0; background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 16px; overflow-x: auto; }
-.tab { padding: 10px 16px; font-size: 13px; font-weight: 500; cursor: pointer;
-  border-bottom: 2px solid transparent; color: var(--muted); white-space: nowrap;
-  transition: color .15s, border-color .15s; background: none; border-top: none;
-  border-left: none; border-right: none; }
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--text); border-bottom-color: var(--tab-active); }
+/* ─── App Body ────────────────────────────────────── */
+#appBody {
+  position: fixed;
+  top: var(--topH); bottom: var(--botH); left: 0; right: 0;
+  display: flex; overflow: hidden;
+}
 
-/* ─── Layout ─────────────────────────────────────── */
-.page { display: none; padding: 16px; max-width: 900px; margin: 0 auto; }
-.page.active { display: block; }
+/* ─── Left Panel: Aircraft ────────────────────────── */
+#panelAc {
+  width: var(--leftW); flex-shrink: 0;
+  background: var(--surf); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.ph {
+  padding: 10px 12px 7px;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); border-bottom: 1px solid var(--border2); flex-shrink: 0;
+}
+#acSearch {
+  margin: 7px 9px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 3px; padding: 5px 9px;
+  color: var(--text); font-size: 11px; outline: none;
+  width: calc(100% - 18px); flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+#acSearch:focus { border-color: var(--accent); }
+#acSearch::placeholder { color: var(--muted); }
+#catRow {
+  display: flex; gap: 3px; padding: 0 8px 7px;
+  flex-wrap: wrap; flex-shrink: 0;
+}
+.cat {
+  font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 7px; border-radius: 2px; cursor: pointer;
+  background: none; border: 1px solid var(--border); color: var(--dim);
+  transition: all 0.15s;
+}
+.cat:hover { border-color: var(--accent); color: var(--text); }
+.cat.on { background: var(--accent); color: #020810; border-color: var(--accent); }
+#acList {
+  flex: 1; overflow-y: auto; padding: 3px 7px;
+}
+.acCard {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: 3px; margin-bottom: 2px;
+  cursor: pointer; background: var(--card); border: 1px solid transparent;
+  transition: all 0.12s;
+}
+.acCard:hover { background: var(--cardhov); border-color: var(--accdim); }
+.acCard.sel { background: rgba(58,175,239,0.1); border-color: var(--accent); }
+.acIcon {
+  width: 34px; height: 34px; border-radius: 3px; background: var(--surf);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.acInfo { flex: 1; min-width: 0; }
+.acName { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.acCat  { font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+.c-ga       { color: #4fc3f7; }
+.c-twin     { color: #81c784; }
+.c-airliner { color: #ce93d8; }
+.c-ag       { color: #ffb74d; }
+.c-military { color: #ef9a9a; }
+.c-special  { color: #80deea; }
+.c-bush     { color: #a5d6a7; }
 
-/* ─── Search boxes ───────────────────────────────── */
-.search-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-.search-box { flex: 1; min-width: 180px; position: relative; }
-.search-box input {
-  width: 100%; padding: 8px 12px 8px 34px; background: var(--card);
-  border: 1px solid var(--border); border-radius: 8px; color: var(--text);
-  font-size: 13px; outline: none; transition: border-color .2s; }
-.search-box input:focus { border-color: var(--accent); }
-.search-box input::placeholder { color: var(--muted); }
-.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-  color: var(--muted); font-size: 14px; pointer-events: none; }
-.search-results { position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-  max-height: 260px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.5); }
-.search-results.open { display: block; }
-.sr-item { padding: 8px 12px; cursor: pointer; font-size: 12px; border-bottom: 1px solid var(--border); }
-.sr-item:last-child { border-bottom: none; }
-.sr-item:hover, .sr-item.focused { background: var(--card); }
-.sr-item .sr-name { font-weight: 600; color: var(--text); }
-.sr-item .sr-sub { color: var(--muted); margin-top: 1px; }
-.sr-empty { padding: 12px; text-align: center; color: var(--muted); font-size: 12px; }
+/* ─── Center: World Map ───────────────────────────── */
+#panelMap {
+  flex: 1; position: relative; overflow: hidden; background: var(--bg);
+}
+#worldCanvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
+/* Airport search overlay */
+#apOverlay {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: 320px; z-index: 10;
+}
+#apSearchBox {
+  width: 100%;
+  background: rgba(9,15,24,0.93);
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 8px 12px; color: var(--text); font-size: 12px;
+  outline: none; backdrop-filter: blur(10px);
+  letter-spacing: 0.04em; transition: border-color 0.2s;
+}
+#apSearchBox:focus { border-color: var(--accent); }
+#apSearchBox::placeholder { color: var(--muted); }
+#apDropdown {
+  background: rgba(9,15,24,0.96);
+  border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px; overflow-y: auto;
+  display: none; backdrop-filter: blur(10px);
+}
+.apItem {
+  padding: 7px 12px; cursor: pointer;
+  display: flex; align-items: center; gap: 9px;
+  border-bottom: 1px solid rgba(24,48,77,0.4);
+  transition: background 0.1s;
+}
+.apItem:last-child { border-bottom: none; }
+.apItem:hover { background: rgba(58,175,239,0.08); }
+.apICAO { font-size: 12px; font-weight: 800; color: var(--accent); font-family: monospace; width: 40px; flex-shrink: 0; }
+.apName { font-size: 10px; color: var(--dim); }
+.apRgn  { font-size: 9px; color: var(--muted); margin-left: auto; flex-shrink: 0; }
+/* Selected airport badge */
+#selBadge {
+  position: absolute; bottom: 12px; left: 12px;
+  background: rgba(9,15,24,0.93); border: 1px solid var(--accent);
+  border-radius: 4px; padding: 8px 12px;
+  backdrop-filter: blur(10px); display: none; pointer-events: none;
+}
+#selICAO { font-size: 24px; font-weight: 900; color: var(--accent); font-family: monospace; line-height: 1; }
+#selName { font-size: 10px; color: var(--dim); margin-top: 2px; }
+/* Help tip */
+#mapTip {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 9px; color: var(--muted); letter-spacing: 0.08em;
+  pointer-events: none;
+}
 
-/* ─── Cards grid ─────────────────────────────────── */
-.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-  padding: 14px 16px; transition: border-color .2s, box-shadow .2s; }
-.card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent)22; }
-.card-head { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
-.card-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
-.card-meta { flex: 1; min-width: 0; }
-.card-title { font-size: 13px; font-weight: 600; color: var(--text); }
-.card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.card-cmd { font-family: 'SF Mono', Consolas, monospace; font-size: 10px;
-  color: var(--green); background: var(--bg); border: 1px solid var(--border);
-  border-radius: 6px; padding: 6px 8px; margin-bottom: 10px; word-break: break-all;
-  line-height: 1.5; max-height: 72px; overflow-y: auto; }
-.btn-row { display: flex; gap: 6px; }
-.btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
-  cursor: pointer; border: none; transition: opacity .15s, transform .1s; }
-.btn:active { transform: scale(.96); }
-.btn-launch { background: var(--accent); color: #fff; flex: 1; }
-.btn-launch:hover { background: var(--accent2); }
-.btn-launch:disabled { opacity: .4; cursor: not-allowed; }
-.btn-copy { background: var(--card); border: 1px solid var(--border); color: var(--muted); }
-.btn-copy:hover { color: var(--text); border-color: var(--muted); }
+/* ─── Right Panel: Conditions ─────────────────────── */
+#panelCond {
+  width: var(--rightW); flex-shrink: 0;
+  background: var(--surf); border-left: 1px solid var(--border);
+  overflow-y: auto; overflow-x: hidden;
+}
+.cs { padding: 10px 12px; border-bottom: 1px solid var(--border2); }
+.cl {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 7px;
+}
+.timeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.timeBtn {
+  padding: 5px 3px; text-align: center; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--card); border: 1px solid var(--border); border-radius: 2px;
+  cursor: pointer; color: var(--dim); transition: all 0.12s;
+}
+.timeBtn:hover { color: var(--text); border-color: var(--accdim); }
+.timeBtn.on { background: rgba(58,175,239,0.13); border-color: var(--accent); color: var(--accent); }
+.togRow { display: flex; gap: 3px; }
+.togBtn {
+  flex: 1; padding: 5px 3px; text-align: center; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--card); border: 1px solid var(--border); border-radius: 2px;
+  cursor: pointer; color: var(--dim); transition: all 0.12s;
+}
+.togBtn.on { background: rgba(58,175,239,0.13); border-color: var(--accent); color: var(--accent); }
+#inAirOpts { margin-top: 7px; display: none; }
+#inAirOpts.vis { display: block; }
+.ci {
+  width: 100%; padding: 5px 9px; margin-top: 4px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 2px;
+  color: var(--text); font-size: 11px; outline: none;
+  transition: border-color 0.2s;
+}
+.ci:focus { border-color: var(--accent); }
+.ci::placeholder { color: var(--muted); }
+#rwSel {
+  width: 100%; padding: 6px 9px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 2px;
+  color: var(--text); font-size: 11px; outline: none; cursor: pointer;
+}
+#rwSel:focus { border-color: var(--accent); }
+#rwSel option { background: var(--surf); }
+.qfBtn {
+  width: 100%; padding: 6px 9px; margin-bottom: 3px; text-align: left;
+  background: var(--card); border: 1px solid var(--border); border-radius: 2px;
+  cursor: pointer; color: var(--dim); font-size: 10px; transition: all 0.12s;
+  line-height: 1.3;
+}
+.qfBtn:hover { background: var(--cardhov); color: var(--text); border-color: var(--accdim); }
+.qfSub { font-size: 8px; color: var(--muted); display: block; margin-top: 1px; }
 
-/* ─── Custom location form ───────────────────────── */
-.custom-block { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-  padding: 16px; margin-top: 12px; }
-.custom-block h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.form-group label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; }
-.form-group input, .form-group select {
-  width: 100%; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--text); font-size: 12px; outline: none; }
-.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
-.form-group option { background: var(--surface); }
-.form-full { grid-column: 1 / -1; }
-.custom-preview { font-family: monospace; font-size: 11px; color: var(--green);
-  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
-  padding: 8px; margin-top: 10px; word-break: break-all; line-height: 1.6; }
-.launch-custom-btn { margin-top: 10px; width: 100%; background: var(--accent);
-  color: #fff; font-weight: 600; font-size: 13px; padding: 9px; border: none;
-  border-radius: 8px; cursor: pointer; }
-.launch-custom-btn:hover { background: var(--accent2); }
+/* ─── Bottom Bar ──────────────────────────────────── */
+#botBar {
+  position: fixed; bottom: 0; left: 0; right: 0; height: var(--botH);
+  background: rgba(4,8,14,0.98); border-top: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 14px; gap: 16px; z-index: 200;
+  backdrop-filter: blur(10px);
+}
+#fsSum { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+#fsAc   { font-size: 14px; font-weight: 800; font-family: monospace; color: var(--text); }
+#fsArr  { color: var(--muted); font-size: 14px; }
+#fsAp   { font-size: 14px; font-weight: 800; font-family: monospace; color: var(--accent); }
+#fsDet  { font-size: 10px; color: var(--dim); }
+.botAct { display: flex; gap: 7px; align-items: center; flex-shrink: 0; }
+#killBtn {
+  height: 38px; padding: 0 14px;
+  background: rgba(232,69,60,0.12); border: 1px solid rgba(232,69,60,0.35);
+  border-radius: 3px; color: var(--red); font-size: 10px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.12s;
+}
+#killBtn:hover { background: rgba(232,69,60,0.22); }
+#flyBtn {
+  height: 38px; padding: 0 28px;
+  background: var(--accent); border: none; border-radius: 3px;
+  color: #030810; font-size: 12px; font-weight: 900;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.12s; min-width: 96px;
+}
+#flyBtn:hover:not(:disabled) { background: #5ecbf8; transform: translateY(-1px); }
+#flyBtn:active { transform: translateY(0); }
+#flyBtn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
 
-/* ─── FFB Tab ─────────────────────────────────────── */
-.ffb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+/* ─── Hidden Panels (FFB / Dossier) ──────────────── */
+.hPanel {
+  position: fixed; top: var(--topH); bottom: var(--botH); left: 0; right: 0;
+  background: var(--bg); overflow-y: auto; padding: 20px;
+  display: none; z-index: 50;
+}
+.hPanel.vis { display: block; }
+
+/* FFB Tester */
+.ffb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 600px) { .ffb-grid { grid-template-columns: 1fr; } }
-.panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-.panel h3 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
-  color: var(--muted); margin-bottom: 12px; }
-.slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.slider-label { font-size: 11px; color: var(--muted); width: 80px; flex-shrink: 0; }
+.fpanel { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+.fpanel h3 { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--dim); margin-bottom: 10px; }
+.slider-row { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+.slider-label { font-size: 10px; color: var(--dim); width: 78px; flex-shrink: 0; }
 .slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
-.slider-val { font-size: 11px; color: var(--text); width: 32px; text-align: right; }
-.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-.mode-btn { padding: 7px; border-radius: 6px; font-size: 11px; font-weight: 500;
-  cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--muted);
-  transition: all .15s; text-align: center; }
-.mode-btn:hover, .mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.direction-wheel { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--border);
+.slider-val { font-size: 10px; color: var(--text); width: 30px; text-align: right; }
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 8px; }
+.mode-btn { padding: 6px; border-radius: 4px; font-size: 10px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--dim);
+  transition: all 0.12s; text-align: center; }
+.mode-btn:hover, .mode-btn.active { background: var(--accent); border-color: var(--accent); color: #030810; }
+.direction-wheel { width: 78px; height: 78px; border-radius: 50%; border: 2px solid var(--border);
   position: relative; margin: 0 auto 10px; cursor: crosshair; background: var(--bg); }
-.direction-dot { width: 12px; height: 12px; background: var(--accent); border-radius: 50%;
+.direction-dot { width: 11px; height: 11px; background: var(--accent); border-radius: 50%;
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); transition: top .1s, left .1s; }
-.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.preset-btn { padding: 8px 6px; border-radius: 6px; font-size: 11px; font-weight: 500;
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.preset-btn { padding: 7px 5px; border-radius: 4px; font-size: 10px; font-weight: 600;
   cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--text);
-  transition: all .15s; text-align: center; }
-.preset-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  transition: all 0.12s; text-align: center; }
+.preset-btn:hover { background: var(--accent); border-color: var(--accent); color: #030810; }
 .code-out { font-family: monospace; font-size: 10px; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 6px; padding: 8px; color: var(--green); white-space: pre; overflow-x: auto; }
-.waveform { width: 100%; height: 50px; display: block; }
+  border-radius: 4px; padding: 7px; color: var(--green); white-space: pre; overflow-x: auto; }
+.waveform { width: 100%; height: 48px; display: block; }
 
-/* ─── DOSSIER ─────────────────────────────────────── */
-.dossier-section { margin-bottom: 20px; }
-.dossier-section h2 { font-size: 13px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .08em; color: var(--accent2); padding: 8px 0 6px;
-  border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-.kv-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; }
-.kv-key { font-size: 11px; color: var(--muted); align-self: start; white-space: nowrap; padding: 2px 0; }
-.kv-val { font-size: 11px; color: var(--text); padding: 2px 0; word-break: break-word; }
-.kv-val code { font-family: monospace; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 3px; padding: 0 4px; font-size: 10px; color: var(--green); }
-.tag-row { display: flex; gap: 5px; flex-wrap: wrap; }
-.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: var(--bg);
-  border: 1px solid var(--border); color: var(--muted); }
+/* Dossier */
+.ds { margin-bottom: 18px; }
+.ds h2 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--accent); padding: 7px 0 5px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; }
+.kk { font-size: 10px; color: var(--dim); align-self: start; white-space: nowrap; padding: 2px 0; }
+.kv2 { font-size: 10px; color: var(--text); padding: 2px 0; word-break: break-word; }
+.kv2 code { font-family: monospace; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 2px; padding: 0 4px; font-size: 9px; color: var(--green); }
+.tag-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag { font-size: 9px; padding: 2px 7px; border-radius: 20px; background: var(--bg);
+  border: 1px solid var(--border); color: var(--dim); }
 
-/* ─── Toast ───────────────────────────────────────── */
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px;
-  font-size: 12px; z-index: 999; opacity: 0; transform: translateY(8px);
-  transition: all .25s; pointer-events: none; max-width: 280px; }
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.ok { border-color: var(--green); color: var(--green); }
-.toast.err { border-color: var(--red); color: var(--red); }
-.toast.warn { border-color: var(--yellow); color: var(--yellow); }
-
-/* ─── Misc ────────────────────────────────────────── */
-.section-label { font-size: 11px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .07em; color: var(--muted); margin: 16px 0 8px; }
-.hidden { display: none !important; }
-select.aircraft-sel { padding: 7px 10px; background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--text); font-size: 12px; cursor: pointer; flex: 1; }
+/* Toast */
+#toast {
+  position: fixed; top: 54px; right: 14px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 4px;
+  padding: 9px 14px; font-size: 11px; max-width: 260px;
+  opacity: 0; transform: translateX(14px);
+  transition: all 0.22s; pointer-events: none; z-index: 300;
+}
+#toast.show { opacity: 1; transform: translateX(0); }
+#toast.ok   { border-color: var(--green); color: var(--green); }
+#toast.err  { border-color: var(--red);   color: var(--red);   }
+#toast.warn { border-color: var(--amber); color: var(--amber); }
 </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="logo">COSMIC<span>FG</span></div>
-  <div style="font-size:11px;color:var(--muted);">FlightGear 2024.1 · Rock 5B+ · RK3588</div>
-  <div class="server-badge" id="serverBadge" onclick="checkServer(true)" title="Click to check launcher server">
-    <div class="dot" id="serverDot"></div>
-    <span id="serverLabel">Launcher Server</span>
-  </div>
-</header>
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">⚡ CosmicFG</div>
+  <div class="topbar-sep"></div>
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('fly',this)">FLY</button>
+    <button class="nav-tab" onclick="showView('ffb',this)">FFB TESTER</button>
+    <button class="nav-tab" onclick="showView('dossier',this)">DOSSIER</button>
+  </nav>
+  <div class="topbar-fill"></div>
+  <div id="srvDot"></div>
+  <div id="srvLabel">Launcher Offline</div>
+</div>
 
-<nav class="tabs">
-  <button class="tab active" onclick="showTab('launch',this)">✈️ LAUNCH</button>
-  <button class="tab" onclick="showTab('ffb',this)">🕹️ FFB TESTER</button>
-  <button class="tab" onclick="showTab('dossier',this)">📋 DOSSIER</button>
-</nav>
+<div id="toast"></div>
 
-<div class="toast" id="toast"></div>
+<!-- ═══ FLY VIEW ═══════════════════════════════════════ -->
+<div id="appBody">
 
-<!-- ═══════════════════════════════════════════════════════════
-     LAUNCH TAB
-═══════════════════════════════════════════════════════════ -->
-<div class="page active" id="page-launch">
-
-  <!-- Search Row -->
-  <div class="search-row">
-
-    <!-- Aircraft Search -->
-    <div class="search-box" id="acSearch">
-      <span class="search-icon">🛩</span>
-      <input type="text" id="acInput" placeholder="Search aircraft…" autocomplete="off"
-             oninput="acFilter()" onkeydown="acKey(event)" onfocus="acFilter()" onblur="setTimeout(acBlur,200)">
-      <div class="search-results" id="acResults"></div>
-    </div>
-
-    <!-- Airport Search -->
-    <div class="search-box" id="apSearch">
-      <span class="search-icon">📍</span>
-      <input type="text" id="apInput" placeholder="Search airport (ICAO/name)…" autocomplete="off"
-             oninput="apFilter()" onkeydown="apKey(event)" onfocus="apFilter()" onblur="setTimeout(apBlur,200)">
-      <div class="search-results" id="apResults"></div>
-    </div>
-
+  <!-- LEFT: Aircraft panel -->
+  <div id="panelAc">
+    <div class="ph">Select Aircraft</div>
+    <input id="acSearch" placeholder="Search aircraft…" oninput="filterAc()" autocomplete="off">
+    <div id="catRow"></div>
+    <div id="acList"></div>
   </div>
 
-  <!-- Selected aircraft banner -->
-  <div id="selectedAcBanner" class="section-label hidden" style="margin-top:0;"></div>
-
-  <!-- Preset location cards -->
-  <div class="section-label">PRESET LOCATIONS</div>
-  <div class="cards-grid" id="cardsGrid"></div>
-
-  <!-- Custom Launch -->
-  <div class="custom-block" style="margin-top:16px;">
-    <h3>🔧 Custom Launch</h3>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Airport ICAO</label>
-        <input type="text" id="c_airport" value="KMCN" placeholder="KMCN" oninput="updateCustomCmd()">
-      </div>
-      <div class="form-group">
-        <label>Runway</label>
-        <input type="text" id="c_runway" value="31" placeholder="31" oninput="updateCustomCmd()">
-      </div>
-      <div class="form-group">
-        <label>Aircraft</label>
-        <input type="text" id="c_aircraft" value="PA28-161-160" placeholder="PA28-161-160" oninput="updateCustomCmd()">
-      </div>
-      <div class="form-group">
-        <label>Time of Day</label>
-        <select id="c_time" onchange="updateCustomCmd()">
-          <option value="morning">Morning</option>
-          <option value="noon" selected>Noon</option>
-          <option value="afternoon">Afternoon</option>
-          <option value="dusk">Dusk</option>
-          <option value="evening">Evening</option>
-          <option value="night">Night</option>
-          <option value="dawn">Dawn</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Wind (deg@kts)</label>
-        <input type="text" id="c_wind" placeholder="e.g. 310@12" oninput="updateCustomCmd()">
-      </div>
-      <div class="form-group">
-        <label>Visibility (m)</label>
-        <input type="text" id="c_vis" placeholder="9999" oninput="updateCustomCmd()">
-      </div>
-      <div class="form-group form-full">
-        <label>Extra flags (space-separated)</label>
-        <input type="text" id="c_extra" placeholder="--enable-clouds --prop:/sim/rendering/multithreading-mode=AutomaticSelection" oninput="updateCustomCmd()">
-      </div>
+  <!-- CENTER: World map -->
+  <div id="panelMap">
+    <canvas id="worldCanvas"></canvas>
+    <div id="apOverlay">
+      <input id="apSearchBox" placeholder="Search departure airport (ICAO or name)…"
+             oninput="filterAp()" onfocus="apDropShow(true)" onblur="setTimeout(()=>apDropShow(false),180)" autocomplete="off">
+      <div id="apDropdown"></div>
     </div>
-    <div class="custom-preview" id="customPreview"></div>
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <button class="launch-custom-btn" style="flex:1" onclick="launchCustom()">▶ LAUNCH CUSTOM</button>
-      <button class="btn btn-copy" onclick="copyCustom()" style="padding:9px 14px;">Copy</button>
+    <div id="selBadge">
+      <div id="selICAO">KMCN</div>
+      <div id="selName">Middle Georgia Regional</div>
     </div>
+    <div id="mapTip">CLICK AIRPORT DOT TO SELECT</div>
   </div>
 
-</div><!-- /page-launch -->
+  <!-- RIGHT: Conditions panel -->
+  <div id="panelCond">
 
-<!-- ═══════════════════════════════════════════════════════════
-     FFB TESTER TAB
-═══════════════════════════════════════════════════════════ -->
-<div class="page" id="page-ffb">
-  <div class="ffb-grid">
-
-    <div class="panel">
-      <h3>Effect Type</h3>
-      <div class="mode-grid" id="modeGrid">
-        <div class="mode-btn active" onclick="setMode('constant',this)">Constant</div>
-        <div class="mode-btn" onclick="setMode('periodic',this)">Periodic</div>
-        <div class="mode-btn" onclick="setMode('spring',this)">Spring</div>
-        <div class="mode-btn" onclick="setMode('damper',this)">Damper</div>
-        <div class="mode-btn" onclick="setMode('ramp',this)">Ramp</div>
-        <div class="mode-btn" onclick="setMode('rumble',this)">Rumble</div>
-      </div>
-
-      <h3>Direction</h3>
-      <div class="direction-wheel" id="dirWheel">
-        <div class="direction-dot" id="dirDot"></div>
-      </div>
-      <div style="text-align:center;font-size:11px;color:var(--muted)" id="dirLabel">0° (Push)</div>
-
-      <h3 style="margin-top:10px;">Parameters</h3>
-      <div class="slider-row">
-        <span class="slider-label">Strength</span>
-        <input type="range" min="0" max="100" value="70" id="sStrength" oninput="syncSlider(this,'vStrength');genCode()">
-        <span class="slider-val" id="vStrength">70</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">Duration (s)</span>
-        <input type="range" min="0" max="30" value="3" id="sDuration" oninput="syncSlider(this,'vDuration');genCode()">
-        <span class="slider-val" id="vDuration">3</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">Period (ms)</span>
-        <input type="range" min="50" max="1000" value="100" id="sPeriod" oninput="syncSlider(this,'vPeriod');genCode()">
-        <span class="slider-val" id="vPeriod">100</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">Device gain</span>
-        <input type="range" min="0" max="100" value="100" id="sGain" oninput="syncSlider(this,'vGain');genCode()">
-        <span class="slider-val" id="vGain">100</span>
+    <div class="cs">
+      <div class="cl">Time of Day</div>
+      <div class="timeGrid" id="timeGrid">
+        <button class="timeBtn" onclick="setTOD('dawn',this)">🌅 Dawn</button>
+        <button class="timeBtn on" onclick="setTOD('morning',this)">🌤 Morning</button>
+        <button class="timeBtn" onclick="setTOD('noon',this)">☀️ Noon</button>
+        <button class="timeBtn" onclick="setTOD('afternoon',this)">🌇 Afternoon</button>
+        <button class="timeBtn" onclick="setTOD('dusk',this)">🌆 Dusk</button>
+        <button class="timeBtn" onclick="setTOD('evening',this)">🌙 Evening</button>
+        <button class="timeBtn" onclick="setTOD('midnight',this)">🌑 Night</button>
+        <button class="timeBtn" onclick="setTOD('real',this)">⏱ Real</button>
       </div>
     </div>
 
-    <div class="panel">
-      <h3>Waveform Preview</h3>
-      <canvas class="waveform" id="waveCanvas" width="280" height="50"></canvas>
-
-      <h3 style="margin-top:12px;">Aviation Presets</h3>
-      <div class="preset-grid">
-        <div class="preset-btn" onclick="applyPreset('turbulence')">Turbulence</div>
-        <div class="preset-btn" onclick="applyPreset('runway')">Runway Rumble</div>
-        <div class="preset-btn" onclick="applyPreset('stall')">Stall Buffet</div>
-        <div class="preset-btn" onclick="applyPreset('touchdown')">Touchdown</div>
-        <div class="preset-btn" onclick="applyPreset('engine')">Engine Vibe</div>
-        <div class="preset-btn" onclick="applyPreset('crosswind')">Crosswind</div>
+    <div class="cs">
+      <div class="cl">Start Type</div>
+      <div class="togRow">
+        <button class="togBtn on" id="btnGnd" onclick="setStart('ground')">On Ground</button>
+        <button class="togBtn"    id="btnAir" onclick="setStart('air')">In Air</button>
       </div>
-
-      <h3 style="margin-top:12px;">Generated Command</h3>
-      <pre class="code-out" id="codeOut">python3 fftest2026.py --help</pre>
-      <div style="display:flex;gap:6px;margin-top:8px;">
-        <button class="btn btn-copy" style="flex:1" onclick="copyFFB()">Copy Command</button>
-        <button class="btn btn-launch" style="flex:1" onclick="runFFB()">▶ Run via Server</button>
+      <div id="inAirOpts">
+        <input class="ci" id="altIn"  type="number" placeholder="Altitude (ft)" value="3000">
+        <input class="ci" id="vcIn"   type="number" placeholder="Airspeed (kts)" value="90">
+        <input class="ci" id="hdgIn"  type="number" placeholder="Heading (°)" value="360">
       </div>
+    </div>
+
+    <div class="cs">
+      <div class="cl">Runway</div>
+      <select id="rwSel"><option value="">Any runway</option></select>
+    </div>
+
+    <div class="cs">
+      <div class="cl">Quick Flights</div>
+      <div id="qfList"></div>
     </div>
 
   </div>
-</div><!-- /page-ffb -->
+</div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     DOSSIER TAB
-═══════════════════════════════════════════════════════════ -->
-<div class="page" id="page-dossier">
-
-  <div class="dossier-section">
-    <h2>🕹️ Joystick / FFB</h2>
-    <div class="kv-grid">
-      <span class="kv-key">Device</span><span class="kv-val">Saitek Cyborg Evo Force (USB HID PID)</span>
-      <span class="kv-key">VID:PID</span><span class="kv-val"><code>06a3:0c2d</code></span>
-      <span class="kv-key">Kernel driver</span><span class="kv-val"><code>hid-pidff</code> (CONFIG_HID_PID=y in pidff kernel)</span>
-      <span class="kv-key">Required kernel</span><span class="kv-val"><code>6.1.84-8-rk2410-pidff</code> — label l3 in extlinux.conf</span>
-      <span class="kv-key">Axes</span><span class="kv-val">X, Y, Z (throttle), Rz (rudder twist)</span>
-      <span class="kv-key">Buttons</span><span class="kv-val">8 + hat switch</span>
-      <span class="kv-key">FF effects</span><span class="kv-val">Constant, Periodic (sine/square/tri/saw), Spring, Damper, Inertia, Friction, Ramp</span>
-      <span class="kv-key">Evdev node</span><span class="kv-val"><code>/dev/input/event*</code> — check with <code>ls -la /dev/input/by-id/</code></span>
-    </div>
+<!-- BOTTOM BAR -->
+<div id="botBar">
+  <div id="fsSum">
+    <div id="fsAc">—</div>
+    <div id="fsArr">→</div>
+    <div id="fsAp">—</div>
+    <div id="fsDet"></div>
   </div>
-
-  <div class="dossier-section">
-    <h2>✈️ Aircraft Fleet</h2>
-    <div class="kv-grid">
-      <span class="kv-key">PA28-161</span><span class="kv-val">Piper Cherokee Warrior II · 160hp · primary trainer · KMCN/KBQK/KVLD</span>
-      <span class="kv-key">PA28-181</span><span class="kv-val">Piper Archer III · 181hp · heavier cross-country</span>
-      <span class="kv-key">PA28R-200</span><span class="kv-val">Piper Arrow II · 200hp · retractable gear</span>
-      <span class="kv-key">c172r</span><span class="kv-val">Cessna 172R · 160hp · Lycoming · most-common trainer</span>
-      <span class="kv-key">c172p</span><span class="kv-val">Cessna 172P · Continental · older fuel-injected</span>
-      <span class="kv-key">AT-802</span><span class="kv-val">Air Tractor 802 · turboprop ag-plane · ag operations</span>
-      <span class="kv-key">ag-cat</span><span class="kv-val">Grumman Ag-Cat · biplane crop-duster · low-level ag work</span>
-    </div>
+  <div class="botAct">
+    <button id="killBtn" onclick="killFG()">■ KILL</button>
+    <button id="flyBtn"  onclick="launch()" disabled>FLY</button>
   </div>
+</div>
 
-  <div class="dossier-section">
-    <h2>🗺️ Scenery & Airports</h2>
-    <div class="kv-grid">
-      <span class="kv-key">Primary</span><span class="kv-val">KMCN — Middle Georgia Regional, Macon GA (MGA School of Aviation)</span>
-      <span class="kv-key">Secondary</span><span class="kv-val">KBQK Brunswick Golden Isles · KVLD Moody AFB/Valdosta · KSAV Savannah/Hilton Head</span>
-      <span class="kv-key">Ag ops</span><span class="kv-val">KAYS Waycross-Ware County (low-level ag strip practice)</span>
-      <span class="kv-key">IMC/IFR</span><span class="kv-val">Zero-zero visibility CAT I ILS approach KMCN Rwy 31</span>
-      <span class="kv-key">Alaska</span><span class="kv-val">PAHO Homer — remote coastal VFR; PAAK Kodiak Island</span>
-      <span class="kv-key">FG scenery path</span><span class="kv-val"><code>/usr/local/share/flightgear/scenery</code></span>
-      <span class="kv-key">TerraSync</span><span class="kv-val"><code>--enable-terrasync</code> for real-time tile download</span>
-    </div>
-  </div>
+<!-- ═══ FFB TESTER ══════════════════════════════════════ -->
+<div class="hPanel" id="ffbPanel">
+  <div style="max-width:780px;margin:0 auto;">
+    <h2 style="color:var(--accent);font-size:14px;margin-bottom:14px;letter-spacing:0.08em;">⚡ FORCE FEEDBACK TESTER</h2>
+    <div class="ffb-grid">
+      <div class="fpanel">
+        <h3>Effect Type</h3>
+        <div class="mode-grid">
+          <button class="mode-btn active" onclick="setMode('spring')">Spring</button>
+          <button class="mode-btn" onclick="setMode('damper')">Damper</button>
+          <button class="mode-btn" onclick="setMode('sine')">Sine Wave</button>
+          <button class="mode-btn" onclick="setMode('triangle')">Triangle</button>
+          <button class="mode-btn" onclick="setMode('sawup')">Saw Up</button>
+          <button class="mode-btn" onclick="setMode('sawdown')">Saw Down</button>
+          <button class="mode-btn" onclick="setMode('square')">Square</button>
+          <button class="mode-btn" onclick="setMode('rumble')">Rumble</button>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Magnitude</span>
+          <input type="range" min="0" max="100" value="50" oninput="ffbParam('mag',this)">
+          <span class="slider-val" id="magVal">50</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Duration (ms)</span>
+          <input type="range" min="100" max="5000" step="100" value="1000" oninput="ffbParam('dur',this)">
+          <span class="slider-val" id="durVal">1000</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Frequency (Hz)</span>
+          <input type="range" min="1" max="100" value="10" oninput="ffbParam('freq',this)">
+          <span class="slider-val" id="freqVal">10</span>
+        </div>
+        <canvas class="waveform" id="waveCanvas"></canvas>
+        <div class="code-out" id="ffbCmd">evtest /dev/input/event0</div>
+      </div>
+      <div class="fpanel">
+        <h3>Direction</h3>
+        <div class="direction-wheel" id="dirWheel">
+          <div class="direction-dot" id="dirDot"></div>
+        </div>
+        <h3 style="margin-top:10px">Aviation Presets</h3>
+        <div class="preset-grid">
+          <button class="preset-btn" onclick="applyFFBPreset('turbulence')">Turbulence</button>
+          <button class="preset-btn" onclick="applyFFBPreset('stall')">Stall Buffet</button>
+          <button class="preset-btn" onclick="applyFFBPreset('touchdown')">Touchdown</button>
+          <button class="preset-btn" onclick="applyFFBPreset('torque')">P-Factor</button>
+          <button class="preset-btn" onclick="applyFFBPreset('spring')">Control Feel</button>
+          <button class="preset-btn" onclick="applyFFBPreset('runway')">Runway Roll</button>
+        </div>
+        <div class="code-out" style="margin-top:10px;" id="ffbInfo">
+Device: Saitek Cyborg Evo Force
+Kernel: 6.1.84-8-rk2410-pidff
+Driver: hid-pidff (USB HID PID)
+Node:   /dev/input/event0
 
-  <div class="dossier-section">
-    <h2>⚙️ Hardware / Kernel</h2>
-    <div class="kv-grid">
-      <span class="kv-key">Board</span><span class="kv-val">Radxa Rock 5B+ · RK3588 SoC · ARM64 · 16GB LPDDR5</span>
-      <span class="kv-key">Storage</span><span class="kv-val">1TB NVMe (root OS) · 58GB microSD (Radxa recovery/SPI tool)</span>
-      <span class="kv-key">SPI NOR</span><span class="kv-val"><code>/dev/mtdblock0</code> 16MB · flash with <code>rock-5b-spi-image-gd1cf491-20240523.img</code></span>
-      <span class="kv-key">Boot target</span><span class="kv-val"><code>default l3</code> in <code>/boot/extlinux/extlinux.conf</code></span>
-      <span class="kv-key">pidff kernel</span><span class="kv-val"><code>vmlinuz-6.1.84-8-rk2410-pidff</code> — CONFIG_HID_PID=y</span>
-      <span class="kv-key">fgfs binary</span><span class="kv-val"><code>/usr/local/bin/fgfs</code> (built from source 2024.1)</span>
-    </div>
-  </div>
-
-  <div class="dossier-section">
-    <h2>🔧 SPI Boot Fix</h2>
-    <div class="kv-grid">
-      <span class="kv-key">Problem</span><span class="kv-val">Board falls back to SD card U-Boot → reads SD extlinux.conf → boots base kernel (no pidff)</span>
-      <span class="kv-key">Root cause</span><span class="kv-val">SPI NOR has stale/incompatible U-Boot that sets SD card as first boot device</span>
-      <span class="kv-key">Fix</span><span class="kv-val">Flash new SPI image (already on SD at <code>/media/radxa/rootfs/home/radxa/Downloads/rock-5b-spi-image-gd1cf491-20240523.img</code>)</span>
-    </div>
-    <pre style="margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;color:var(--green);overflow-x:auto">sudo dd if=/media/radxa/rootfs/home/radxa/Downloads/rock-5b-spi-image-gd1cf491-20240523.img \
-    of=/dev/mtdblock0 bs=4096 conv=sync status=progress &amp;&amp; sync
-# Power OFF, remove SD card, power ON → uname -r should show 6.1.84-8-rk2410-pidff</pre>
-  </div>
-
-  <div class="dossier-section">
-    <h2>🎓 Training Plan</h2>
-    <div class="kv-grid">
-      <span class="kv-key">Goal</span><span class="kv-val">PPL → Commercial → Agricultural Aviation (aerial application)</span>
-      <span class="kv-key">School</span><span class="kv-val">MGA School of Aviation @ KMCN · Enrolled Spring 2027</span>
-      <span class="kv-key">Sim focus</span><span class="kv-val">ILS approaches, pattern work, slow-flight/stall recognition, ag low-level</span>
-      <span class="kv-key">FFB goal</span><span class="kv-val">Force-trim simulation for PA28 controls via hid-pidff + fftest2026.py</span>
-    </div>
-  </div>
-
-  <div class="dossier-section">
-    <h2>🚀 Launcher Server</h2>
-    <div class="kv-grid">
-      <span class="kv-key">Script</span><span class="kv-val"><code>fg-launcher-server.py</code> — tiny Python HTTP server on localhost:8765</span>
-      <span class="kv-key">Start</span><span class="kv-val"><code>python3 ~/cosmicindustries.github.io/flightgear/fg-launcher-server.py</code></span>
-      <span class="kv-key">Status</span><span class="kv-val"><a href="http://localhost:8765/status" target="_blank" style="color:var(--accent2)">http://localhost:8765/status</a></span>
-      <span class="kv-key">Protocol</span><span class="kv-val">POST /launch with JSON <code>{"args":[...]}</code> → spawns fgfs, returns PID</span>
-      <span class="kv-key">Kill FG</span><span class="kv-val">GET/POST <code>http://localhost:8765/kill</code></span>
-    </div>
-  </div>
-
-</div><!-- /page-dossier -->
-
-<script>
-/* ─── Aircraft database ──────────────────────────────────────────────────── */
-const AIRCRAFT = [
-  {id:"PA28-161-160", name:"PA28-161 Warrior II", cat:"Piper Cherokee", hp:160, role:"Primary trainer"},
-  {id:"PA28-181",     name:"PA28-181 Archer III",  cat:"Piper Cherokee", hp:181, role:"Cross-country"},
-  {id:"PA28R-200",    name:"PA28R-200 Arrow II",   cat:"Piper Cherokee", hp:200, role:"Complex (retract)"},
-  {id:"c172r",        name:"C172R Skyhawk",         cat:"Cessna 172",    hp:160, role:"Primary trainer"},
-  {id:"c172p",        name:"C172P Skyhawk",         cat:"Cessna 172",    hp:160, role:"Older model"},
-  {id:"c150",         name:"C150 Aerobat",          cat:"Cessna",        hp:100, role:"Basic trainer"},
-  {id:"c182t",        name:"C182T Skylane",         cat:"Cessna",        hp:230, role:"High-performance"},
-  {id:"c310",         name:"C310 Twin",             cat:"Cessna",        hp:285, role:"Multi-engine"},
-  {id:"AT-802",       name:"Air Tractor AT-802",    cat:"Ag-plane",      hp:1350,role:"Agricultural turboprop"},
-  {id:"ag-cat",       name:"Grumman Ag-Cat",        cat:"Ag-plane",      hp:450, role:"Biplane crop-duster"},
-  {id:"beech99",      name:"Beechcraft 99",         cat:"Beechcraft",    hp:680, role:"Commuter/cargo"},
-  {id:"King Air C90", name:"King Air C90",          cat:"Beechcraft",    hp:1100,role:"Twin turboprop IFR"},
-  {id:"DR400-140B",   name:"Robin DR400",           cat:"Robin",         hp:140, role:"European trainer"},
-  {id:"dhc2",         name:"DHC-2 Beaver",          cat:"DHC",           hp:450, role:"Bush floatplane"},
-  {id:"piper-j3cub",  name:"Piper J-3 Cub",        cat:"Piper",         hp:65,  role:"Taildragger classic"},
-  {id:"dc3",          name:"Douglas DC-3",          cat:"Douglas",       hp:2400,role:"Classic airliner"},
-  {id:"b737",         name:"Boeing 737-300",        cat:"Boeing",        hp:0,   role:"Airliner (jet)"},
-  {id:"b747",         name:"Boeing 747-400",        cat:"Boeing",        hp:0,   role:"Heavy (jet)"},
-  {id:"A320",         name:"Airbus A320",           cat:"Airbus",        hp:0,   role:"Narrowbody airliner"},
-  {id:"f16",          name:"F-16 Fighting Falcon",  cat:"Fighter",       hp:0,   role:"Military (supersonic)"},
-  {id:"ufo",          name:"UFO",                   cat:"Novelty",       hp:0,   role:"Non-aerodynamic test"},
-];
-
-/* ─── Airport database ───────────────────────────────────────────────────── */
-const AIRPORTS = [
-  {icao:"KMCN", name:"Middle Georgia Regional",     city:"Macon, GA",          note:"MGA school · ILS 31"},
-  {icao:"KBQK", name:"Brunswick Golden Isles",      city:"Brunswick, GA",      note:"Coastal VFR"},
-  {icao:"KVLD", name:"Moody AFB / Valdosta Rgnl",   city:"Valdosta, GA",       note:"MOA airspace nearby"},
-  {icao:"KSAV", name:"Savannah/Hilton Head Intl",   city:"Savannah, GA",       note:"Class C"},
-  {icao:"KAYS", name:"Waycross-Ware County",        city:"Waycross, GA",       note:"Ag strip practice"},
-  {icao:"PAHO", name:"Homer Airport",               city:"Homer, AK",          note:"Coastal VFR · fjords"},
-  {icao:"PAAK", name:"Kodiak Airport",              city:"Kodiak Island, AK",  note:"Remote island"},
-  {icao:"KATL", name:"Hartsfield-Jackson Atlanta",  city:"Atlanta, GA",        note:"Class B · no FG ILS"},
-  {icao:"KJFK", name:"John F Kennedy Intl",         city:"New York, NY",       note:"Class B"},
-  {icao:"KLAX", name:"Los Angeles Intl",            city:"Los Angeles, CA",    note:"Class B"},
-  {icao:"KSFO", name:"San Francisco Intl",          city:"San Francisco, CA",  note:"Class B · fog"},
-  {icao:"KORD", name:"O'Hare Intl",                 city:"Chicago, IL",        note:"Class B"},
-  {icao:"KDFW", name:"Dallas/Fort Worth Intl",      city:"Dallas, TX",         note:"Class B"},
-  {icao:"KDAL", name:"Dallas Love Field",           city:"Dallas, TX",         note:"Class D"},
-  {icao:"KPHX", name:"Phoenix Sky Harbor",          city:"Phoenix, AZ",        note:"Class B"},
-  {icao:"KDEN", name:"Denver Intl",                 city:"Denver, CO",         note:"Class B · mile-high"},
-  {icao:"EGLL", name:"London Heathrow",             city:"London, UK",         note:"Class A"},
-  {icao:"EDDF", name:"Frankfurt am Main",           city:"Frankfurt, DE",      note:"Class C"},
-  {icao:"LFPG", name:"Charles de Gaulle",           city:"Paris, FR",          note:"Class A"},
-  {icao:"RJTT", name:"Tokyo Haneda",                city:"Tokyo, JP",          note:"Class D/C"},
-  {icao:"WSSS", name:"Singapore Changi",            city:"Singapore",          note:"Class C"},
-  {icao:"YSSY", name:"Sydney Kingsford Smith",      city:"Sydney, AU",         note:"Class C"},
-  {icao:"NZAA", name:"Auckland Intl",               city:"Auckland, NZ",       note:"Class C"},
-  {icao:"FAOR", name:"O.R. Tambo Intl",             city:"Johannesburg, ZA",   note:"Class B"},
-  {icao:"KDVN", name:"Davenport Municipal",         city:"Davenport, IA",      note:"Small GA"},
-  {icao:"KVPC", name:"Cartersville Airport",        city:"Cartersville, GA",   note:"Small GA strip"},
-];
-
-/* ─── Preset launch cards ────────────────────────────────────────────────── */
-const PRESETS = [
-  {
-    icon:"🛬", title:"KMCN ILS 31",
-    sub:"Middle Georgia Regional · ILS Cat-I approach",
-    aircraft:"PA28-161-160", airport:"KMCN", runway:"31",
-    extra:["--vc=90","--altitude=3000","--heading=310","--timeofday=afternoon",
-           "--visibility=8000","--enable-clouds"],
-  },
-  {
-    icon:"🔁", title:"KMCN Pattern",
-    sub:"Left traffic pattern · Rwy 23",
-    aircraft:"PA28-161-160", airport:"KMCN", runway:"23",
-    extra:["--vc=70","--altitude=2100","--heading=230","--timeofday=morning"],
-  },
-  {
-    icon:"🌊", title:"KBQK Brunswick",
-    sub:"Coastal VFR · Golden Isles",
-    aircraft:"PA28-161-160", airport:"KBQK", runway:"07",
-    extra:["--vc=85","--timeofday=noon","--enable-terrasync"],
-  },
-  {
-    icon:"🌩", title:"IMC Zero-Zero",
-    sub:"Instrument practice · CAT-I minimums",
-    aircraft:"PA28-181", airport:"KMCN", runway:"31",
-    extra:["--timeofday=dawn","--visibility=200","--enable-clouds",
-           "--prop:/environment/weather-scenario=CAT-I"],
-  },
-  {
-    icon:"🌾", title:"Ag Strip Low",
-    sub:"KAYS Waycross · agricultural low-level",
-    aircraft:"AT-802", airport:"KAYS", runway:"18",
-    extra:["--vc=110","--altitude=50","--timeofday=morning"],
-  },
-  {
-    icon:"🦅", title:"Ag-Cat Crop",
-    sub:"Grumman biplane · ultra-low ag work",
-    aircraft:"ag-cat", airport:"KAYS", runway:"18",
-    extra:["--vc=80","--altitude=25","--timeofday=morning"],
-  },
-  {
-    icon:"🏔", title:"PAHO Homer AK",
-    sub:"Homer coastal · remote Alaskan VFR",
-    aircraft:"dhc2", airport:"PAHO", runway:"03",
-    extra:["--vc=90","--timeofday=afternoon","--enable-terrasync"],
-  },
-  {
-    icon:"🌙", title:"KSAV Night VFR",
-    sub:"Savannah/Hilton Head · Class C night",
-    aircraft:"c172r", airport:"KSAV", runway:"10",
-    extra:["--timeofday=night","--vc=100","--enable-clouds"],
-  },
-  {
-    icon:"🛩", title:"KVLD Valdosta",
-    sub:"Moody AFB / Valdosta Regional",
-    aircraft:"PA28-161-160", airport:"KVLD", runway:"17",
-    extra:["--vc=90","--timeofday=noon"],
-  },
-  {
-    icon:"🌅", title:"KMCN Dawn Check",
-    sub:"Pre-dawn engine-start practice",
-    aircraft:"PA28-161-160", airport:"KMCN", runway:"31",
-    extra:["--timeofday=dawn","--on-ground"],
-  },
-];
-
-/* ─── State ──────────────────────────────────────────────────────────────── */
-let selectedAircraft = null;   // id string or null
-let selectedAirport  = null;   // icao string or null
-let serverOnline     = false;
-const LAUNCHER_URL   = "http://localhost:8765";
-const FGFS           = "/usr/local/bin/fgfs";
-
-/* ─── Tabs ───────────────────────────────────────────────────────────────── */
-function showTab(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  btn.classList.add('active');
-  try { localStorage.setItem('fg_tab', name); } catch(_) {}
-}
-
-/* ─── Server status ──────────────────────────────────────────────────────── */
-async function checkServer(verbose) {
-  const dot = document.getElementById('serverDot');
-  const lbl = document.getElementById('serverLabel');
-  try {
-    const r = await fetch(LAUNCHER_URL + '/status', {signal: AbortSignal.timeout(1500)});
-    const d = await r.json();
-    serverOnline = true;
-    dot.className = 'dot green';
-    lbl.textContent = d.active ? 'FG Running' : 'Server Ready';
-    if (verbose) toast('Launcher server online', 'ok');
-  } catch(_) {
-    serverOnline = false;
-    dot.className = 'dot red';
-    lbl.textContent = 'Server Offline';
-    if (verbose) toast('Start fg-launcher-server.py to enable one-click launch', 'warn');
-  }
-  document.querySelectorAll('.btn-launch').forEach(b => b.disabled = !serverOnline);
-}
-
-/* ─── Aircraft search ────────────────────────────────────────────────────── */
-let acFocusIdx = -1;
-function acFilter() {
-  const q = document.getElementById('acInput').value.trim().toLowerCase();
-  const box = document.getElementById('acResults');
-  const matches = q.length < 1
-    ? AIRCRAFT
-    : AIRCRAFT.filter(a =>
-        a.id.toLowerCase().includes(q) ||
-        a.name.toLowerCase().includes(q) ||
-        a.cat.toLowerCase().includes(q) ||
-        a.role.toLowerCase().includes(q));
-  if (!matches.length) {
-    box.innerHTML = '<div class="sr-empty">No aircraft found</div>';
-  } else {
-    box.innerHTML = matches.slice(0,12).map((a,i) =>
-      `<div class="sr-item" data-id="${a.id}" onclick="selectAircraft('${a.id}')">
-        <div class="sr-name">${a.name}</div>
-        <div class="sr-sub">${a.cat} · ${a.hp ? a.hp+'hp · ' : ''}${a.role}</div>
-      </div>`).join('');
-  }
-  box.classList.add('open');
-  acFocusIdx = -1;
-}
-function acBlur() { document.getElementById('acResults').classList.remove('open'); }
-function acKey(e) {
-  const items = document.querySelectorAll('#acResults .sr-item');
-  if (e.key === 'ArrowDown') { acFocusIdx = Math.min(acFocusIdx+1, items.length-1); highlightAc(items); }
-  else if (e.key === 'ArrowUp') { acFocusIdx = Math.max(acFocusIdx-1, -1); highlightAc(items); }
-  else if (e.key === 'Enter' && acFocusIdx >= 0) { items[acFocusIdx]?.click(); }
-  else if (e.key === 'Escape') { acBlur(); }
-}
-function highlightAc(items) { items.forEach((el,i) => el.classList.toggle('focused', i===acFocusIdx)); }
-function selectAircraft(id) {
-  const a = AIRCRAFT.find(x => x.id === id);
-  if (!a) return;
-  selectedAircraft = id;
-  document.getElementById('acInput').value = a.name;
-  document.getElementById('acResults').classList.remove('open');
-  document.getElementById('c_aircraft').value = id;
-  const banner = document.getElementById('selectedAcBanner');
-  banner.textContent = `✈ ${a.name} selected — cards below use this aircraft`;
-  banner.classList.remove('hidden');
-  renderCards();
-  updateCustomCmd();
-}
-
-/* ─── Airport search ─────────────────────────────────────────────────────── */
-let apFocusIdx = -1;
-function apFilter() {
-  const q = document.getElementById('apInput').value.trim().toLowerCase();
-  const box = document.getElementById('apResults');
-  const matches = q.length < 1
-    ? AIRPORTS
-    : AIRPORTS.filter(a =>
-        a.icao.toLowerCase().includes(q) ||
-        a.name.toLowerCase().includes(q) ||
-        a.city.toLowerCase().includes(q) ||
-        a.note.toLowerCase().includes(q));
-  if (!matches.length) {
-    box.innerHTML = '<div class="sr-empty">No airport found — type any ICAO code</div>';
-  } else {
-    box.innerHTML = matches.slice(0,12).map((a,i) =>
-      `<div class="sr-item" data-icao="${a.icao}" onclick="selectAirport('${a.icao}')">
-        <div class="sr-name">${a.icao} — ${a.name}</div>
-        <div class="sr-sub">${a.city} · ${a.note}</div>
-      </div>`).join('');
-  }
-  box.classList.add('open');
-  apFocusIdx = -1;
-}
-function apBlur() { document.getElementById('apResults').classList.remove('open'); }
-function apKey(e) {
-  const items = document.querySelectorAll('#apResults .sr-item');
-  if (e.key === 'ArrowDown') { apFocusIdx = Math.min(apFocusIdx+1, items.length-1); highlightAp(items); }
-  else if (e.key === 'ArrowUp') { apFocusIdx = Math.max(apFocusIdx-1, -1); highlightAp(items); }
-  else if (e.key === 'Enter' && apFocusIdx >= 0) { items[apFocusIdx]?.click(); }
-  else if (e.key === 'Escape') { apBlur(); }
-}
-function highlightAp(items) { items.forEach((el,i) => el.classList.toggle('focused', i===apFocusIdx)); }
-function selectAirport(icao) {
-  const a = AIRPORTS.find(x => x.icao === icao);
-  if (!a) { icao = icao.toUpperCase(); } // allow free-type
-  selectedAirport = icao;
-  const name = a ? `${icao} — ${a.name}` : icao;
-  document.getElementById('apInput').value = name;
-  document.getElementById('apResults').classList.remove('open');
-  document.getElementById('c_airport').value = icao;
-  // Add a quick card for this airport
-  renderCards(icao);
-  updateCustomCmd();
-}
-
-/* ─── Build fgfs args ────────────────────────────────────────────────────── */
-function buildArgs(preset, overrideAc) {
-  const ac = overrideAc || (selectedAircraft && selectedAircraft) || preset.aircraft;
-  const args = [
-    `--aircraft=${ac}`,
-    `--airport=${preset.airport}`,
-  ];
-  if (preset.runway) args.push(`--runway=${preset.runway}`);
-  if (preset.extra) args.push(...preset.extra);
-  return args;
-}
-
-function buildCmd(args) {
-  return [FGFS, ...args].join(' ');
-}
-
-/* ─── Render cards ───────────────────────────────────────────────────────── */
-function renderCards(highlightIcao) {
-  const grid = document.getElementById('cardsGrid');
-  let presets = [...PRESETS];
-
-  // If an airport is selected, inject a quick-launch card for it first
-  if (highlightIcao && !PRESETS.find(p => p.airport === highlightIcao)) {
-    const ap = AIRPORTS.find(a => a.icao === highlightIcao);
-    presets.unshift({
-      icon:"📍",
-      title:`${highlightIcao} Quick Launch`,
-      sub: ap ? ap.name + ' · ' + ap.city : 'Custom airport',
-      aircraft: selectedAircraft || "PA28-161-160",
-      airport: highlightIcao,
-      runway: "",
-      extra: ["--vc=90","--timeofday=noon"],
-    });
-  }
-
-  grid.innerHTML = presets.map((p, idx) => {
-    const args  = buildArgs(p);
-    const cmd   = buildCmd(args);
-    const argsJ = JSON.stringify(args);
-    return `<div class="card">
-      <div class="card-head">
-        <div class="card-icon">${p.icon}</div>
-        <div class="card-meta">
-          <div class="card-title">${p.title}</div>
-          <div class="card-sub">${p.sub}${selectedAircraft && p.aircraft !== selectedAircraft ? ' · <span style="color:var(--accent2)">'+selectedAircraft+'</span>' : ''}</div>
+sudo modprobe joydev
+sudo python3 fftest2026.py --list
         </div>
       </div>
-      <div class="card-cmd">${escHtml(cmd)}</div>
-      <div class="btn-row">
-        <button class="btn btn-launch" onclick='launchPreset(${argsJ})' ${serverOnline?'':'disabled'}>▶ Launch</button>
-        <button class="btn btn-copy"   onclick='copyText("${escAttr(cmd)}")'>Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DOSSIER ══════════════════════════════════════════ -->
+<div class="hPanel" id="dossierPanel">
+  <div style="max-width:700px;margin:0 auto;">
+    <h2 style="color:var(--accent);font-size:14px;margin-bottom:14px;letter-spacing:0.08em;">📋 SYSTEM DOSSIER</h2>
+    <div class="ds">
+      <h2>Hardware</h2>
+      <div class="kv">
+        <div class="kk">Board</div><div class="kv2">Radxa Rock 5B+ (RK3588)</div>
+        <div class="kk">RAM</div><div class="kv2">16GB LPDDR5</div>
+        <div class="kk">Boot</div><div class="kv2">SPI NOR → NVMe (after SPI flash)</div>
+        <div class="kk">SPI Image</div><div class="kv2"><code>rock-5b-spi-image-gd1cf491-20240523.img</code></div>
       </div>
-    </div>`;
-  }).join('');
+    </div>
+    <div class="ds">
+      <h2>Kernel</h2>
+      <div class="kv">
+        <div class="kk">Target</div><div class="kv2"><code>6.1.84-8-rk2410-pidff</code></div>
+        <div class="kk">Feature</div><div class="kv2"><code>CONFIG_HID_PID=y</code> — USB HID PID force feedback</div>
+        <div class="kk">Verify</div><div class="kv2"><code>uname -r</code> should show pidff suffix</div>
+        <div class="kk">If wrong</div><div class="kv2">Flash SPI bootloader (see below)</div>
+      </div>
+    </div>
+    <div class="ds">
+      <h2>SPI Bootloader Flash</h2>
+      <div class="kv">
+        <div class="kk">Step 1</div><div class="kv2"><code>sudo dd if=/media/radxa/rootfs/home/radxa/Downloads/rock-5b-spi-image-gd1cf491-20240523.img of=/dev/mtdblock0 bs=4096 conv=sync status=progress &amp;&amp; sync</code></div>
+        <div class="kk">Step 2</div><div class="kv2">Power off → Remove SD card → Power on</div>
+        <div class="kk">Step 3</div><div class="kv2"><code>uname -r</code> → must show <code>6.1.84-8-rk2410-pidff</code></div>
+      </div>
+    </div>
+    <div class="ds">
+      <h2>FlightGear</h2>
+      <div class="kv">
+        <div class="kk">Binary</div><div class="kv2"><code>/usr/local/bin/fgfs</code></div>
+        <div class="kk">Version</div><div class="kv2">2024.1</div>
+        <div class="kk">Launcher</div><div class="kv2"><code>python3 fg-launcher-server.py</code> — http://127.0.0.1:8765</div>
+        <div class="kk">Joystick</div><div class="kv2">Saitek Cyborg Evo Force — <code>/dev/input/js0</code></div>
+        <div class="kk">FFB node</div><div class="kv2"><code>/dev/input/event0</code></div>
+      </div>
+    </div>
+    <div class="ds">
+      <h2>Post-Boot Checklist</h2>
+      <div class="kv">
+        <div class="kk">①</div><div class="kv2"><code>uname -r | grep pidff</code></div>
+        <div class="kk">②</div><div class="kv2"><code>sudo modprobe joydev &amp;&amp; ls /dev/input/js0</code></div>
+        <div class="kk">③</div><div class="kv2"><code>python3 fg-launcher-server.py &amp;</code></div>
+        <div class="kk">④</div><div class="kv2">Open this page → FLY</div>
+      </div>
+    </div>
+    <div class="ds">
+      <h2>Tags</h2>
+      <div class="tag-row">
+        <span class="tag">RK3588</span>
+        <span class="tag">Rock5B+</span>
+        <span class="tag">pidff</span>
+        <span class="tag">hid-pidff</span>
+        <span class="tag">Saitek Evo Force</span>
+        <span class="tag">FlightGear 2024.1</span>
+        <span class="tag">PA28-161</span>
+        <span class="tag">SPI Boot</span>
+        <span class="tag">NVMe</span>
+        <span class="tag">ARM64</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ─── Config ───────────────────────────────────────────
+const LAUNCHER = 'http://localhost:8765';
+const FGFS    = '/usr/local/bin/fgfs';
+
+// ─── Aircraft Database ────────────────────────────────
+const AIRCRAFT = [
+  // GA Single
+  {id:'PA28-161-160', name:'Piper Warrior II',    cat:'ga',       icon:'🛩'},
+  {id:'PA28-181',     name:'Piper Archer III',     cat:'ga',       icon:'🛩'},
+  {id:'PA28R-200',    name:'Piper Arrow',          cat:'ga',       icon:'🛩'},
+  {id:'c172r',        name:'Cessna 172R Skyhawk',  cat:'ga',       icon:'🛩'},
+  {id:'c172p',        name:'Cessna 172P Skyhawk',  cat:'ga',       icon:'🛩'},
+  {id:'c150',         name:'Cessna 150',           cat:'ga',       icon:'🛩'},
+  {id:'c182t',        name:'Cessna 182T Skylane',  cat:'ga',       icon:'🛩'},
+  {id:'DR400-140B',   name:'Robin DR400-140B',     cat:'ga',       icon:'🛩'},
+  {id:'piper-j3cub',  name:'Piper J-3 Cub',        cat:'ga',       icon:'🛩'},
+  // Twin / Complex
+  {id:'c310',         name:'Cessna 310',           cat:'twin',     icon:'✈'},
+  {id:'beech99',      name:'Beechcraft 99',        cat:'twin',     icon:'✈'},
+  {id:'kingairc90',   name:'King Air C90',         cat:'twin',     icon:'✈'},
+  // Airliners
+  {id:'b737',         name:'Boeing 737',           cat:'airliner', icon:'🛫'},
+  {id:'b747',         name:'Boeing 747',           cat:'airliner', icon:'🛫'},
+  {id:'A320',         name:'Airbus A320',          cat:'airliner', icon:'🛫'},
+  {id:'dc3',          name:'Douglas DC-3',         cat:'airliner', icon:'🛫'},
+  // Agricultural
+  {id:'AT-802',       name:'Air Tractor 802',      cat:'ag',       icon:'🌾'},
+  {id:'ag-cat',       name:'Grumman Ag-Cat',       cat:'ag',       icon:'🌾'},
+  // Bush / Float
+  {id:'dhc2',         name:'de Havilland Beaver',  cat:'bush',     icon:'🌊'},
+  // Military
+  {id:'f16',          name:'F-16 Fighting Falcon', cat:'military', icon:'⚔️'},
+  // Special
+  {id:'ufo',          name:'UFO',                  cat:'special',  icon:'🛸'},
+];
+
+const CATEGORIES = ['all','ga','twin','airliner','ag','bush','military','special'];
+
+// ─── Airport Database ─────────────────────────────────
+const AIRPORTS = [
+  // Local / Georgia
+  {icao:'KMCN',  name:'Middle Georgia Regional',      region:'GA',  lat:32.69,  lon:-83.65,  rw:['04','13','22','31']},
+  {icao:'KBQK',  name:'Brunswick Golden Isles',       region:'GA',  lat:31.26,  lon:-81.47,  rw:['07','16','25','34']},
+  {icao:'KVLD',  name:'Valdosta Regional',            region:'GA',  lat:30.78,  lon:-83.28,  rw:['05','17','23','35']},
+  {icao:'KSAV',  name:'Savannah/Hilton Head Intl',   region:'GA',  lat:32.13,  lon:-81.20,  rw:['01','10','19','28']},
+  {icao:'KAYS',  name:'Waycross/Ware County',        region:'GA',  lat:31.25,  lon:-82.40,  rw:['18','36']},
+  {icao:'KATL',  name:'Hartsfield–Jackson Atlanta',  region:'GA',  lat:33.64,  lon:-84.43,  rw:['08L','08R','09L','09R','10','26L','26R','27L','27R','28']},
+  {icao:'KVPC',  name:'Cartersville Airport',        region:'GA',  lat:34.12,  lon:-84.85,  rw:['09','18','27','36']},
+  // Alaska
+  {icao:'PAHO',  name:'Homer Airport',               region:'AK',  lat:59.64,  lon:-151.48, rw:['04','12','22','30']},
+  {icao:'PAAK',  name:'Kodiak Airport',              region:'AK',  lat:57.75,  lon:-152.49, rw:['07','18','25','36']},
+  // Major US
+  {icao:'KJFK',  name:'John F. Kennedy Intl',        region:'NY',  lat:40.64,  lon:-73.78,  rw:['04L','04R','13L','13R','22L','22R','31L','31R']},
+  {icao:'KLAX',  name:'Los Angeles International',   region:'CA',  lat:33.94,  lon:-118.41, rw:['06L','06R','07L','07R','24L','24R','25L','25R']},
+  {icao:'KSFO',  name:'San Francisco International', region:'CA',  lat:37.62,  lon:-122.37, rw:['01L','01R','10L','10R','19L','19R','28L','28R']},
+  {icao:'KORD',  name:"Chicago O'Hare International",region:'IL',  lat:41.98,  lon:-87.90,  rw:['04L','04R','09L','09R','10L','10R','22L','22R','27L','27R','28L','28R']},
+  {icao:'KDFW',  name:'Dallas/Fort Worth International',region:'TX',lat:32.90, lon:-97.04,  rw:['13L','13R','17L','17R','18L','18R','31L','31R','35L','35R','36L','36R']},
+  {icao:'KDAL',  name:'Dallas Love Field',           region:'TX',  lat:32.85,  lon:-96.85,  rw:['13L','13R','31L','31R']},
+  {icao:'KPHX',  name:'Phoenix Sky Harbor International',region:'AZ',lat:33.43,lon:-112.01,rw:['07L','07R','08','25L','25R','26']},
+  {icao:'KDEN',  name:'Denver International',        region:'CO',  lat:39.86,  lon:-104.67, rw:['07','08L','08R','16L','16R','17L','17R','25','26L','26R','34L','34R','35L','35R']},
+  {icao:'KDVN',  name:'Davenport Municipal',         region:'IA',  lat:41.61,  lon:-90.59,  rw:['03','15','21','33']},
+  // International
+  {icao:'EGLL',  name:'London Heathrow',             region:'UK',  lat:51.48,  lon:-0.45,   rw:['09L','09R','27L','27R']},
+  {icao:'EDDF',  name:'Frankfurt International',     region:'DE',  lat:50.03,  lon:8.57,    rw:['07L','07C','07R','18','25L','25C','25R','36']},
+  {icao:'LFPG',  name:'Paris Charles de Gaulle',     region:'FR',  lat:49.01,  lon:2.55,    rw:['08L','08R','09L','09R','26L','26R','27L','27R']},
+  {icao:'RJTT',  name:'Tokyo Haneda',                region:'JP',  lat:35.55,  lon:139.78,  rw:['04','05','16L','16R','22','23','34L','34R']},
+  {icao:'WSSS',  name:'Singapore Changi',            region:'SG',  lat:1.36,   lon:103.99,  rw:['02C','02L','20C','20R']},
+  {icao:'YSSY',  name:'Sydney Kingsford Smith',      region:'AU',  lat:-33.95, lon:151.18,  rw:['07','16L','16R','25','34L','34R']},
+  {icao:'NZAA',  name:'Auckland International',      region:'NZ',  lat:-37.01, lon:174.79,  rw:['05L','05R','23L','23R']},
+  {icao:'FAOR',  name:'O.R. Tambo International',    region:'ZA',  lat:-26.14, lon:28.24,   rw:['03L','03R','21L','21R']},
+];
+
+// ─── Quick Flights ────────────────────────────────────
+const QF = [
+  {name:'KMCN ILS 31 · Dawn',    sub:'PA28-161 · PA28-161-160', ac:'PA28-161-160', ap:'KMCN', args:['--aircraft=PA28-161-160','--airport=KMCN','--runway=31','--timeofday=dawn']},
+  {name:'KMCN Pattern · Morn',   sub:'C172R · Touch & Go',      ac:'c172r',        ap:'KMCN', args:['--aircraft=c172r','--airport=KMCN','--runway=04','--timeofday=morning']},
+  {name:'KBQK Brunswick',        sub:'PA28-181 · Afternoon',    ac:'PA28-181',     ap:'KBQK', args:['--aircraft=PA28-181','--airport=KBQK','--runway=25','--timeofday=afternoon']},
+  {name:'IMC Zero-Zero',         sub:'PA28-181 · Night',        ac:'PA28-181',     ap:'KMCN', args:['--aircraft=PA28-181','--airport=KMCN','--runway=31','--timeofday=midnight','--visibility=100','--cloud-coverage=4']},
+  {name:'Ag Strip Low · Dawn',   sub:'AT-802 · Runway 13',      ac:'AT-802',       ap:'KMCN', args:['--aircraft=AT-802','--airport=KMCN','--runway=13','--timeofday=dawn']},
+  {name:'Ag-Cat Crop Duster',    sub:'Ag-Cat · Morning',        ac:'ag-cat',       ap:'KMCN', args:['--aircraft=ag-cat','--airport=KMCN','--runway=13','--timeofday=morning']},
+  {name:'PAHO Homer AK',         sub:'Beaver · Real time',      ac:'dhc2',         ap:'PAHO', args:['--aircraft=dhc2','--airport=PAHO','--runway=04','--timeofday=real']},
+  {name:'KSAV Night VFR',        sub:'C172P · Evening',         ac:'c172p',        ap:'KSAV', args:['--aircraft=c172p','--airport=KSAV','--runway=10','--timeofday=evening']},
+  {name:'KVLD Valdosta',         sub:'C182T · Noon',            ac:'c182t',        ap:'KVLD', args:['--aircraft=c182t','--airport=KVLD','--runway=05','--timeofday=noon']},
+  {name:'KMCN Arrow Dawn',       sub:'PA28R-200 · Runway 22',   ac:'PA28R-200',    ap:'KMCN', args:['--aircraft=PA28R-200','--airport=KMCN','--runway=22','--timeofday=dawn']},
+];
+
+// ─── State ────────────────────────────────────────────
+let selAc = null, selAp = null;
+let curTOD = 'morning', curStart = 'ground';
+let serverOnline = false;
+let activeCat = 'all';
+
+// ─── Toast ────────────────────────────────────────────
+let _tTimer;
+function toast(msg, type='ok', dur=3000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + type;
+  clearTimeout(_tTimer);
+  _tTimer = setTimeout(() => { el.className = ''; }, dur);
 }
 
-/* ─── Launch preset ──────────────────────────────────────────────────────── */
-async function launchPreset(args) {
-  if (!serverOnline) { toast('Start fg-launcher-server.py first', 'warn'); return; }
+// ─── Server ───────────────────────────────────────────
+async function checkServer() {
   try {
-    const r = await fetch(LAUNCHER_URL + '/launch', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({args}),
-    });
-    const d = await r.json();
-    if (d.launched) toast(`FG launched · PID ${d.pid}`, 'ok');
-    else toast(d.error || 'Launch failed', 'err');
-    setTimeout(checkServer, 1200);
-  } catch(e) {
-    toast('Server not responding — start fg-launcher-server.py', 'warn');
+    const r = await fetch(LAUNCHER + '/status', { signal: AbortSignal.timeout(2500) });
+    const ok = r.ok;
+    serverOnline = ok;
+    document.getElementById('srvDot').className = ok ? 'online' : '';
+    document.getElementById('srvLabel').textContent = ok ? 'Launcher Online' : 'Launcher Offline';
+  } catch {
+    serverOnline = false;
+    document.getElementById('srvDot').className = '';
+    document.getElementById('srvLabel').textContent = 'Launcher Offline';
   }
 }
+setInterval(checkServer, 8000);
+checkServer();
 
-/* ─── Custom command ─────────────────────────────────────────────────────── */
-function updateCustomCmd() {
-  const airport  = document.getElementById('c_airport').value.trim() || 'KMCN';
-  const runway   = document.getElementById('c_runway').value.trim();
-  const aircraft = document.getElementById('c_aircraft').value.trim() || 'PA28-161-160';
-  const tod      = document.getElementById('c_time').value;
-  const wind     = document.getElementById('c_wind').value.trim();
-  const vis      = document.getElementById('c_vis').value.trim();
-  const extra    = document.getElementById('c_extra').value.trim();
-
-  let cmd = `${FGFS} --aircraft=${aircraft} --airport=${airport}`;
-  if (runway) cmd += ` --runway=${runway}`;
-  cmd += ` --timeofday=${tod}`;
-  if (wind) cmd += ` --wind=${wind}`;
-  if (vis)  cmd += ` --visibility=${vis}`;
-  if (extra) cmd += ` ${extra}`;
-
-  document.getElementById('customPreview').textContent = cmd;
-}
-
-function customArgs() {
-  const airport  = document.getElementById('c_airport').value.trim() || 'KMCN';
-  const runway   = document.getElementById('c_runway').value.trim();
-  const aircraft = document.getElementById('c_aircraft').value.trim() || 'PA28-161-160';
-  const tod      = document.getElementById('c_time').value;
-  const wind     = document.getElementById('c_wind').value.trim();
-  const vis      = document.getElementById('c_vis').value.trim();
-  const extra    = document.getElementById('c_extra').value.trim();
-
-  const args = [`--aircraft=${aircraft}`, `--airport=${airport}`];
-  if (runway) args.push(`--runway=${runway}`);
-  args.push(`--timeofday=${tod}`);
-  if (wind) args.push(`--wind=${wind}`);
-  if (vis)  args.push(`--visibility=${vis}`);
-  if (extra) {
-    extra.split(/\s+/).filter(Boolean).forEach(f => args.push(f));
-  }
-  return args;
-}
-
-async function launchCustom() {
-  if (!serverOnline) { toast('Start fg-launcher-server.py first', 'warn'); return; }
-  await launchPreset(customArgs());
-}
-
-function copyCustom() {
-  copyText(document.getElementById('customPreview').textContent);
-}
-
-/* ─── FFB Tab ────────────────────────────────────────────────────────────── */
-let ffbMode = 'constant';
-let ffbDir  = 0;
-
-function setMode(m, el) {
-  ffbMode = m;
-  document.querySelectorAll('#modeGrid .mode-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  genCode();
-  drawWave();
-}
-
-function syncSlider(el, valId) {
-  document.getElementById(valId).textContent = el.value;
-}
-
-function applyPreset(name) {
-  const p = {
-    turbulence: {mode:'periodic', strength:45, dur:10, period:250, dir:0},
-    runway:     {mode:'rumble',   strength:30, dur:5,  period:80,  dir:0},
-    stall:      {mode:'periodic', strength:85, dur:3,  period:120, dir:0},
-    touchdown:  {mode:'constant', strength:90, dur:1,  period:100, dir:0},
-    engine:     {mode:'periodic', strength:20, dur:30, period:50,  dir:0},
-    crosswind:  {mode:'spring',   strength:60, dur:8,  period:200, dir:90},
-  }[name];
-  if (!p) return;
-  setMode(p.mode, document.querySelector(`[onclick="setMode('${p.mode}',this)"]`));
-  document.getElementById('sStrength').value = p.strength;
-  document.getElementById('vStrength').textContent = p.strength;
-  document.getElementById('sDuration').value = p.dur;
-  document.getElementById('vDuration').textContent = p.dur;
-  document.getElementById('sPeriod').value = p.period;
-  document.getElementById('vPeriod').textContent = p.period;
-  ffbDir = p.dir;
-  updateDirDot();
-  genCode();
-  drawWave();
-}
-
-function genCode() {
-  const str = document.getElementById('sStrength').value;
-  const dur = document.getElementById('sDuration').value;
-  const per = document.getElementById('sPeriod').value;
-  const gain= document.getElementById('sGain').value;
-  let cmd = `python3 fftest2026.py --gain ${gain}`;
-  switch(ffbMode) {
-    case 'constant': cmd += ` --batch constant:${str}:${dur}:${ffbDir}`; break;
-    case 'periodic': cmd += ` --batch periodic:${str}:${dur}:${per}:sine:${ffbDir}`; break;
-    case 'spring':   cmd += ` --batch spring:${str}:${dur}`; break;
-    case 'damper':   cmd += ` --batch damper:${str}:${dur}`; break;
-    case 'ramp':     cmd += ` --batch ramp:${str}:${dur}`; break;
-    case 'rumble':   cmd += ` --batch rumble:${str}:${dur}`; break;
-  }
-  document.getElementById('codeOut').textContent = cmd;
-}
-
-function copyFFB() {
-  copyText(document.getElementById('codeOut').textContent);
-}
-
-async function runFFB() {
-  toast('FFB run via server not yet implemented — copy and run in terminal', 'warn');
-}
-
-/* Direction wheel */
-(function() {
-  const wheel = document.getElementById('dirWheel');
-  if (!wheel) return;
-  function handlePt(e) {
-    const r = wheel.getBoundingClientRect();
-    const cx = r.left + r.width/2, cy = r.top + r.height/2;
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - cx;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - cy;
-    ffbDir = Math.round(((Math.atan2(y,x) * 180 / Math.PI) + 360 + 90) % 360);
-    updateDirDot();
-    genCode();
-    drawWave();
-    e.preventDefault();
-  }
-  wheel.addEventListener('mousedown', e => {
-    handlePt(e);
-    const mm = ev => handlePt(ev);
-    const mu = () => { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); };
-    document.addEventListener('mousemove', mm);
-    document.addEventListener('mouseup', mu);
+// ─── Aircraft Panel ───────────────────────────────────
+function buildCats() {
+  const row = document.getElementById('catRow');
+  CATEGORIES.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'cat' + (c === 'all' ? ' on' : '');
+    b.textContent = c === 'all' ? 'All' : c.charAt(0).toUpperCase() + c.slice(1);
+    b.onclick = () => { activeCat = c; document.querySelectorAll('.cat').forEach(x => x.classList.remove('on')); b.classList.add('on'); filterAc(); };
+    row.appendChild(b);
   });
-  wheel.addEventListener('touchstart', handlePt, {passive:false});
-  wheel.addEventListener('touchmove',  handlePt, {passive:false});
-})();
-
-function updateDirDot() {
-  const dot = document.getElementById('dirDot');
-  const lbl = document.getElementById('dirLabel');
-  if (!dot) return;
-  const r = 28;
-  const rad = (ffbDir - 90) * Math.PI / 180;
-  const x = 50 + r * Math.cos(rad);
-  const y = 50 + r * Math.sin(rad);
-  dot.style.left = x + '%';
-  dot.style.top  = y + '%';
-  const names = ['Push (0°)','Push-R (45°)','Right (90°)','Pull-R (135°)','Pull (180°)','Pull-L (225°)','Left (270°)','Push-L (315°)'];
-  lbl.textContent = `${ffbDir}° · ${names[Math.round(ffbDir/45) % 8]}`;
 }
 
-/* Waveform canvas */
+function filterAc() {
+  const q = document.getElementById('acSearch').value.toLowerCase();
+  const list = document.getElementById('acList');
+  list.innerHTML = '';
+  AIRCRAFT.filter(a =>
+    (activeCat === 'all' || a.cat === activeCat) &&
+    (!q || a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q))
+  ).forEach(a => {
+    const d = document.createElement('div');
+    d.className = 'acCard' + (selAc === a.id ? ' sel' : '');
+    d.innerHTML = `<div class="acIcon">${a.icon}</div><div class="acInfo"><div class="acName">${a.name}</div><div class="acCat c-${a.cat}">${a.cat}</div></div>`;
+    d.onclick = () => selectAc(a.id);
+    list.appendChild(d);
+  });
+}
+
+function selectAc(id) {
+  selAc = id;
+  filterAc();
+  updateSummary();
+}
+
+// ─── Airport Search ───────────────────────────────────
+function filterAp() {
+  const q = document.getElementById('apSearchBox').value.toLowerCase();
+  const dd = document.getElementById('apDropdown');
+  if (!q) { dd.innerHTML = ''; return; }
+  const hits = AIRPORTS.filter(a => a.icao.toLowerCase().includes(q) || a.name.toLowerCase().includes(q)).slice(0, 10);
+  if (!hits.length) { dd.innerHTML = '<div class="apItem"><span class="apName">No airports found</span></div>'; return; }
+  dd.innerHTML = hits.map(a =>
+    `<div class="apItem" onclick="selectAp('${a.icao}')">
+      <span class="apICAO">${a.icao}</span>
+      <span class="apName">${a.name}</span>
+      <span class="apRgn">${a.region}</span>
+    </div>`
+  ).join('');
+}
+
+function apDropShow(v) {
+  document.getElementById('apDropdown').style.display = v ? 'block' : 'none';
+}
+
+function selectAp(icao) {
+  const ap = AIRPORTS.find(a => a.icao === icao);
+  if (!ap) return;
+  selAp = icao;
+  document.getElementById('apSearchBox').value = '';
+  document.getElementById('apDropdown').style.display = 'none';
+  // Badge
+  document.getElementById('selICAO').textContent = ap.icao;
+  document.getElementById('selName').textContent = ap.name;
+  document.getElementById('selBadge').style.display = 'block';
+  // Runway select
+  const sel = document.getElementById('rwSel');
+  sel.innerHTML = '<option value="">Any runway</option>' +
+    ap.rw.map(r => `<option value="${r}">${r}</option>`).join('');
+  // Redraw map
+  drawMap();
+  updateSummary();
+}
+
+// ─── World Map Canvas ─────────────────────────────────
+function project(lat, lon, W, H) {
+  const lonMin = -165, lonMax = 178;
+  const latMin = -44,  latMax = 66;
+  const x = (lon - lonMin) / (lonMax - lonMin) * W;
+  const y = (1 - (lat - latMin) / (latMax - latMin)) * H;
+  return [x, y];
+}
+
+function drawMap() {
+  const canvas = document.getElementById('worldCanvas');
+  const rect   = canvas.getBoundingClientRect();
+  const dpr    = window.devicePixelRatio || 1;
+  canvas.width  = rect.width  * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+
+  // Background
+  ctx.fillStyle = '#04070d';
+  ctx.fillRect(0, 0, W, H);
+
+  // Major graticule lines
+  ctx.lineWidth = 0.4;
+  for (let lon = -165; lon <= 180; lon += 30) {
+    const x = project(0, lon, W, H)[0];
+    ctx.strokeStyle = lon === 0 ? '#0f2538' : '#070f1a';
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let lat = -60; lat <= 66; lat += 30) {
+    const y = project(lat, 0, W, H)[1];
+    ctx.strokeStyle = lat === 0 ? '#0f2538' : '#070f1a';
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  // Minor grid (10°)
+  ctx.lineWidth = 0.2;
+  ctx.setLineDash([1, 9]);
+  for (let lon = -165; lon <= 180; lon += 10) {
+    const x = project(0, lon, W, H)[0];
+    ctx.strokeStyle = '#070f1a';
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let lat = -40; lat <= 66; lat += 10) {
+    const y = project(lat, 0, W, H)[1];
+    ctx.strokeStyle = '#070f1a';
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // Airport dots
+  AIRPORTS.forEach(ap => {
+    const [x, y] = project(ap.lat, ap.lon, W, H);
+    const isSel = ap.icao === selAp;
+
+    if (isSel) {
+      // Outer pulse ring
+      ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(58,175,239,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(58,175,239,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+    }
+
+    // Dot
+    ctx.beginPath(); ctx.arc(x, y, isSel ? 5 : 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = isSel ? '#3aafef' : '#155880';
+    ctx.fill();
+    if (isSel) {
+      // Glow
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(58,175,239,0.6)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    // ICAO label
+    ctx.font = `${isSel ? '700' : '500'} ${isSel ? 10 : 8}px monospace`;
+    ctx.fillStyle = isSel ? '#3aafef' : '#1a5070';
+    ctx.fillText(ap.icao, x + (isSel ? 8 : 6), y + 3);
+  });
+}
+
+// Map click handler
+function initMapClick() {
+  const canvas = document.getElementById('worldCanvas');
+  canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const W = rect.width, H = rect.height;
+    let best = null, bestD = 18;
+    AIRPORTS.forEach(ap => {
+      const [x, y] = project(ap.lat, ap.lon, W, H);
+      const d = Math.hypot(x - mx, y - my);
+      if (d < bestD) { bestD = d; best = ap; }
+    });
+    if (best) selectAp(best.icao);
+  });
+}
+
+// ─── Time of Day ──────────────────────────────────────
+function setTOD(v, btn) {
+  curTOD = v;
+  document.querySelectorAll('.timeBtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  updateSummary();
+}
+
+// ─── Start Type ───────────────────────────────────────
+function setStart(v) {
+  curStart = v;
+  document.getElementById('btnGnd').classList.toggle('on', v === 'ground');
+  document.getElementById('btnAir').classList.toggle('on', v === 'air');
+  document.getElementById('inAirOpts').classList.toggle('vis', v === 'air');
+}
+
+// ─── Quick Flights ────────────────────────────────────
+function buildQF() {
+  const list = document.getElementById('qfList');
+  QF.forEach(q => {
+    const b = document.createElement('button');
+    b.className = 'qfBtn';
+    b.innerHTML = q.name + `<span class="qfSub">${q.sub}</span>`;
+    b.onclick = () => {
+      selectAc(q.ac);
+      selectAp(q.ap);
+      launchArgs(q.args);
+    };
+    list.appendChild(b);
+  });
+}
+
+// ─── Bottom Summary ───────────────────────────────────
+function updateSummary() {
+  const acObj = AIRCRAFT.find(a => a.id === selAc);
+  const apObj = AIRPORTS.find(a => a.icao === selAp);
+  document.getElementById('fsAc').textContent = acObj ? acObj.name : '—';
+  document.getElementById('fsAp').textContent = selAp || '—';
+  document.getElementById('fsDet').textContent = selAp && curTOD ? `${curTOD.toUpperCase()} · ${curStart === 'air' ? 'IN AIR' : 'ON GROUND'}` : '';
+  document.getElementById('flyBtn').disabled = !(selAc && selAp);
+}
+
+// ─── Build fgfs args ──────────────────────────────────
+function buildArgs() {
+  const args = [FGFS];
+  if (selAc)  args.push(`--aircraft=${selAc}`);
+  if (selAp)  args.push(`--airport=${selAp}`);
+  const rw = document.getElementById('rwSel').value;
+  if (rw)     args.push(`--runway=${rw}`);
+  if (curTOD !== 'real') args.push(`--timeofday=${curTOD}`);
+  if (curStart === 'air') {
+    args.push('--in-air');
+    const alt = document.getElementById('altIn').value; if (alt) args.push(`--altitude=${alt}`);
+    const vc  = document.getElementById('vcIn').value;  if (vc)  args.push(`--vc=${vc}`);
+    const hdg = document.getElementById('hdgIn').value; if (hdg) args.push(`--heading=${hdg}`);
+  }
+  return args.slice(1); // strip FGFS binary — server prepends it
+}
+
+// ─── Launch ───────────────────────────────────────────
+async function launch() {
+  if (!selAc || !selAp) { toast('Select aircraft and airport first.', 'warn'); return; }
+  const args = buildArgs();
+  await launchArgs(args);
+}
+
+async function launchArgs(args) {
+  try {
+    const r = await fetch(LAUNCHER + '/launch', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fgfs: FGFS, args }),
+      signal: AbortSignal.timeout(5000)
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok) {
+      toast('FlightGear launched! 🚀', 'ok');
+    } else {
+      toast(`Launch failed: ${j.error || r.status}`, 'err');
+      if (!serverOnline) fallbackLaunch(args);
+    }
+  } catch (e) {
+    toast(`Server offline — copied fgfs command.`, 'warn');
+    fallbackLaunch(args);
+  }
+}
+
+function fallbackLaunch(args) {
+  const cmd = [FGFS, ...args].join(' ');
+  navigator.clipboard.writeText(cmd).catch(() => {});
+  toast('Copied to clipboard — paste in terminal.', 'warn', 5000);
+}
+
+async function killFG() {
+  try {
+    await fetch(LAUNCHER + '/kill', { method: 'POST', signal: AbortSignal.timeout(3000) });
+    toast('FlightGear terminated.', 'ok');
+  } catch {
+    toast('Kill failed — server offline?', 'err');
+  }
+}
+
+// ─── View Switching ───────────────────────────────────
+function showView(id, btn) {
+  document.getElementById('appBody').style.display   = id === 'fly' ? 'flex'  : 'none';
+  document.getElementById('ffbPanel').classList.toggle('vis', id === 'ffb');
+  document.getElementById('dossierPanel').classList.toggle('vis', id === 'dossier');
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (id === 'fly') { drawMap(); }
+}
+
+// ─── FFB Tester ───────────────────────────────────────
+let ffbMode = 'spring', ffbMag = 50, ffbDur = 1000, ffbFreq = 10;
+let dirX = 0, dirY = 0;
+
+function setMode(m) {
+  ffbMode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().replace(' ','') === m));
+  updateFFBCmd();
+  drawWave();
+}
+function ffbParam(p, el) {
+  const v = +el.value;
+  if (p === 'mag')  { ffbMag = v;  document.getElementById('magVal').textContent = v; }
+  if (p === 'dur')  { ffbDur = v;  document.getElementById('durVal').textContent = v; }
+  if (p === 'freq') { ffbFreq = v; document.getElementById('freqVal').textContent = v; }
+  updateFFBCmd(); drawWave();
+}
+function updateFFBCmd() {
+  const cmds = {
+    sine: `python3 -c "
+import evdev, math; from evdev import ecodes, ff
+d = evdev.InputDevice('/dev/input/event0')
+e = ff.Effect(ecodes.FF_PERIODIC,-1,${ffbMag*655},ff.Trigger(0,0),ff.Replay(${ffbDur},0),
+    ff.EffectType(ff_periodic_effect=ff.Periodic(ecodes.FF_SINE,${ffbMag*655},0,${Math.round(1000/ffbFreq)},0,0)))
+d.upload_effect(e)
+print('Effect uploaded')"`,
+    rumble: `python3 -c "
+import evdev; from evdev import ecodes, ff
+d = evdev.InputDevice('/dev/input/event0')
+r = ff.Rumble(strong_magnitude=${Math.round(ffbMag*655)}, weak_magnitude=${Math.round(ffbMag*655)})
+e = ff.Effect(ecodes.FF_RUMBLE,-1,0,ff.Trigger(0,0),ff.Replay(${ffbDur},0),ff.EffectType(ff_rumble_effect=r))
+eid = d.upload_effect(e); d.write(ecodes.EV_FF,eid,1)
+import time; time.sleep(${ffbDur/1000}); d.erase_effect(eid)"`,
+    spring: `python3 -c "
+import evdev; from evdev import ecodes, ff
+d = evdev.InputDevice('/dev/input/event0')
+e = ff.Effect(ecodes.FF_SPRING,-1,${ffbMag*655},ff.Trigger(0,0),ff.Replay(${ffbDur},0),
+    ff.EffectType(ff_condition_effect=[ff.Condition(${ffbMag*655},0,${ffbMag*655},0,0,0)]*2))
+eid = d.upload_effect(e); d.write(ecodes.EV_FF,eid,1)
+import time; time.sleep(${ffbDur/1000}); d.erase_effect(eid)"`,
+  };
+  document.getElementById('ffbCmd').textContent = cmds[ffbMode] || `# Effect: ${ffbMode} | Mag: ${ffbMag}% | Dur: ${ffbDur}ms | Freq: ${ffbFreq}Hz`;
+}
 function drawWave() {
-  const cv = document.getElementById('waveCanvas');
-  if (!cv) return;
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#1f6feb';
-  ctx.lineWidth = 2;
-  const str = parseFloat(document.getElementById('sStrength').value) / 100;
-  const per = parseFloat(document.getElementById('sPeriod').value);
+  const canvas = document.getElementById('waveCanvas');
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#04080e'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = '#3aafef'; ctx.lineWidth = 1.5;
   ctx.beginPath();
+  const amp = (ffbMag/100) * (H/2 - 4);
+  const cy = H/2;
   for (let x = 0; x < W; x++) {
-    const t = x / W;
+    const t = (x / W) * ffbFreq * Math.PI * 2;
     let y;
     switch(ffbMode) {
-      case 'constant': y = 0.5 - str*0.4; break;
-      case 'periodic': y = 0.5 - Math.sin(t * (W/per) * Math.PI * 2) * str * 0.4; break;
-      case 'ramp':     y = 0.5 - t * str * 0.4; break;
-      case 'rumble':   y = 0.5 - (Math.random() * 2 - 1) * str * 0.3; break;
-      case 'spring':   y = 0.5 - Math.cos(t * Math.PI) * str * 0.4; break;
-      case 'damper':   y = 0.5 - str * 0.4 * Math.exp(-t*3); break;
-      default:         y = 0.5;
+      case 'sine':     y = cy - Math.sin(t) * amp; break;
+      case 'triangle': { const p = (t / (2*Math.PI)) % 1; y = cy - (p < 0.5 ? (p*4-1)*amp : (3-p*4)*amp); break; }
+      case 'square':   y = cy - (Math.sin(t) > 0 ? amp : -amp); break;
+      case 'sawup':    y = cy - ((t/(2*Math.PI))%1 * 2 - 1) * amp; break;
+      case 'sawdown':  y = cy - (1 - (t/(2*Math.PI))%1 * 2) * amp; break;
+      case 'spring':   y = cy - Math.sign(Math.sin(t)) * amp * 0.7; break;
+      case 'damper':   y = cy - Math.cos(t) * amp * Math.exp(-x/W*2); break;
+      case 'rumble':   y = cy - (Math.random()*2-1) * amp; break;
+      default:         y = cy;
     }
-    if (x === 0) ctx.moveTo(x, y*H); else ctx.lineTo(x, y*H);
+    x === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
   }
   ctx.stroke();
+  ctx.strokeStyle = '#0f2538'; ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+}
+function applyFFBPreset(p) {
+  const presets = {
+    turbulence: {mode:'rumble', mag:40, dur:3000, freq:15},
+    stall:      {mode:'rumble', mag:70, dur:2000, freq:8},
+    touchdown:  {mode:'rumble', mag:80, dur:400,  freq:25},
+    torque:     {mode:'spring', mag:35, dur:5000, freq:5},
+    spring:     {mode:'spring', mag:50, dur:5000, freq:1},
+    runway:     {mode:'sine',   mag:20, dur:10000,freq:30},
+  };
+  const s = presets[p]; if (!s) return;
+  ffbMode = s.mode; ffbMag = s.mag; ffbDur = s.dur; ffbFreq = s.freq;
+  document.querySelector(`[onclick="setMode('${s.mode}')"]`)?.click();
+  updateFFBCmd(); drawWave();
+}
+function initDirWheel() {
+  const wheel = document.getElementById('dirWheel');
+  const dot   = document.getElementById('dirDot');
+  function update(e) {
+    const r = wheel.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    const dx = (e.clientX - cx) / (r.width/2);
+    const dy = (e.clientY - cy) / (r.height/2);
+    const len = Math.min(1, Math.hypot(dx,dy));
+    const ang = Math.atan2(dy,dx);
+    dirX = Math.round(Math.cos(ang)*len*100);
+    dirY = Math.round(Math.sin(ang)*len*100);
+    dot.style.left = (50 + Math.cos(ang)*len*36) + '%';
+    dot.style.top  = (50 + Math.sin(ang)*len*36) + '%';
+    updateFFBCmd();
+  }
+  let down = false;
+  wheel.addEventListener('mousedown', e => { down = true; update(e); });
+  document.addEventListener('mousemove', e => { if (down) update(e); });
+  document.addEventListener('mouseup',   () => { down = false; });
 }
 
-/* ─── Utilities ──────────────────────────────────────────────────────────── */
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) {
-  return s.replace(/\\/g,'\\\\').replace(/"/g,'\\"');
-}
+// ─── Map Resize ───────────────────────────────────────
+const ro = new ResizeObserver(() => drawMap());
+ro.observe(document.getElementById('panelMap'));
 
-let toastTimer;
-function toast(msg, type) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show ' + (type||'');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
-}
-
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(
-    () => toast('Copied to clipboard', 'ok'),
-    () => {
-      const ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy'); ta.remove();
-      toast('Copied', 'ok');
-    }
-  );
-}
-
-/* ─── Init ───────────────────────────────────────────────────────────────── */
-window.addEventListener('DOMContentLoaded', () => {
-  // Restore tab
-  try {
-    const t = localStorage.getItem('fg_tab');
-    if (t) {
-      const btn = document.querySelector(`.tab[onclick*="'${t}'"]`);
-      if (btn) showTab(t, btn);
-    }
-  } catch(_) {}
-
-  renderCards();
-  updateCustomCmd();
-  updateDirDot();
-  genCode();
-  drawWave();
-
-  // Server status check (polling every 5s)
-  checkServer(false);
-  setInterval(() => checkServer(false), 5000);
-});
+// ─── Init ─────────────────────────────────────────────
+buildCats();
+filterAc();
+buildQF();
+drawMap();
+initMapClick();
+initDirWheel();
+drawWave();
+updateSummary();
 </script>
 </body>
 </html>
