@@ -119,8 +119,9 @@ html, body {
 .acIcon {
   width: 34px; height: 34px; border-radius: 3px; background: var(--surf);
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
+  font-size: 16px; flex-shrink: 0; overflow: hidden;
 }
+.acImg { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; display: block; }
 .acInfo { flex: 1; min-width: 0; }
 .acName { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.2; }
 .acCat  { font-size: 8px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
@@ -514,6 +515,42 @@ html, body {
       </div>
     </div>
 
+    <!-- ─── Performance ─────────────────────────────── -->
+    <div class="cs" id="perfSection">
+      <div class="cl">Performance</div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Render Quality</div>
+        <div style="display:flex;gap:3px;">
+          <button class="togBtn" id="pqLow"   onclick="setPerfQ(1,this)">Low</button>
+          <button class="togBtn" id="pqMed"   onclick="setPerfQ(2,this)">Med</button>
+          <button class="togBtn on" id="pqHigh"  onclick="setPerfQ(3,this)">High</button>
+          <button class="togBtn" id="pqUltra" onclick="setPerfQ(5,this)">Ultra</button>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:9px;color:var(--dim);margin-bottom:3px;">FPS Limit <span style="color:var(--text);font-weight:600;" id="fpsLbl">60</span></div>
+        <input type="range" id="fpsSlider" min="20" max="120" step="5" value="60"
+               style="width:100%;accent-color:var(--accent);"
+               oninput="document.getElementById('fpsLbl').textContent=this.value">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;">
+        <button class="togBtn"    id="togAI"      onclick="this.classList.toggle('on')">AI Traffic</button>
+        <button class="togBtn on" id="togRandObj"  onclick="this.classList.toggle('on')">Rand Objects</button>
+        <button class="togBtn on" id="togVeg"      onclick="this.classList.toggle('on')">Vegetation</button>
+        <button class="togBtn on" id="tog3dCloud"  onclick="this.classList.toggle('on')">3D Clouds</button>
+        <button class="togBtn on" id="togSound"    onclick="this.classList.toggle('on')">Sound</button>
+        <button class="togBtn on" id="togSpec"     onclick="this.classList.toggle('on')">Specular</button>
+      </div>
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <button class="togBtn on" id="togFull" onclick="this.classList.toggle('on')" style="flex:1;">Fullscreen</button>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--dim);margin-bottom:3px;">Window Size (if windowed)</div>
+        <input class="ci" id="geoIn" type="text" placeholder="1920x1080" autocomplete="off"
+               style="font-size:9px;font-family:monospace;">
+      </div>
+    </div>
+
     <div class="cs">
       <div class="cl">Quick Flights</div>
       <div id="qfList"></div>
@@ -672,6 +709,29 @@ sudo python3 fftest2026.py --list
 // ─── Config ───────────────────────────────────────────
 const LAUNCHER = 'http://localhost:8765';
 const FGFS    = '/usr/local/bin/fgfs';
+
+// ─── Aircraft Images ──────────────────────────────────
+const AIRCRAFT_IMG = {
+  'PA28-161':  'https://commons.wikimedia.org/wiki/Special:FilePath/Piper_PA-28-161_Warrior_II.jpg?width=120',
+  'PA28-181':  'https://commons.wikimedia.org/wiki/Special:FilePath/Piper_PA-28-181_Archer_III.jpg?width=120',
+  'PA28R-200': 'https://commons.wikimedia.org/wiki/Special:FilePath/Piper_PA-28R-201_Arrow_III.jpg?width=120',
+  'PA34-200T': 'https://commons.wikimedia.org/wiki/Special:FilePath/Piper_PA-34-200T_Seneca_II.jpg?width=120',
+  'PA44-180':  'https://commons.wikimedia.org/wiki/Special:FilePath/Piper_PA-44-180_Seminole.jpg?width=120',
+  'c182t':     'https://commons.wikimedia.org/wiki/Special:FilePath/Cessna_182T_Skylane.jpg?width=120',
+  'c172r':     'https://commons.wikimedia.org/wiki/Special:FilePath/Cessna_172_Skyhawk_(D-EITB).jpg?width=120',
+  'c172p':     'https://commons.wikimedia.org/wiki/Special:FilePath/Cessna_172P_Skyhawk.jpg?width=120',
+  'c182s':     'https://commons.wikimedia.org/wiki/Special:FilePath/Cessna_182S_Skylane.jpg?width=120',
+  'c150':      'https://commons.wikimedia.org/wiki/Special:FilePath/Cessna_150F_(N8056S).jpg?width=120',
+  'c172':      'https://commons.wikimedia.org/wiki/Special:FilePath/Cessna.172.6917.jpg?width=120',
+  'p51d':      'https://commons.wikimedia.org/wiki/Special:FilePath/P-51_Mustang_edit1.jpg?width=120',
+  'spitfire':  'https://commons.wikimedia.org/wiki/Special:FilePath/Supermarine-spitfire_mk1_R6830_FAF.jpg?width=120',
+  '737-300':   'https://commons.wikimedia.org/wiki/Special:FilePath/Boeing_737-300_G-BVZA_British_Airways.jpg?width=120',
+  'b747':      'https://commons.wikimedia.org/wiki/Special:FilePath/747_swiss_hb-igf_arp.jpg?width=120',
+  'concorde':  'https://commons.wikimedia.org/wiki/Special:FilePath/Concorde_777.jpg?width=120',
+  'f16':       'https://commons.wikimedia.org/wiki/Special:FilePath/F-16_Fighting_Falcon_USAF.jpg?width=120',
+  'f15':       'https://commons.wikimedia.org/wiki/Special:FilePath/F-15_Eagle_USAF.jpg?width=120',
+  'A320':      'https://commons.wikimedia.org/wiki/Special:FilePath/A320_Iberia_EC-ICR.jpg?width=120',
+};
 
 // ─── Aircraft Database ────────────────────────────────
 // MGA = Middle Georgia State University fleet (Piper Brand Ambassador)
@@ -920,7 +980,11 @@ function filterAc() {
     const d = document.createElement('div');
     d.className = 'acCard' + (selAc === a.id ? ' sel' : '');
     const sub = a.note || a.cat;
-    d.innerHTML = `<div class="acIcon">${a.icon}</div><div class="acInfo"><div class="acName">${a.name}</div><div class="acCat c-${a.cat}">${sub}</div></div>`;
+    const imgUrl = AIRCRAFT_IMG[a.id];
+    const iconHtml = imgUrl
+      ? `<img src="${imgUrl}" loading="lazy" class="acImg" alt="" data-fb="${a.icon}" onerror="this.style.display='none';this.parentElement.textContent=this.dataset.fb">`
+      : a.icon;
+    d.innerHTML = `<div class="acIcon">${iconHtml}</div><div class="acInfo"><div class="acName">${a.name}</div><div class="acCat c-${a.cat}">${sub}</div></div>`;
     d.onclick = () => selectAc(a.id);
     list.appendChild(d);
   });
@@ -982,13 +1046,15 @@ function project(lat, lon, W, H) {
 
 function drawMap() {
   const canvas = document.getElementById('worldCanvas');
-  const rect   = canvas.getBoundingClientRect();
+  const parent = canvas.parentElement;
+  const W = parent.clientWidth  || canvas.offsetWidth  || 600;
+  const H = parent.clientHeight || canvas.offsetHeight || 400;
+  if (W <= 0 || H <= 0) { requestAnimationFrame(drawMap); return; }
   const dpr    = window.devicePixelRatio || 1;
-  canvas.width  = rect.width  * dpr;
-  canvas.height = rect.height * dpr;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-  const W = rect.width, H = rect.height;
 
   // Background
   ctx.fillStyle = '#04070d';
@@ -1137,6 +1203,14 @@ function setSeason(v) {
   document.getElementById('btnWint').classList.toggle('on', v === 'winter');
 }
 
+// ─── Performance Controls ─────────────────────────────
+let curPerfQ = 3;
+function setPerfQ(n, btn) {
+  curPerfQ = n;
+  ['pqLow','pqMed','pqHigh','pqUltra'].forEach(id => document.getElementById(id).classList.remove('on'));
+  btn.classList.add('on');
+}
+
 // ─── Build fgfs args ──────────────────────────────────
 function buildArgs() {
   const args = [FGFS];
@@ -1174,6 +1248,22 @@ function buildArgs() {
   args.push(`--season=${curSeason}`);
   const mp = document.getElementById('mpIn').value.trim();
   if (mp) args.push(`--multiplay=in,10,0.0.0.0,${mp},5000`);
+  // ── Performance ───────────────────────────────────
+  args.push(`--prop:/sim/rendering/quality-level=${curPerfQ}`);
+  const fps = document.getElementById('fpsSlider').value;
+  if (fps && fps != 60) args.push(`--prop:/sim/frame-rate-throttle-hz=${fps}`);
+  if (!document.getElementById('togAI').classList.contains('on'))      args.push('--disable-ai-traffic', '--disable-ai-models');
+  if (!document.getElementById('togRandObj').classList.contains('on')) args.push('--disable-random-objects');
+  if (!document.getElementById('togVeg').classList.contains('on'))     args.push('--disable-random-vegetation');
+  if (!document.getElementById('tog3dCloud').classList.contains('on')) args.push('--disable-clouds3d');
+  if (!document.getElementById('togSound').classList.contains('on'))   args.push('--disable-sound');
+  if (!document.getElementById('togSpec').classList.contains('on'))    args.push('--disable-specular-highlight');
+  if (document.getElementById('togFull').classList.contains('on')) {
+    args.push('--fullscreen');
+  } else {
+    const geo = document.getElementById('geoIn').value.trim();
+    if (geo) args.push(`--geometry=${geo}`);
+  }
   return args.slice(1); // strip FGFS binary — server prepends it
 }
 
