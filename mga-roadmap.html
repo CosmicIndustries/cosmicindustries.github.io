@@ -1,0 +1,1420 @@
+<title>MGA Flight Training Roadmap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --bg:#EEF2F7; --surface:#FFFFFF; --surface-2:#F4F7FB; --border:#D1DCE9;
+  --fg:#111827; --fg-2:#4B5563; --fg-3:#9CA3AF;
+  --accent:#1B5FD8; --accent-2:#DBEAFE;
+  --green:#15803D; --green-bg:#DCFCE7;
+  --amber:#B45309; --amber-bg:#FEF3C7;
+  --red:#B91C1C; --red-bg:#FEE2E2;
+  --purple:#7C3AED; --purple-bg:#EDE9FE;
+  --sky:#0369A1; --sky-bg:#E0F2FE;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#07101E; --surface:#0F1C2E; --surface-2:#162234; --border:#1E3150;
+    --fg:#E2E8F0; --fg-2:#94A3B8; --fg-3:#475569;
+    --accent:#60A5FA; --accent-2:#1E3A6E;
+    --green:#4ADE80; --green-bg:#14532D;
+    --amber:#FCD34D; --amber-bg:#451A03;
+    --red:#F87171; --red-bg:#450A0A;
+    --purple:#C4B5FD; --purple-bg:#2E1065;
+    --sky:#38BDF8; --sky-bg:#0C4A6E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#07101E; --surface:#0F1C2E; --surface-2:#162234; --border:#1E3150;
+  --fg:#E2E8F0; --fg-2:#94A3B8; --fg-3:#475569;
+  --accent:#60A5FA; --accent-2:#1E3A6E;
+  --green:#4ADE80; --green-bg:#14532D;
+  --amber:#FCD34D; --amber-bg:#451A03;
+  --red:#F87171; --red-bg:#450A0A;
+  --purple:#C4B5FD; --purple-bg:#2E1065;
+  --sky:#38BDF8; --sky-bg:#0C4A6E;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: 0 2.5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  min-height: 100vh;
+}
+
+/* ── STICKY HEADER ─────────────────────────────── */
+.page-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.85rem max(16px, env(safe-area-inset-left, 0px));
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.header-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+.header-sub { font-size: 0.75rem; opacity: 0.8; margin-top: 1px; }
+.header-total { text-align: right; }
+.header-total-num {
+  font-size: 1.35rem; font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+}
+.header-total-label { font-size: 0.7rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ── LAYOUT ────────────────────────────────────── */
+.main { max-width: 960px; margin: 0 auto; padding-top: 1.75rem; }
+section { margin-bottom: 2.25rem; }
+.section-title {
+  font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--fg-3);
+  margin-bottom: 0.85rem;
+}
+
+/* ── CAREER PATH ───────────────────────────────── */
+.career-path {
+  display: flex; flex-wrap: wrap; gap: 0; align-items: center;
+}
+.cp-pill {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--fg);
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+}
+.cp-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.cp-arrow {
+  font-size: 0.85rem; color: var(--fg-3);
+  padding: 0 0.25rem;
+}
+.cp-pill.drone { background: var(--purple-bg); border-color: var(--purple); color: var(--purple); }
+
+/* ── STAT CARDS ────────────────────────────────── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.875rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+.stat-label { font-size: 0.7rem; font-weight: 600; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.35rem; }
+.stat-value { font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--fg); }
+.stat-note { font-size: 0.72rem; color: var(--fg-2); margin-top: 0.25rem; }
+
+/* ── LEG CARDS ─────────────────────────────────── */
+.legs-grid { display: flex; flex-direction: column; gap: 1rem; }
+.leg-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.leg-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 0.75rem; flex-wrap: wrap;
+  padding: 1rem 1.15rem 0.75rem;
+}
+.leg-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-2); color: var(--accent);
+  font-size: 0.78rem; font-weight: 800;
+  flex-shrink: 0; margin-top: 2px;
+}
+.leg-num.drone { background: var(--purple-bg); color: var(--purple); }
+.leg-title-block { flex: 1; min-width: 0; }
+.leg-title { font-size: 1rem; font-weight: 700; }
+.leg-course { font-size: 0.75rem; color: var(--fg-3); margin-top: 2px; }
+.leg-cost {
+  text-align: right; flex-shrink: 0;
+}
+.leg-cost-main { font-size: 1.15rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--fg); }
+.leg-cost-sub { font-size: 0.7rem; color: var(--fg-3); }
+
+/* progress bar */
+.leg-progress-wrap { padding: 0 1.15rem 0.5rem; }
+.leg-progress-label {
+  display: flex; justify-content: space-between;
+  font-size: 0.68rem; color: var(--fg-3);
+  margin-bottom: 0.3rem;
+}
+.progress-bar { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.3s; }
+
+/* cost rows */
+.leg-rows { padding: 0 1.15rem; }
+.leg-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.38rem 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem; gap: 0.5rem;
+}
+.leg-row-label { color: var(--fg-2); min-width: 0; }
+.leg-row-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; white-space: nowrap; }
+
+/* scholarship chips */
+.leg-schips { padding: 0.75rem 1.15rem; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.schip {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  border-radius: 999px; padding: 0.28rem 0.65rem;
+  font-size: 0.7rem; font-weight: 600;
+  border: 1.5px solid;
+}
+.schip.green { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+.schip.amber { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+.schip.red   { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+.schip.purple { background: var(--purple-bg); border-color: var(--purple); color: var(--purple); }
+.schip.sky   { background: var(--sky-bg);   border-color: var(--sky);   color: var(--sky); }
+.schip.neutral { background: var(--surface-2); border-color: var(--border); color: var(--fg-2); }
+.schip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.schip.green  .schip-dot { background: var(--green); }
+.schip.amber  .schip-dot { background: var(--amber); }
+.schip.red    .schip-dot { background: var(--red); }
+.schip.purple .schip-dot { background: var(--purple); }
+.schip.sky    .schip-dot { background: var(--sky); }
+.schip.neutral .schip-dot { background: var(--fg-3); }
+
+/* ── ACADEMIC TABLE ────────────────────────────── */
+.tbl-wrap { overflow-x: auto; border-radius: 12px; border: 1.5px solid var(--border); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.82rem; }
+thead { background: var(--surface-2); }
+th { padding: 0.65rem 0.9rem; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-3); white-space: nowrap; }
+td { padding: 0.6rem 0.9rem; border-top: 1px solid var(--border); color: var(--fg-2); vertical-align: middle; }
+td.mono { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--fg); }
+tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface-2); }
+.badge-credit {
+  display: inline-block; background: var(--accent-2); color: var(--accent);
+  border-radius: 4px; padding: 0.15rem 0.45rem; font-size: 0.68rem; font-weight: 700;
+}
+
+/* ── FUNDING GRID ──────────────────────────────── */
+.fund-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.875rem;
+}
+.fund-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.95rem 1.05rem;
+}
+.fund-card.urgent { border-color: var(--red); }
+.fund-card.soon   { border-color: var(--amber); }
+.fund-card.open   { border-color: var(--green); }
+.fund-name { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.3rem; }
+.fund-amount {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+.fund-amount.green { color: var(--green); }
+.fund-amount.amber { color: var(--amber); }
+.fund-amount.purple { color: var(--purple); }
+.fund-amount.sky   { color: var(--sky); }
+.fund-deadline {
+  font-size: 0.72rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  border-radius: 999px; padding: 0.22rem 0.6rem;
+  margin-bottom: 0.45rem;
+}
+.fund-deadline.red    { background: var(--red-bg);   color: var(--red); }
+.fund-deadline.amber  { background: var(--amber-bg); color: var(--amber); }
+.fund-deadline.green  { background: var(--green-bg); color: var(--green); }
+.fund-deadline.neutral { background: var(--surface-2); color: var(--fg-3); }
+.fund-notes { font-size: 0.74rem; color: var(--fg-2); line-height: 1.45; }
+.fund-apply {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  margin-top: 0.6rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.7rem; font-weight: 700;
+  background: var(--accent-2); color: var(--accent);
+  text-decoration: none;
+  border: 1.5px solid var(--accent);
+  transition: background 0.15s, color 0.15s;
+}
+.fund-apply:hover { background: var(--accent); color: #fff; }
+
+/* ── PAYOFF STACK ──────────────────────────────── */
+.payoff-wrap { overflow-x: auto; border-radius: 12px; border: 1.5px solid var(--border); }
+.payoff-tbl { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.82rem; }
+.payoff-tbl th { padding: 0.6rem 1rem; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-3); background: var(--surface-2); white-space: nowrap; }
+.payoff-tbl td { padding: 0.55rem 1rem; border-top: 1px solid var(--border); vertical-align: middle; }
+.payoff-tbl td.src { color: var(--fg-2); }
+.payoff-tbl td.ded { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--green); text-align: right; white-space: nowrap; }
+.payoff-tbl td.bal { font-family: 'JetBrains Mono', monospace; font-weight: 700; text-align: right; white-space: nowrap; }
+.payoff-tbl tr.row-start td { background: var(--surface-2); font-weight: 700; }
+.payoff-tbl tr.row-gap td { background: var(--red-bg); }
+.payoff-tbl tr.row-zero td { background: var(--green-bg); font-weight: 800; }
+.pbadge {
+  display: inline-block; border-radius: 4px; padding: 0.1rem 0.38rem;
+  font-size: 0.64rem; font-weight: 700; margin-left: 0.35rem; vertical-align: middle;
+}
+.pbadge.urgent { background: var(--red-bg); color: var(--red); }
+.pbadge.soon { background: var(--amber-bg); color: var(--amber); }
+.pbadge.ok { background: var(--green-bg); color: var(--green); }
+
+/* ── ACTION ITEMS ──────────────────────────────── */
+.action-list { display: flex; flex-direction: column; gap: 0.65rem; }
+.action-item {
+  display: flex; gap: 0.85rem; align-items: flex-start;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+.action-item.urgent { border-color: var(--red); }
+.action-item.soon   { border-color: var(--amber); }
+.action-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  font-size: 0.72rem; font-weight: 800;
+  flex-shrink: 0; margin-top: 1px;
+}
+.action-item.urgent .action-num { background: var(--red-bg); color: var(--red); }
+.action-item.soon   .action-num { background: var(--amber-bg); color: var(--amber); }
+.action-item:not(.urgent):not(.soon) .action-num { background: var(--accent-2); color: var(--accent); }
+.action-body { flex: 1; min-width: 0; }
+.action-title { font-size: 0.88rem; font-weight: 700; }
+.action-detail { font-size: 0.76rem; color: var(--fg-2); margin-top: 0.2rem; line-height: 1.45; }
+
+/* ── PROFILE BUILDER ──────────────────────────── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.profile-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.profile-card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+.pf-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--fg-2);
+}
+.pf-input, .pf-textarea {
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.8rem;
+  color: var(--fg);
+  font-family: inherit;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.pf-input:focus, .pf-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.pf-textarea { resize: vertical; min-height: 4rem; }
+.pf-essay { min-height: 8rem; }
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.pf-btn {
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+.pf-btn:hover { opacity: 0.85; }
+.pf-save { background: var(--green); color: #fff; }
+.pf-copy { background: var(--accent-2); color: var(--accent); border: 1.5px solid var(--accent); }
+.pf-export { background: var(--accent); color: #fff; }
+.gist-sync-card { background: var(--surface); border: 1.5px solid var(--accent); border-radius: 14px; padding: 1.1rem 1rem; margin-top: 1rem; }
+.gist-sync-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); margin-bottom: 0.6rem; }
+.gist-sync-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 0.5rem; }
+.gist-sync-row label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.72rem; font-weight: 600; color: var(--fg-2); flex: 1; min-width: 200px; }
+.gist-sync-row input { background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 7px; padding: 0.35rem 0.55rem; font-size: 0.8rem; color: var(--fg); font-family: monospace; width: 100%; transition: border-color 0.15s; }
+.gist-sync-row input:focus { outline: none; border-color: var(--accent); }
+.gist-sync-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.gist-status { font-size: 0.78rem; min-height: 1.2em; margin-top: 0.4rem; }
+.gist-status--ok   { color: var(--green); }
+.gist-status--warn { color: #f59e0b; }
+.gist-status--info { color: var(--accent); }
+.gist-note { font-size: 0.7rem; color: var(--fg-2); margin-top: 0.5rem; line-height: 1.5; }
+
+/* ── AIRCRAFT RATES ───────────────────────────── */
+.rate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+.rate-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8rem 0.95rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.rate-icon { font-size: 1.4rem; flex-shrink: 0; }
+.rate-ac { font-size: 0.8rem; font-weight: 700; }
+.rate-hr { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; font-weight: 700; color: var(--accent); }
+.rate-note { font-size: 0.68rem; color: var(--fg-3); }
+
+/* ── UTIL ──────────────────────────────────────── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0; }
+@media (max-width: 480px) {
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .fund-grid { grid-template-columns: 1fr; }
+  .rate-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<!-- STICKY HEADER -->
+<header class="page-header">
+  <div>
+    <div class="header-title">✈ MGA Flight Training Roadmap</div>
+    <div class="header-sub">Middle Georgia State University · School of Aviation · Ag/Cargo Path + Part 107</div>
+  </div>
+  <div class="header-total">
+    <div class="header-total-num">$94,342</div>
+    <div class="header-total-label">estimated program total</div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- CAREER PATH -->
+  <section>
+    <div class="section-title">Career Path</div>
+    <div class="career-path">
+      <div class="cp-pill active">PPL</div>
+      <div class="cp-arrow">→</div>
+      <div class="cp-pill">Instrument</div>
+      <div class="cp-arrow">→</div>
+      <div class="cp-pill">Commercial</div>
+      <div class="cp-arrow">→</div>
+      <div class="cp-pill">CFI</div>
+      <div class="cp-arrow">→</div>
+      <div class="cp-pill">CFII</div>
+      <div class="cp-arrow">→</div>
+      <div class="cp-pill">Multi-Engine</div>
+      <div class="cp-arrow">→</div>
+      <div class="cp-pill drone">Part 107 🚁</div>
+      <div class="cp-arrow">→</div>
+      <div class="cp-pill" style="background:var(--green-bg);border-color:var(--green);color:var(--green);">Ag Aviation / Cargo</div>
+    </div>
+  </section>
+
+  <!-- STAT CARDS -->
+  <section>
+    <div class="section-title">At a Glance</div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Flight Training</div>
+        <div class="stat-value">$66,654</div>
+        <div class="stat-note">7 stages incl. Part 107</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Academic Costs</div>
+        <div class="stat-value">$27,688</div>
+        <div class="stat-note">Tuition $24,240 + fees $3,448</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Max Scholarships</div>
+        <div class="stat-value">$30k+</div>
+        <div class="stat-note">HOPE, AOPA, EAA, NAAA…</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Flight Hours Target</div>
+        <div class="stat-value">250 hr</div>
+        <div class="stat-note">CPL min; build to 1,500 via CFI</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLIGHT LEGS -->
+  <section>
+    <div class="section-title">Flight Training — Stage Breakdown</div>
+    <div class="legs-grid">
+
+      <!-- LEG 1: PPL -->
+      <div class="leg-card">
+        <div class="leg-header">
+          <div class="leg-num">1</div>
+          <div class="leg-title-block">
+            <div class="leg-title">Private Pilot Certificate</div>
+            <div class="leg-course">AVIA 3106 · 40 hr min dual + solo</div>
+          </div>
+          <div class="leg-cost">
+            <div class="leg-cost-main">$9,725</div>
+            <div class="leg-cost-sub">Running total: $9,725</div>
+          </div>
+        </div>
+        <div class="leg-progress-wrap">
+          <div class="leg-progress-label"><span>Program progress</span><span>10%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+        </div>
+        <div class="leg-rows">
+          <div class="leg-row"><span class="leg-row-label">Warrior III (30 hr @ $159)</span><span class="leg-row-val">$4,770</span></div>
+          <div class="leg-row"><span class="leg-row-label">Frasca Sim (10 hr @ $80)</span><span class="leg-row-val">$800</span></div>
+          <div class="leg-row"><span class="leg-row-label">CFI fee (40 hr @ $20)</span><span class="leg-row-val">$800</span></div>
+          <div class="leg-row"><span class="leg-row-label">Books / supplies / checkride</span><span class="leg-row-val">$1,155</span></div>
+          <div class="leg-row"><span class="leg-row-label">Med cert + FAA fees</span><span class="leg-row-val">~$200</span></div>
+          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$9,725</span></div>
+        </div>
+        <div class="leg-schips">
+          <div class="schip green"><div class="schip-dot"></div>EAA Scholarship — avg $6,800 · Dec 16</div>
+          <div class="schip green"><div class="schip-dot"></div>HOPE / Zell Miller — academic</div>
+          <div class="schip green"><div class="schip-dot"></div>FAFSA / Pell — academic</div>
+        </div>
+      </div>
+
+      <!-- LEG 2: Instrument -->
+      <div class="leg-card">
+        <div class="leg-header">
+          <div class="leg-num">2</div>
+          <div class="leg-title-block">
+            <div class="leg-title">Instrument Rating</div>
+            <div class="leg-course">AVIA 3018 · 50 hr instrument time</div>
+          </div>
+          <div class="leg-cost">
+            <div class="leg-cost-main">$9,188</div>
+            <div class="leg-cost-sub">Running total: $18,913</div>
+          </div>
+        </div>
+        <div class="leg-progress-wrap">
+          <div class="leg-progress-label"><span>Program progress</span><span>20%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+        </div>
+        <div class="leg-rows">
+          <div class="leg-row"><span class="leg-row-label">Archer (30 hr @ $164)</span><span class="leg-row-val">$4,920</span></div>
+          <div class="leg-row"><span class="leg-row-label">Frasca Sim (20 hr @ $80)</span><span class="leg-row-val">$1,600</span></div>
+          <div class="leg-row"><span class="leg-row-label">CFI-I fee (50 hr @ $20)</span><span class="leg-row-val">$1,000</span></div>
+          <div class="leg-row"><span class="leg-row-label">Foggles / nav charts / checkride</span><span class="leg-row-val">~$668</span></div>
+          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$9,188</span></div>
+        </div>
+        <div class="leg-schips">
+          <div class="schip amber"><div class="schip-dot"></div>Lyons Aviation Scholarship — $1,500</div>
+          <div class="schip amber"><div class="schip-dot"></div">EAA Scholarships — Dec 16 deadline</div>
+          <div class="schip amber"><div class="schip-dot"></div">AOPA Foundation — Dec 31 deadline</div>
+        </div>
+      </div>
+
+      <!-- LEG 3: Commercial -->
+      <div class="leg-card">
+        <div class="leg-header">
+          <div class="leg-num">3</div>
+          <div class="leg-title-block">
+            <div class="leg-title">Commercial Pilot Certificate</div>
+            <div class="leg-course">AVIA 3020 · 250 total hr required</div>
+          </div>
+          <div class="leg-cost">
+            <div class="leg-cost-main">$28,536</div>
+            <div class="leg-cost-sub">Running total: $47,449</div>
+          </div>
+        </div>
+        <div class="leg-progress-wrap">
+          <div class="leg-progress-label"><span>Program progress</span><span>50%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+        </div>
+        <div class="leg-rows">
+          <div class="leg-row"><span class="leg-row-label">Arrow (100 hr @ $179)</span><span class="leg-row-val">$17,900</span></div>
+          <div class="leg-row"><span class="leg-row-label">Archer cross-country (30 hr @ $164)</span><span class="leg-row-val">$4,920</span></div>
+          <div class="leg-row"><span class="leg-row-label">CFI fee (130 hr @ $20)</span><span class="leg-row-val">$2,600</span></div>
+          <div class="leg-row"><span class="leg-row-label">Checkride + supplies</span><span class="leg-row-val">~$1,116</span></div>
+          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$28,536</span></div>
+        </div>
+        <div class="leg-schips">
+          <div class="schip amber"><div class="schip-dot"></div>Lyons Aviation — $1,500</div>
+          <div class="schip amber"><div class="schip-dot"></div>EAA Alex Foss Memorial — strong match</div>
+          <div class="schip amber"><div class="schip-dot"></div>AOPA Foundation — 32 awards up to $14k</div>
+          <div class="schip sky"><div class="schip-dot"></div>NAAA — aerial application focus</div>
+        </div>
+      </div>
+
+      <!-- LEG 4: CFI -->
+      <div class="leg-card">
+        <div class="leg-header">
+          <div class="leg-num">4</div>
+          <div class="leg-title-block">
+            <div class="leg-title">Certified Flight Instructor (CFI)</div>
+            <div class="leg-course">AVIA 3024 · Hour-builder stage</div>
+          </div>
+          <div class="leg-cost">
+            <div class="leg-cost-main">$7,119</div>
+            <div class="leg-cost-sub">Running total: $54,568</div>
+          </div>
+        </div>
+        <div class="leg-progress-wrap">
+          <div class="leg-progress-label"><span>Program progress</span><span>58%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:58%"></div></div>
+        </div>
+        <div class="leg-rows">
+          <div class="leg-row"><span class="leg-row-label">Ground / sim prep (20 hr @ $80)</span><span class="leg-row-val">$1,600</span></div>
+          <div class="leg-row"><span class="leg-row-label">Dual instruction received (25 hr @ $179)</span><span class="leg-row-val">$4,475</span></div>
+          <div class="leg-row"><span class="leg-row-label">Checkride + supplies</span><span class="leg-row-val">~$1,044</span></div>
+          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$7,119</span></div>
+        </div>
+        <div class="leg-schips">
+          <div class="schip amber"><div class="schip-dot"></div>AOPA Foundation</div>
+          <div class="schip amber"><div class="schip-dot"></div>EAA Scholarships</div>
+          <div class="schip green"><div class="schip-dot"></div>Teach → earn while building hours</div>
+        </div>
+      </div>
+
+      <!-- LEG 5: CFII -->
+      <div class="leg-card">
+        <div class="leg-header">
+          <div class="leg-num">5</div>
+          <div class="leg-title-block">
+            <div class="leg-title">Instrument Flight Instructor (CFII)</div>
+            <div class="leg-course">AVIA 3026 · Adds instrument teaching</div>
+          </div>
+          <div class="leg-cost">
+            <div class="leg-cost-main">$5,081</div>
+            <div class="leg-cost-sub">Running total: $59,649</div>
+          </div>
+        </div>
+        <div class="leg-progress-wrap">
+          <div class="leg-progress-label"><span>Program progress</span><span>63%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:63%"></div></div>
+        </div>
+        <div class="leg-rows">
+          <div class="leg-row"><span class="leg-row-label">Sim time (15 hr @ $80)</span><span class="leg-row-val">$1,200</span></div>
+          <div class="leg-row"><span class="leg-row-label">Dual received (15 hr @ $164)</span><span class="leg-row-val">$2,460</span></div>
+          <div class="leg-row"><span class="leg-row-label">Checkride + materials</span><span class="leg-row-val">~$1,421</span></div>
+          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$5,081</span></div>
+        </div>
+        <div class="leg-schips">
+          <div class="schip neutral"><div class="schip-dot"></div>AOPA Foundation</div>
+          <div class="schip neutral"><div class="schip-dot"></div>EAA Scholarships</div>
+        </div>
+      </div>
+
+      <!-- LEG 6: Multi-Engine -->
+      <div class="leg-card">
+        <div class="leg-header">
+          <div class="leg-num">6</div>
+          <div class="leg-title-block">
+            <div class="leg-title">Multi-Engine Add-On Rating</div>
+            <div class="leg-course">AVIA 3022 · Piper Seminole</div>
+          </div>
+          <div class="leg-cost">
+            <div class="leg-cost-main">$6,678</div>
+            <div class="leg-cost-sub">Running total: $66,327</div>
+          </div>
+        </div>
+        <div class="leg-progress-wrap">
+          <div class="leg-progress-label"><span>Program progress</span><span>70%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+        </div>
+        <div class="leg-rows">
+          <div class="leg-row"><span class="leg-row-label">Piper Seminole (20 hr @ $298)</span><span class="leg-row-val">$5,960</span></div>
+          <div class="leg-row"><span class="leg-row-label">CFI fee (20 hr @ $20)</span><span class="leg-row-val">$400</span></div>
+          <div class="leg-row"><span class="leg-row-label">Checkride + supplies</span><span class="leg-row-val">~$318</span></div>
+          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$6,678</span></div>
+        </div>
+        <div class="leg-schips">
+          <div class="schip sky"><div class="schip-dot"></div>NAAA — aerial application / ag aviation</div>
+          <div class="schip neutral"><div class="schip-dot"></div>AOPA Foundation</div>
+        </div>
+      </div>
+
+      <!-- LEG 7: Part 107 -->
+      <div class="leg-card" style="border-color:var(--purple)">
+        <div class="leg-header">
+          <div class="leg-num drone">7</div>
+          <div class="leg-title-block">
+            <div class="leg-title">FAA Part 107 Commercial Drone</div>
+            <div class="leg-course">Remote Pilot Certificate · UAS operations</div>
+          </div>
+          <div class="leg-cost">
+            <div class="leg-cost-main">~$327</div>
+            <div class="leg-cost-sub">Running total: ~$66,654</div>
+          </div>
+        </div>
+        <div class="leg-progress-wrap">
+          <div class="leg-progress-label"><span>Program progress</span><span>71%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:71%;background:var(--purple)"></div></div>
+        </div>
+        <div class="leg-rows">
+          <div class="leg-row"><span class="leg-row-label">King Schools online course</span><span class="leg-row-val">~$150</span></div>
+          <div class="leg-row"><span class="leg-row-label">FAA Airman Knowledge Test fee</span><span class="leg-row-val">$175</span></div>
+          <div class="leg-row"><span class="leg-row-label">FAA IACRA registration</span><span class="leg-row-val">Free</span></div>
+          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$327</span></div>
+        </div>
+        <div class="leg-schips">
+          <div class="schip purple"><div class="schip-dot"></div>Lowest cost cert in the program</div>
+          <div class="schip purple"><div class="schip-dot"></div>Opens ag scouting + precision contracts</div>
+        </div>
+      </div>
+
+    </div><!-- /legs-grid -->
+  </section>
+
+  <!-- ACADEMIC COSTS -->
+  <section>
+    <div class="section-title">Academic Costs (MGA Tuition + Fees)</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Credits / Detail</th>
+            <th>Per Semester</th>
+            <th>Total Est.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>In-State Tuition</td>
+            <td><span class="badge-credit">~120 cr total</span></td>
+            <td class="mono">$3,030</td>
+            <td class="mono">$24,240</td>
+          </tr>
+          <tr>
+            <td>Mandatory Fees</td>
+            <td>Tech, activity, health, athletics</td>
+            <td class="mono">~$431</td>
+            <td class="mono">$3,448</td>
+          </tr>
+          <tr>
+            <td>Books / Supplies</td>
+            <td>Avg per semester est.</td>
+            <td class="mono">~$300</td>
+            <td class="mono">Varies</td>
+          </tr>
+          <tr>
+            <td>Room &amp; Board</td>
+            <td>On-campus option available</td>
+            <td class="mono">~$3,600</td>
+            <td class="mono">Separate</td>
+          </tr>
+          <tr>
+            <td>Academic Subtotal</td>
+            <td>Tuition + mandatory fees</td>
+            <td class="mono">—</td>
+            <td class="mono">$27,688</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:0.74rem;color:var(--fg-3);margin-top:0.55rem;">
+      HOPE Scholarship covers full in-state tuition (3.0+ GPA). Zell Miller covers tuition + fees (3.7+). Either eliminates the $24,240–$27,688 academic cost entirely.
+    </div>
+  </section>
+
+  <!-- FUNDING SOURCES -->
+  <section>
+    <div class="section-title">Funding Sources — Ranked by Urgency &amp; Payout Ease</div>
+    <div class="fund-grid">
+
+      <div class="fund-card soon">
+        <div class="fund-name">✈ EAA Aviation Foundation</div>
+        <div class="fund-amount amber">Avg $6,800 · 25+ named awards</div>
+        <div class="fund-deadline amber">⏰ Dec 16, 2026 — OPEN NOW</div>
+        <div class="fund-notes">No upper age limit (16+). One application covers all 25+ EAA named awards. University Part 141 eligible ("any accredited flight training or post-secondary program"). Free to apply. eaa.org/scholarships</div>
+        <a class="fund-apply" href="https://www.eaa.org/scholarships" target="_blank">↗ Apply at eaa.org</a>
+      </div>
+
+      <div class="fund-card soon">
+        <div class="fund-name">🔑 AOPA Foundation</div>
+        <div class="fund-amount amber">$250–$14,000 · Adults eligible</div>
+        <div class="fund-deadline amber">⏰ Dec 31, 2026 — OPEN NOW</div>
+        <div class="fund-notes">$69/yr AOPA membership required. One application covers 32 awards. Adults explicitly eligible — no upper age cap. Fall window closes Dec 31. Spring window opens Apr 1, 2027. aopa.org/scholarships</div>
+        <a class="fund-apply" href="https://www.aopa.org/scholarships" target="_blank">↗ Apply at aopa.org</a>
+      </div>
+
+      <div class="fund-card open">
+        <div class="fund-name">🎓 HOPE Scholarship (GA)</div>
+        <div class="fund-amount green">Full In-State Tuition</div>
+        <div class="fund-deadline green">Rolling — maintain 3.0 GPA</div>
+        <div class="fund-notes">Covers $24,240 tuition automatically for GA residents. Zell Miller (3.7+) adds fees. Apply via FAFSA + GSFC.</div>
+        <a class="fund-apply" href="https://www.gsfc.org" target="_blank">↗ Apply at gsfc.org</a>
+      </div>
+
+      <div class="fund-card open">
+        <div class="fund-name">💰 FAFSA / Federal Pell Grant</div>
+        <div class="fund-amount green">Up to $7,395/yr</div>
+        <div class="fund-deadline green">Annual — Oct FAFSA priority</div>
+        <div class="fund-notes">Free application. Pell Grant is gift aid (no repayment). File at studentaid.gov. Also unlocks subsidized loans.</div>
+        <a class="fund-apply" href="https://studentaid.gov" target="_blank">↗ Apply at studentaid.gov</a>
+      </div>
+
+      <div class="fund-card soon">
+        <div class="fund-name">✈ EAA Scholarships</div>
+        <div class="fund-amount amber">Avg $6,800 · 25+ awards</div>
+        <div class="fund-deadline amber">Dec 16, 2026</div>
+        <div class="fund-notes">Free application via eaa.org. Alex Foss Agricultural Aviation Memorial is a strong match. Multiple awards possible.</div>
+        <a class="fund-apply" href="https://www.eaa.org/scholarships" target="_blank">↗ Apply at eaa.org</a>
+      </div>
+
+      <div class="fund-card soon">
+        <div class="fund-name">🔑 AOPA Foundation</div>
+        <div class="fund-amount amber">$250–$14,000 · 32 awards</div>
+        <div class="fund-deadline amber">Dec 31, 2026</div>
+        <div class="fund-notes">$69/yr AOPA membership required. Apply for multiple awards in one application. aopa.org/scholarships</div>
+        <a class="fund-apply" href="https://www.aopa.org/scholarships" target="_blank">↗ Apply at aopa.org</a>
+      </div>
+
+      <div class="fund-card">
+        <div class="fund-name">🌾 NAAA Scholarships</div>
+        <div class="fund-amount sky">Varies · Ag-focused</div>
+        <div class="fund-deadline neutral">Annual cycle</div>
+        <div class="fund-notes">National Agricultural Aviation Association. Best match for commercial + multi-engine stages. ag-aviation.com</div>
+        <a class="fund-apply" href="https://www.ag-aviation.com" target="_blank">↗ Apply at ag-aviation.com</a>
+      </div>
+
+      <div class="fund-card">
+        <div class="fund-name">🎓 Lyons Aviation Scholarship</div>
+        <div class="fund-amount sky">$1,500</div>
+        <div class="fund-deadline neutral">Annual — check lyonsaviation.com</div>
+        <div class="fund-notes">Applicable at Instrument Rating and CPL stages. Relatively easy application process.</div>
+        <a class="fund-apply" href="https://www.lyonsaviation.com" target="_blank">↗ Apply at lyonsaviation.com</a>
+      </div>
+
+      <div class="fund-card soon">
+        <div class="fund-name">🦅 AAAE Native American</div>
+        <div class="fund-amount amber">$2,000</div>
+        <div class="fund-deadline amber">Opens Dec 2026 · apply early Jan 2027</div>
+        <div class="fund-notes">American Association of Airport Executives. Native American <em>origin</em> qualifies — no tribal enrollment required. Enrolled in aviation program at accredited 2- or 4-year school. 3.0+ GPA required. aaae.aero</div>
+        <a class="fund-apply" href="https://www.aaae.aero" target="_blank">↗ Apply at aaae.aero</a>
+      </div>
+
+      <div class="fund-card">
+        <div class="fund-name">✈ NBAA International Operators</div>
+        <div class="fund-amount amber">Up to $8,000</div>
+        <div class="fund-deadline neutral">Jan 2027 cycle (watch nbaa.org)</div>
+        <div class="fund-notes">For those entering business aviation or pursuing international ops careers. No stated age limit. One of the highest-value NBAA awards. nbaa.org/scholarships</div>
+        <a class="fund-apply" href="https://www.nbaa.org/scholarships" target="_blank">↗ Apply at nbaa.org</a>
+      </div>
+
+      <div class="fund-card">
+        <div class="fund-name">✊ OBAP Scholarships</div>
+        <div class="fund-amount sky">$1,000–$5,000 · partner-funded</div>
+        <div class="fund-deadline neutral">Apr 2027 &amp; Sep 2027 cycles</div>
+        <div class="fund-notes">Organization of Black Aerospace Professionals. Open to any race/ethnicity 17+. Part 141 eligible. Requires 3-month OBAP membership + volunteer hours before applying — join NOW to start the clock. obap.org</div>
+        <a class="fund-apply" href="https://www.obap.org" target="_blank">↗ Apply at obap.org</a>
+      </div>
+
+      <div class="fund-card">
+        <div class="fund-name">🌲 Cherokee Nation Foundation</div>
+        <div class="fund-amount purple">Varies · $500K+ awarded/yr</div>
+        <div class="fund-deadline neutral">Jan 31, 2027 deadline</div>
+        <div class="fund-notes">Requires Cherokee Nation citizenship (enrolled member). Min 2.0 GPA, full-time student. If you can establish CN citizenship, this stacks with all other awards. cherokee.org</div>
+        <a class="fund-apply" href="https://www.cherokee.org" target="_blank">↗ Apply at cherokee.org</a>
+      </div>
+
+      <div class="fund-card">
+        <div class="fund-name">🏛 BIA Higher Education Grant</div>
+        <div class="fund-amount purple">$2,500–$5,000/yr</div>
+        <div class="fund-deadline neutral">Apply via MGA by June 1</div>
+        <div class="fund-notes">Bureau of Indian Affairs. Requires enrollment in a federally recognized tribe. Supplemental aid for Native American students at accredited universities. Apply through MGA's financial aid office. bie.edu</div>
+        <a class="fund-apply" href="https://www.bie.edu" target="_blank">↗ Apply at bie.edu</a>
+      </div>
+
+      <div class="fund-card">
+        <div class="fund-name">📚 American Indian College Fund</div>
+        <div class="fund-amount purple">Varies</div>
+        <div class="fund-deadline neutral">Annual application cycle</div>
+        <div class="fund-notes">Requires tribal enrollment. Multiple award levels. collegefund.org for current amounts and deadlines.</div>
+        <a class="fund-apply" href="https://collegefund.org" target="_blank">↗ Apply at collegefund.org</a>
+      </div>
+
+      <div class="fund-card urgent">
+        <div class="fund-name">♿ Georgia DVR (Vocational Rehab)</div>
+        <div class="fund-amount green">$10K–$30K+ gap coverage</div>
+        <div class="fund-deadline red">⚠ Apply NOW — 60–90 day approval</div>
+        <div class="fund-notes">Georgia Vocational Services. ADHD qualifies as a disability. MGA's aviation degree requires flight training — the full program is eligible. Can fund tuition, fees, training costs, books, and supplies. Apply at gvs.georgia.gov or call 1-866-489-0001. This is your #1 gap-closer — start immediately.</div>
+        <a class="fund-apply" href="https://gvs.georgia.gov" target="_blank">↗ Apply at gvs.georgia.gov</a>
+      </div>
+      <div class="fund-card soon">
+        <div class="fund-name">💼 WIOA / WorkSource Georgia</div>
+        <div class="fund-amount amber">Up to full training cost</div>
+        <div class="fund-deadline amber">⏰ Apply now at local CareerCenter</div>
+        <div class="fund-notes">Workforce Innovation &amp; Opportunity Act. Commercial pilot = federally designated in-demand occupation. WorkSource Middle Flint (Bleckley Co.) can fund MGA training. Apply at Macon or Cochran area CareerCenter — bring your MGA program info. Stacks with DVR. worksourcegeorgia.com</div>
+        <a class="fund-apply" href="https://www.worksourcegeorgia.com" target="_blank">↗ Apply at worksourcegeorgia.com</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">🦽 Able Flight Scholarship</div>
+        <div class="fund-amount sky">Flight training + stipend · SIU</div>
+        <div class="fund-deadline neutral">Annual cycle · ableflight.siu.edu</div>
+        <div class="fund-notes">Scholarship for people with disabilities pursuing flight training. No stated age limit. Covers training, ground school, testing fees, and travel. Confirm ADHD eligibility directly: 618-453-8898 or victoria.mathieu@siu.edu. ableflight.siu.edu</div>
+        <a class="fund-apply" href="https://ableflight.siu.edu" target="_blank">↗ Apply at ableflight.siu.edu</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FUNDING PAYOFF STACK -->
+  <section>
+    <div class="section-title">💰 Funding Payoff Stack — $94,342 → $0</div>
+    <div class="payoff-wrap">
+      <table class="payoff-tbl">
+        <thead>
+          <tr>
+            <th>Funding Source</th>
+            <th style="text-align:right">Amount Applied</th>
+            <th style="text-align:right">Remaining Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-start">
+            <td class="src">📋 MGA Program Total (flight + academic)</td>
+            <td class="ded" style="color:var(--fg-3)">—</td>
+            <td class="bal" style="color:var(--red)">$94,342</td>
+          </tr>
+          <tr>
+            <td class="src">🎓 HOPE / Zell Miller (GA tuition grant) <span class="pbadge ok">Rolling</span></td>
+            <td class="ded">−$27,688</td>
+            <td class="bal" style="color:var(--amber)">$66,654</td>
+          </tr>
+          <tr>
+            <td class="src">💰 FAFSA / Pell Grant (3 yrs × $7,395) <span class="pbadge ok">Annual</span></td>
+            <td class="ded">−$22,185</td>
+            <td class="bal" style="color:var(--amber)">$44,469</td>
+          </tr>
+          <tr>
+            <td class="src">✈ EAA Aviation Foundation <span class="pbadge soon">Dec 16</span></td>
+            <td class="ded">−$6,800</td>
+            <td class="bal" style="color:var(--amber)">$37,669</td>
+          </tr>
+          <tr>
+            <td class="src">🔑 AOPA Foundation <span class="pbadge soon">Dec 31</span></td>
+            <td class="ded">−$14,000</td>
+            <td class="bal" style="color:var(--amber)">$23,669</td>
+          </tr>
+          <tr>
+            <td class="src">🦅 AAAE Native American Scholarship <span class="pbadge soon">Jan 2027</span></td>
+            <td class="ded">−$2,000</td>
+            <td class="bal" style="color:var(--amber)">$21,669</td>
+          </tr>
+          <tr>
+            <td class="src">✈ NBAA International Operators <span class="pbadge soon">Jan 2027</span></td>
+            <td class="ded">−$8,000</td>
+            <td class="bal" style="color:var(--amber)">$13,669</td>
+          </tr>
+          <tr>
+            <td class="src">✊ OBAP Scholarship <span class="pbadge soon">Apr 2027</span></td>
+            <td class="ded">−$5,000</td>
+            <td class="bal" style="color:var(--fg)">$8,669</td>
+          </tr>
+          <tr>
+            <td class="src">🏛 BIA Higher Education Grant <span class="pbadge ok">June 1</span></td>
+            <td class="ded">−$5,000</td>
+            <td class="bal" style="color:var(--fg)">$3,669</td>
+          </tr>
+          <tr class="row-gap">
+            <td class="src" style="font-weight:700">♿ Georgia DVR + 💼 WIOA (gap-closers) <span class="pbadge urgent">Apply NOW</span></td>
+            <td class="ded" style="color:var(--red)">−$3,669+</td>
+            <td class="bal" style="font-size:1.15rem;color:var(--green)">$0 ✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:0.73rem;color:var(--fg-3);margin-top:0.6rem;line-height:1.5;">
+      Uses maximum award amounts. EAA average = $6,800; AOPA top award = $14,000 — realistic if you apply all eligible awards in both programs. DVR + WIOA amounts set to cover the remaining gap; actual amounts depend on your individual plan. Any shortfall post-scholarship is covered by CFI income (teach at MGA after certification). <strong>Stack is achievable — start with DVR and EAA this week.</strong>
+    </div>
+  </section>
+
+  <!-- AIRCRAFT RATES -->
+  <section>
+    <div class="section-title">MGA Fleet — Hourly Rates (Wet)</div>
+    <div class="rate-grid">
+      <div class="rate-card">
+        <div class="rate-icon">🛩</div>
+        <div>
+          <div class="rate-ac">Piper Warrior III</div>
+          <div class="rate-hr">$159/hr</div>
+          <div class="rate-note">PPL primary trainer</div>
+        </div>
+      </div>
+      <div class="rate-card">
+        <div class="rate-icon">✈</div>
+        <div>
+          <div class="rate-ac">Piper Archer</div>
+          <div class="rate-hr">$164/hr</div>
+          <div class="rate-note">Instrument / CPL XC</div>
+        </div>
+      </div>
+      <div class="rate-card">
+        <div class="rate-icon">✈</div>
+        <div>
+          <div class="rate-ac">Piper Arrow</div>
+          <div class="rate-hr">$179/hr</div>
+          <div class="rate-note">Complex / CPL maneuvers</div>
+        </div>
+      </div>
+      <div class="rate-card">
+        <div class="rate-icon">✈</div>
+        <div>
+          <div class="rate-ac">Piper Seminole</div>
+          <div class="rate-hr">$298/hr</div>
+          <div class="rate-note">Multi-engine rating</div>
+        </div>
+      </div>
+      <div class="rate-card">
+        <div class="rate-icon">🛩</div>
+        <div>
+          <div class="rate-ac">Citabria</div>
+          <div class="rate-hr">$132/hr</div>
+          <div class="rate-note">Aerobatics / tailwheel</div>
+        </div>
+      </div>
+      <div class="rate-card">
+        <div class="rate-icon">🖥</div>
+        <div>
+          <div class="rate-ac">Frasca Sim</div>
+          <div class="rate-hr">$80/hr</div>
+          <div class="rate-note">IFR / procedure practice</div>
+        </div>
+      </div>
+      <div class="rate-card">
+        <div class="rate-icon">👨‍✈️</div>
+        <div>
+          <div class="rate-ac">CFI Fee</div>
+          <div class="rate-hr">$20/hr</div>
+          <div class="rate-note">Added to all dual instruction</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTION ITEMS -->
+  <section>
+    <div class="section-title">Priority Action Items</div>
+    <div class="action-list">
+      <div class="action-item urgent">
+        <div class="action-num">1</div>
+        <div class="action-body">
+          <div class="action-title">⏰ Apply EAA Scholarships by Dec 16, 2026 — MOST URGENT</div>
+          <div class="action-detail">Free application at eaa.org. One submission covers 25+ named awards, avg $6,800. Flag Alex Foss Agricultural Aviation Memorial specifically. No age cap — adults fully eligible. Do this first.</div>
+        </div>
+      </div>
+      <div class="action-item urgent">
+        <div class="action-num">2</div>
+        <div class="action-body">
+          <div class="action-title">♿ Apply Georgia DVR NOW — biggest single gap-closer</div>
+          <div class="action-detail">ADHD qualifies as a disability under Georgia Vocational Services. MGA's aviation degree requires flight training — the whole program is eligible. Call 1-866-489-0001 or apply at gvs.georgia.gov. Takes 60–90 days to approve — start TODAY. Can cover training costs, tuition, fees, books, and supplies — potentially $10K–$30K+.</div>
+        </div>
+      </div>
+      <div class="action-item urgent">
+        <div class="action-num">3</div>
+        <div class="action-body">
+          <div class="action-title">💼 Apply WIOA / WorkSource Georgia — run in parallel with DVR</div>
+          <div class="action-detail">Commercial pilot is a federally designated in-demand occupation in Georgia. WorkSource Middle Flint serves Bleckley County (Cochran). Apply at the nearest CareerCenter (Macon area). Bring MGA program details. WIOA and DVR stack — apply for both at once. worksourcegeorgia.com</div>
+        </div>
+      </div>
+      <div class="action-item urgent">
+        <div class="action-num">4</div>
+        <div class="action-body">
+          <div class="action-title">⏰ Join AOPA &amp; Apply by Dec 31, 2026</div>
+          <div class="action-detail">$69/yr membership. One application covers 32 awards ($250–$14,000). Adults explicitly eligible — no upper age cap. Spring window opens Apr 1, 2027 if you miss fall. aopa.org/scholarships</div>
+        </div>
+      </div>
+      <div class="action-item soon">
+        <div class="action-num">5</div>
+        <div class="action-body">
+          <div class="action-title">✊ Join OBAP NOW — 3-month membership clock starts today</div>
+          <div class="action-detail">OBAP requires 3 months of membership + volunteer hours before you can apply for their $1,000–$5,000 scholarships. Open to any race/ethnicity 17+. Join at obap.org immediately so you're eligible for the Apr 2027 cycle.</div>
+        </div>
+      </div>
+      <div class="action-item soon">
+        <div class="action-num">6</div>
+        <div class="action-body">
+          <div class="action-title">🦅 AAAE Native American — Watch for Dec 2026 opening</div>
+          <div class="action-detail">$2,000 award, opens Dec 2026, apply early Jan 2027. Native American origin qualifies — no tribal enrollment required. Need 3.0+ GPA and enrollment in aviation program at accredited school. aaae.aero</div>
+        </div>
+      </div>
+      <div class="action-item soon">
+        <div class="action-num">7</div>
+        <div class="action-body">
+          <div class="action-title">⏰ File FAFSA for 2026–27 — Oct/Nov priority window</div>
+          <div class="action-detail">studentaid.gov. Unlocks Pell Grant (up to $7,395/yr gift aid) and subsidized loans. Filing early maximizes your institutional aid package.</div>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-num">8</div>
+        <div class="action-body">
+          <div class="action-title">Verify HOPE / Zell Miller eligibility</div>
+          <div class="action-detail">3.0+ GPA = HOPE (full tuition). 3.7+ GPA = Zell Miller (tuition + fees). Either eliminates $24,240–$27,688 in academic costs. Check at gsfc.org.</div>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-num">9</div>
+        <div class="action-body">
+          <div class="action-title">🌲 Explore Cherokee Nation citizenship enrollment</div>
+          <div class="action-detail">If you have Cherokee ancestry, look into establishing CN citizenship — it unlocks the Cherokee Nation Foundation (Jan 31, 2027 deadline) and the BIA Higher Education Grant ($2,500–$5,000/yr). Contact Cherokee Nation citizenship office at cherokee.org.</div>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-num">10</div>
+        <div class="action-body">
+          <div class="action-title">Book MGA admissions / aviation advising appointment</div>
+          <div class="action-detail">Get your Part 141 training plan locked in. Confirm current fleet availability and instructor assignments. Visit mga.edu/aviation or call the Cochran campus directly.</div>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-num">11</div>
+        <div class="action-body">
+          <div class="action-title">Study for Part 107 — lowest cost cert in the stack</div>
+          <div class="action-detail">King Schools course (~$150) + $175 knowledge test fee = ~$327 total. No flight test required. Opens commercial drone work in ag scouting, precision agriculture, and cargo support immediately after passing.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLICATION PROFILE BUILDER -->
+  <section id="profile-builder">
+    <div class="section-title">📋 Scholarship Application Profile — Fill Once, Apply Everywhere</div>
+    <p style="font-size:0.82rem;color:var(--fg-2);margin-bottom:1rem;">Enter your info once. Hit <strong>Save Profile</strong> (stored in your browser). Then use <strong>Export</strong> to copy or download a ready-to-paste packet for any scholarship portal.</p>
+
+    <div class="profile-grid">
+      <!-- PERSONAL -->
+      <div class="profile-card">
+        <div class="profile-card-title">👤 Personal Info</div>
+        <label class="pf-label">Full Legal Name<input class="pf-input" id="pf-name" placeholder="e.g. Dinadeyohvsgi Cosmic"></label>
+        <label class="pf-label">Date of Birth<input class="pf-input" id="pf-dob" type="date"></label>
+        <label class="pf-label">Phone<input class="pf-input" id="pf-phone" placeholder="(912) 555-0100"></label>
+        <label class="pf-label">Email<input class="pf-input" id="pf-email" placeholder="cosmicindustries@protonmail.com"></label>
+        <label class="pf-label">Street Address<input class="pf-input" id="pf-addr" placeholder="123 Main St"></label>
+        <label class="pf-label">City, State, ZIP<input class="pf-input" id="pf-citystatezip" placeholder="Brunswick, GA 31520"></label>
+        <label class="pf-label">Citizenship<input class="pf-input" id="pf-citizen" value="U.S. Citizen"></label>
+        <label class="pf-label">Ethnicity / Heritage (for applicable scholarships)<input class="pf-input" id="pf-heritage" placeholder="Cherokee / Native American"></label>
+      </div>
+
+      <!-- ACADEMIC -->
+      <div class="profile-card">
+        <div class="profile-card-title">🎓 Academic Info</div>
+        <label class="pf-label">School / University<input class="pf-input" id="pf-school" value="Middle Georgia State University (MGA)"></label>
+        <label class="pf-label">Program / Major<input class="pf-input" id="pf-major" value="Aviation — Commercial Pilot Track (Part 141)"></label>
+        <label class="pf-label">Enrollment Status<input class="pf-input" id="pf-enroll" value="Full-time undergraduate"></label>
+        <label class="pf-label">GPA (current or projected)<input class="pf-input" id="pf-gpa" placeholder="3.0"></label>
+        <label class="pf-label">Expected Graduation<input class="pf-input" id="pf-grad" placeholder="May 2028"></label>
+        <label class="pf-label">Total Program Cost<input class="pf-input" id="pf-cost" value="$94,342"></label>
+        <label class="pf-label">FAFSA EFC / Unmet Need<input class="pf-input" id="pf-need" placeholder="e.g. $44,000 unmet after grants"></label>
+        <label class="pf-label">Financial Need Statement (1-2 sentences)<textarea class="pf-textarea" id="pf-need-stmt" rows="3" placeholder="I am pursuing a commercial pilot certificate with zero family financial support. My program costs exceed $94,000, and I rely entirely on scholarships and grants to complete training."></textarea></label>
+      </div>
+
+      <!-- AVIATION -->
+      <div class="profile-card">
+        <div class="profile-card-title">✈ Aviation Background</div>
+        <label class="pf-label">Current Certificates / Ratings<input class="pf-input" id="pf-certs" placeholder="Student Pilot (or None yet)"></label>
+        <label class="pf-label">Total Flight Hours (logged)<input class="pf-input" id="pf-hours" placeholder="0"></label>
+        <label class="pf-label">Aviation Career Goal<input class="pf-input" id="pf-career-goal" value="Agricultural cargo / ag aviation pilot — drone + manned"></label>
+        <label class="pf-label">Target Certifications<textarea class="pf-textarea" id="pf-target-certs" rows="3">PPL → Instrument → Commercial → CFI → CFII → Multi-Engine → Part 107 (drone)</textarea></label>
+        <label class="pf-label">Relevant Work / Experience<textarea class="pf-textarea" id="pf-exp" rows="3" placeholder="e.g. CosmicIndustries operator, ag technology interest, drone operations study"></textarea></label>
+      </div>
+
+      <!-- BACKGROUND / ELIGIBILITY FLAGS -->
+      <div class="profile-card">
+        <div class="profile-card-title">📄 Eligibility Flags</div>
+        <label class="pf-label">Disability / DVR Status<input class="pf-input" id="pf-dvr" value="ADHD diagnosed — Georgia DVR application in progress"></label>
+        <label class="pf-label">Tribal / Native American Status<input class="pf-input" id="pf-tribal" placeholder="Cherokee ancestry — enrollment status TBD"></label>
+        <label class="pf-label">WIOA / WorkSource Status<input class="pf-input" id="pf-wioa" value="Applied / in progress (WorkSource Middle Flint)"></label>
+        <label class="pf-label">OBAP Membership Date<input class="pf-input" id="pf-obap" placeholder="e.g. Oct 22, 2026 (join today)"></label>
+        <label class="pf-label">AOPA Membership #<input class="pf-input" id="pf-aopa" placeholder="Will join — #pending"></label>
+        <label class="pf-label">EAA Member #<input class="pf-input" id="pf-eaa" placeholder="Will join — #pending"></label>
+      </div>
+    </div>
+
+    <!-- ESSAYS -->
+    <div class="profile-card" style="margin-top:1rem;">
+      <div class="profile-card-title">✍ Master Essays (adapt per application)</div>
+      <label class="pf-label" style="margin-bottom:0.75rem;">Personal Statement / Why Aviation (400–600 words)
+        <textarea class="pf-textarea pf-essay" id="pf-ps" rows="8" placeholder="Write your core personal statement here. Cover: Cherokee heritage, ADHD journey, why agricultural aviation specifically, what MGA's Part 141 program means, long-term goal (ag cargo + drone ops). Adapt the opening sentence per application but keep this as your master draft."></textarea>
+      </label>
+      <label class="pf-label" style="margin-bottom:0.75rem;">Career Goals Essay (250–400 words)
+        <textarea class="pf-textarea pf-essay" id="pf-career" rows="6" placeholder="Describe your specific career path: PPL → Commercial → CFI → ag aviation. Mention Part 107 drone work as near-term revenue while building hours. Tie to Georgia's agricultural economy and community impact."></textarea>
+      </label>
+      <label class="pf-label">Short Answer: Leadership / Community Involvement (150–250 words)
+        <textarea class="pf-textarea pf-essay" id="pf-leadership" rows="5" placeholder="e.g. CosmicIndustries, community involvement, any mentorship, Cherokee heritage community ties, ADHD advocacy."></textarea>
+      </label>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="profile-actions">
+      <button class="pf-btn pf-save" onclick="saveProfile()">💾 Save Profile</button>
+      <button class="pf-btn pf-copy" onclick="copyProfile('full')">📋 Copy Full Profile</button>
+      <button class="pf-btn pf-copy" onclick="copyProfile('eaa')">Copy for EAA</button>
+      <button class="pf-btn pf-copy" onclick="copyProfile('aopa')">Copy for AOPA</button>
+      <button class="pf-btn pf-copy" onclick="copyProfile('bia')">Copy for BIA/Cherokee</button>
+      <button class="pf-btn pf-export" onclick="exportProfile()">📤 Download .txt</button>
+    </div>
+    <div id="pf-status" style="font-size:0.78rem;color:var(--green);margin-top:0.5rem;min-height:1.2em;"></div>
+
+    <!-- Cross-device Gist Sync -->
+    <div class="gist-sync-card">
+      <div class="gist-sync-title">☁️ Cross-Device Sync via GitHub Gist</div>
+      <p class="gist-note">Enter your GitHub Personal Access Token (PAT) with <code>gist</code> scope — stored only in this browser, never uploaded. Your profile saves to a <strong>private</strong> Gist accessible from any device where you enter the same PAT.</p>
+      <div class="gist-sync-row">
+        <label>GitHub PAT (gist scope)
+          <input id="gist-pat" type="password" placeholder="ghp_…" autocomplete="off" spellcheck="false">
+        </label>
+        <label>Gist ID (auto-filled after first sync)
+          <input id="gist-id" type="text" placeholder="Leave blank to create new" autocomplete="off" spellcheck="false">
+        </label>
+      </div>
+      <div class="gist-sync-btns">
+        <button class="pf-btn pf-save" onclick="syncToGist()">☁️ Sync to Gist</button>
+        <button class="pf-btn pf-copy" onclick="loadFromGist()">📥 Load from Gist</button>
+      </div>
+      <div id="gist-status" class="gist-status"></div>
+      <p class="gist-note">🔑 Create a PAT at <strong>github.com → Settings → Developer settings → Personal access tokens → Fine-grained</strong> with only the <em>Gists</em> permission. Your data stays in your own GitHub account.</p>
+    </div>
+  </section>
+
+  <div style="font-size:0.72rem;color:var(--fg-3);text-align:center;padding-top:0.5rem;">
+    Cost estimates based on MGA School of Aviation published rates · Scholarships subject to annual cycle changes · All costs approximate · Updated Oct 2026
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ── PROFILE FIELDS ─────────────────────────────── */
+const PF_FIELDS = [
+  'pf-name','pf-dob','pf-phone','pf-email','pf-addr','pf-citystatezip',
+  'pf-citizen','pf-heritage','pf-school','pf-major','pf-enroll','pf-gpa',
+  'pf-grad','pf-cost','pf-need','pf-need-stmt','pf-certs','pf-hours',
+  'pf-career-goal','pf-target-certs','pf-exp','pf-dvr','pf-tribal',
+  'pf-wioa','pf-obap','pf-aopa','pf-eaa','pf-ps','pf-career','pf-leadership'
+];
+
+function getVal(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function setVal(id,v){ const el=document.getElementById(id); if(el) el.value=v||''; }
+
+function saveProfile(){
+  try{
+    const data={};
+    PF_FIELDS.forEach(id=>{ data[id]=getVal(id); });
+    localStorage.setItem('mga_profile', JSON.stringify(data));
+    showStatus('✅ Profile saved to browser storage.');
+  } catch(e){ showStatus('⚠ Could not save: '+e.message); }
+}
+
+function loadProfile(){
+  try{
+    const raw=localStorage.getItem('mga_profile');
+    if(!raw) return;
+    const data=JSON.parse(raw);
+    PF_FIELDS.forEach(id=>{ if(data[id]!==undefined) setVal(id,data[id]); });
+  } catch(e){}
+}
+
+function buildText(mode){
+  const n=getVal('pf-name')||'[Name]';
+  const school=getVal('pf-school')||'MGA';
+  const program=getVal('pf-major')||'Aviation';
+  const gpa=getVal('pf-gpa')||'[GPA]';
+  const goal=getVal('pf-career-goal')||'[Career Goal]';
+  const hrs=getVal('pf-hours')||'0';
+  const certs=getVal('pf-certs')||'Student Pilot';
+  const need=getVal('pf-need-stmt')||'[Financial need statement]';
+  const ps=getVal('pf-ps')||'[Personal statement]';
+  const career=getVal('pf-career')||'[Career goals essay]';
+  const tribal=getVal('pf-tribal')||'[Tribal status]';
+  const dvr=getVal('pf-dvr')||'[DVR status]';
+  const heritage=getVal('pf-heritage')||'[Heritage]';
+  const addr=getVal('pf-addr'); const csz=getVal('pf-citystatezip');
+  const phone=getVal('pf-phone'); const email=getVal('pf-email');
+  const enroll=getVal('pf-enroll')||'Full-time';
+  const grad=getVal('pf-grad')||'[Grad date]';
+  const dob=getVal('pf-dob')||'[DOB]';
+  const lead=getVal('pf-leadership')||'[Leadership essay]';
+
+  const sep='─'.repeat(52);
+
+  if(mode==='eaa'){
+    return `EAA SCHOLARSHIP APPLICATION — ${n}\n${sep}\nApplicant: ${n}\nDOB: ${dob}\nPhone: ${phone}\nEmail: ${email}\nAddress: ${addr}, ${csz}\n\nSchool: ${school}\nProgram: ${program} | Enrollment: ${enroll}\nGPA: ${gpa} | Expected Graduation: ${grad}\n\nAviation Background:\nCertificates: ${certs} | Logged Hours: ${hrs}\n\nCareer Goal:\n${goal}\n\n${sep}\nPERSONAL STATEMENT:\n${sep}\n${ps}\n\n${sep}\nCAREER GOALS:\n${sep}\n${career}\n\n${sep}\nFINANCIAL NEED:\n${sep}\n${need}\n`;
+  }
+  if(mode==='aopa'){
+    return `AOPA SCHOLARSHIP APPLICATION — ${n}\n${sep}\nApplicant: ${n} | DOB: ${dob}\nContact: ${phone} | ${email}\nAddress: ${addr}, ${csz}\n\nAcademic:\nSchool: ${school}\nMajor/Program: ${program}\nGPA: ${gpa} | Status: ${enroll} | Grad: ${grad}\n\nFlight Experience:\nCerts/Ratings: ${certs}\nTotal Hours: ${hrs}\n\nCareer Objective: ${goal}\n\n${sep}\nPERSONAL STATEMENT:\n${sep}\n${ps}\n\n${sep}\nFINANCIAL NEED:\n${sep}\n${need}\n`;
+  }
+  if(mode==='bia'){
+    return `BIA / CHEROKEE NATION SCHOLARSHIP APPLICATION — ${n}\n${sep}\nApplicant: ${n} | DOB: ${dob}\nContact: ${phone} | ${email}\nAddress: ${addr}, ${csz}\n\nTribal/Heritage Status: ${tribal}\nEthnicity/Heritage: ${heritage}\n\nAcademic:\nSchool: ${school}\nProgram: ${program}\nGPA: ${gpa} | Status: ${enroll} | Grad: ${grad}\n\nCareer Goal:\n${goal}\n\n${sep}\nPERSONAL STATEMENT:\n${sep}\n${ps}\n\n${sep}\nFINANCIAL NEED:\n${sep}\n${need}\n`;
+  }
+
+  // Full profile
+  return `SCHOLARSHIP APPLICATION PROFILE — ${n}\nGenerated: ${new Date().toLocaleDateString()}\n${sep}\n\nPERSONAL\nName: ${n}\nDOB: ${dob}\nPhone: ${phone}\nEmail: ${email}\nAddress: ${addr}, ${csz}\nCitizenship: ${getVal('pf-citizen')}\nHeritage: ${heritage}\n\nACADEMIC\nSchool: ${school}\nProgram: ${program}\nEnrollment: ${enroll}\nGPA: ${gpa}\nGraduation: ${grad}\nProgram Cost: ${getVal('pf-cost')}\nUnmet Need: ${getVal('pf-need')}\n\nAVIATION\nCertificates: ${certs}\nFlight Hours: ${hrs}\nCareer Goal: ${goal}\nTarget Certs: ${getVal('pf-target-certs')}\nExperience: ${getVal('pf-exp')}\n\nELIGIBILITY\nDVR/Disability: ${dvr}\nTribal Status: ${tribal}\nWIOA Status: ${getVal('pf-wioa')}\nOBAP Member Since: ${getVal('pf-obap')}\nAOPA Member #: ${getVal('pf-aopa')}\nEAA Member #: ${getVal('pf-eaa')}\n\n${sep}\nPERSONAL STATEMENT:\n${sep}\n${ps}\n\n${sep}\nCAREER GOALS:\n${sep}\n${career}\n\n${sep}\nLEADERSHIP / COMMUNITY:\n${sep}\n${lead}\n\n${sep}\nFINANCIAL NEED:\n${sep}\n${need}\n`;
+}
+
+function copyProfile(mode){
+  const text=buildText(mode);
+  navigator.clipboard.writeText(text)
+    .then(()=>showStatus('✅ Copied to clipboard! Paste directly into the application portal.'))
+    .catch(()=>{
+      // fallback: select a temp textarea
+      const ta=document.createElement('textarea');
+      ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); showStatus('✅ Copied (fallback).'); }
+      catch(e){ showStatus('⚠ Copy failed — try selecting and copying the text manually.'); }
+      document.body.removeChild(ta);
+    });
+}
+
+function exportProfile(){
+  const text=buildText('full');
+  const name=getVal('pf-name').replace(/\s+/g,'_')||'applicant';
+  const filename=`scholarship_profile_${name}_${new Date().toISOString().slice(0,10)}.txt`;
+  try{
+    const blob=new Blob([text],{type:'text/plain'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); document.body.removeChild(a); },1000);
+    showStatus('📤 Download started: '+filename);
+  } catch(e){
+    copyProfile('full');
+    showStatus('📋 Download unavailable here — copied to clipboard instead.');
+  }
+}
+
+function showStatus(msg){
+  const el=document.getElementById('pf-status');
+  if(el){ el.textContent=msg; setTimeout(()=>{ el.textContent=''; },5000); }
+}
+
+// ── GIST SYNC ──────────────────────────────────────────────────────────────
+// PAT and Gist ID live only in localStorage — never in the synced data itself.
+const GIST_FILENAME = 'mga_scholarship_profile.json';
+
+function getGistPAT(){ try{ return localStorage.getItem('mga_gist_pat')||''; }catch(e){return '';} }
+function getGistID(){  try{ return localStorage.getItem('mga_gist_id')||'';  }catch(e){return '';} }
+function setGistID(id){ try{ localStorage.setItem('mga_gist_id',id); }catch(e){} }
+
+function gistHeaders(pat){
+  return {
+    'Authorization': 'Bearer '+pat,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'Content-Type': 'application/json'
+  };
+}
+
+async function syncToGist(){
+  const pat = getGistPAT();
+  if(!pat){ showSyncStatus('⚠ Enter your GitHub PAT first.','warn'); return; }
+  const data={};
+  PF_FIELDS.forEach(f=>{ data[f]=getVal(f); });
+  const body = JSON.stringify({
+    description: 'MGA Scholarship Application Profile (private)',
+    public: false,
+    files: { [GIST_FILENAME]: { content: JSON.stringify(data,null,2) } }
+  });
+  showSyncStatus('⏳ Syncing…','info');
+  try{
+    const gistId = getGistID();
+    let url = 'https://api.github.com/gists';
+    let method = 'POST';
+    if(gistId){ url += '/'+gistId; method = 'PATCH'; }
+    const r = await fetch(url,{ method, headers: gistHeaders(pat), body });
+    if(!r.ok){ const t=await r.text(); throw new Error(r.status+': '+t.slice(0,120)); }
+    const j = await r.json();
+    setGistID(j.id);
+    showSyncStatus('✅ Synced to Gist '+j.id.slice(0,8)+'… — open on any device with your PAT.','ok');
+  } catch(e){
+    showSyncStatus('❌ Sync failed: '+e.message,'warn');
+  }
+}
+
+async function loadFromGist(){
+  const pat = getGistPAT();
+  if(!pat){ showSyncStatus('⚠ Enter your GitHub PAT first.','warn'); return; }
+  const gistId = getGistID();
+  if(!gistId){ showSyncStatus('⚠ No Gist ID saved yet — sync first from your other device.','warn'); return; }
+  showSyncStatus('⏳ Loading from Gist…','info');
+  try{
+    const r = await fetch('https://api.github.com/gists/'+gistId,{ headers: gistHeaders(pat) });
+    if(!r.ok){ const t=await r.text(); throw new Error(r.status+': '+t.slice(0,120)); }
+    const j = await r.json();
+    const file = j.files[GIST_FILENAME];
+    if(!file){ throw new Error('Profile file not found in Gist.'); }
+    const data = JSON.parse(file.content);
+    PF_FIELDS.forEach(f=>setVal(f,data[f]||''));
+    try{ localStorage.setItem('mga_profile',JSON.stringify(data)); }catch(e){}
+    showSyncStatus('✅ Profile loaded from Gist. Updated: '+new Date(j.updated_at).toLocaleString(),'ok');
+  } catch(e){
+    showSyncStatus('❌ Load failed: '+e.message,'warn');
+  }
+}
+
+function showSyncStatus(msg,type){
+  const el=document.getElementById('gist-status');
+  if(!el) return;
+  el.textContent=msg;
+  el.className='gist-status gist-status--'+(type||'info');
+  if(type==='ok'||type==='warn') setTimeout(()=>{ el.textContent=''; el.className='gist-status'; },8000);
+}
+
+// Auto-save on input change
+document.addEventListener('DOMContentLoaded',()=>{
+  loadProfile();
+  // Restore PAT field if saved
+  try{
+    const savedPAT = localStorage.getItem('mga_gist_pat')||'';
+    const savedID  = localStorage.getItem('mga_gist_id')||'';
+    const patEl = document.getElementById('gist-pat');
+    const idEl  = document.getElementById('gist-id');
+    if(patEl && savedPAT) patEl.value=savedPAT;
+    if(idEl  && savedID)  idEl.value=savedID;
+  }catch(e){}
+  // Save PAT/ID on change
+  const patEl=document.getElementById('gist-pat');
+  const idEl =document.getElementById('gist-id');
+  if(patEl) patEl.addEventListener('input',()=>{ try{ localStorage.setItem('mga_gist_pat',patEl.value.trim()); }catch(e){} });
+  if(idEl)  idEl.addEventListener('input',()=>{ try{ localStorage.setItem('mga_gist_id',idEl.value.trim()); }catch(e){} });
+
+  PF_FIELDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',()=>{
+      try{
+        const data={};
+        PF_FIELDS.forEach(f=>{ data[f]=getVal(f); });
+        localStorage.setItem('mga_profile',JSON.stringify(data));
+      } catch(e){}
+    });
+  });
+});
+</script>
