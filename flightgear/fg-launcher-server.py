@@ -27,6 +27,7 @@ from urllib.parse import urlparse
 DEFAULT_PORT = 8765
 DEFAULT_FGFS = "/usr/local/bin/fgfs"
 CORS_ORIGIN = "*"          # GitHub Pages can be any origin; restrict here if desired
+FG_VERSION = "2024.1.7"    # FlightGear release this launcher targets
 MAX_LAUNCH_ARGS = 40       # Safety limit on number of args
 ALLOWED_ARG_PREFIXES = (   # Whitelist: only fgfs flags
     "--fg-root=", "--fg-aircraft=", "--airport=", "--runway=",
@@ -84,6 +85,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             body = json.dumps({
                 "status": "running",
                 "fgfs": fgfs_path,
+                "fg_version": FG_VERSION,
                 "fgfs_exists": os.path.isfile(fgfs_path),
                 "active": active_process is not None and active_process.poll() is None,
             }).encode()
@@ -210,6 +212,7 @@ def main():
 
     server = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     print(f"COSMIC Launcher Server  →  http://localhost:{args.port}/status")
+    print(f"FlightGear              :  {FG_VERSION}")
     print(f"fgfs binary             :  {fgfs_path}")
     print("Press Ctrl+C to stop.\n")
     try:
