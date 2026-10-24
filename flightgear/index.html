@@ -717,7 +717,7 @@ let worldGeom = null;
       worldGeom = feat.geometry;
       drawMap();
     })
-    .catch(() => {}); // offline: no land, just grid + dots
+    .catch(e => console.error('[FG map] world fetch failed:', e)); // offline: no land
 })();
 
 // ─── Config ───────────────────────────────────────────
