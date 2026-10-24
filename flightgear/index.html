@@ -703,8 +703,22 @@ sudo python3 fftest2026.py --list
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <script>
 'use strict';
+
+// ─── World Geometry ───────────────────────────────────
+let worldGeom = null;
+(function fetchWorld() {
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json')
+    .then(r => r.json())
+    .then(world => {
+      const feat = topojson.feature(world, world.objects.land);
+      worldGeom = feat.geometry;
+      drawMap();
+    })
+    .catch(() => {}); // offline: no land, just grid + dots
+})();
 
 // ─── Config ───────────────────────────────────────────
 const LAUNCHER = 'http://localhost:8765';
@@ -1059,6 +1073,27 @@ function drawMap() {
   // Background
   ctx.fillStyle = '#04070d';
   ctx.fillRect(0, 0, W, H);
+
+  // Land masses
+  if (worldGeom) {
+    const polys = worldGeom.type === 'MultiPolygon'
+      ? worldGeom.coordinates : [worldGeom.coordinates];
+    ctx.beginPath();
+    polys.forEach(polygon => {
+      polygon.forEach(ring => {
+        ring.forEach(([lon, lat], i) => {
+          const [x, y] = project(lat, lon, W, H);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+      });
+    });
+    ctx.fillStyle = '#0a1828';
+    ctx.fill('evenodd');
+    ctx.strokeStyle = '#1a3a5c';
+    ctx.lineWidth = 0.7;
+    ctx.stroke();
+  }
 
   // Major graticule lines
   ctx.lineWidth = 0.4;
