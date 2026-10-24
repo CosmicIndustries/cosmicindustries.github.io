@@ -40,9 +40,12 @@ from urllib.parse import urlparse
 LAUNCH_DIR = Path(__file__).resolve().parent
 
 # ── Launcher server constants (kept in sync with fg-launcher-server.py) ───────
-DEFAULT_PORT = 8765
-DEFAULT_FGFS = "/usr/local/bin/fgfs"
-FG_VERSION   = "2024.1.7"
+DEFAULT_PORT       = 8765
+DEFAULT_FGFS       = "/home/radxa/builds/flightgear/build/src/Main/fgfs"
+DEFAULT_FG_HOME    = "/home/radxa/.fgfs"
+DEFAULT_FG_ROOT    = "/home/radxa/.fgfs/fgdata_2024_1"
+DEFAULT_FG_SCENERY = "/home/radxa/.fgfs/TerraSync:/home/radxa/.fgfs/fgdata_2024_1/Scenery"
+FG_VERSION         = "2024.1.7"
 MAX_LAUNCH_ARGS = 40
 ALLOWED_ARG_PREFIXES = (
     "--fg-root=", "--fg-aircraft=", "--airport=", "--runway=",
@@ -61,6 +64,9 @@ ALLOWED_ARG_PREFIXES = (
 
 # ── Global server state (shared across handler instances) ─────────────────────
 _fgfs_path     = DEFAULT_FGFS
+_fg_home       = DEFAULT_FG_HOME
+_fg_root       = DEFAULT_FG_ROOT
+_fg_scenery    = DEFAULT_FG_SCENERY
 _active_proc   = None
 _proc_lock     = threading.Lock()
 _server_port   = DEFAULT_PORT
@@ -146,6 +152,9 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                 "fgfs_exists": os.path.isfile(_fgfs_path),
                 "active":      active,
                 "pid":         _active_proc.pid if active else None,
+                "fg_home":     _fg_home,
+                "fg_root":     _fg_root,
+                "fg_scenery":  _fg_scenery,
             })
 
         elif path == "/kill":
@@ -185,10 +194,18 @@ class _Handler(http.server.BaseHTTPRequestHandler):
 
             _kill_fg()
 
+            fg_env = {
+                **os.environ,
+                "FG_HOME":    _fg_home,
+                "FG_ROOT":    _fg_root,
+                "FG_SCENERY": _fg_scenery,
+            }
+
             with _proc_lock:
                 try:
                     _active_proc = subprocess.Popen(
                         cmd,
+                        env=fg_env,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
                         start_new_session=True,
@@ -562,17 +579,23 @@ def _open_browser(port):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
-    global _fgfs_path, _server_port
+    global _fgfs_path, _fg_home, _fg_root, _fg_scenery, _server_port
 
     parser = argparse.ArgumentParser(
         description="COSMIC FlightGear Qt Launcher",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
-    parser.add_argument("--port",  type=int, default=DEFAULT_PORT,
+    parser.add_argument("--port",       type=int, default=DEFAULT_PORT,
                         help=f"HTTP port (default {DEFAULT_PORT})")
-    parser.add_argument("--fgfs",  default=DEFAULT_FGFS,
-                        help=f"Path to fgfs binary (default {DEFAULT_FGFS})")
+    parser.add_argument("--fgfs",       default=DEFAULT_FGFS,
+                        help=f"Path to fgfs binary (default: {DEFAULT_FGFS})")
+    parser.add_argument("--fg-home",    default=DEFAULT_FG_HOME,
+                        help=f"FG_HOME env var (default: {DEFAULT_FG_HOME})")
+    parser.add_argument("--fg-root",    default=DEFAULT_FG_ROOT,
+                        help=f"FG_ROOT env var (default: {DEFAULT_FG_ROOT})")
+    parser.add_argument("--fg-scenery", default=DEFAULT_FG_SCENERY,
+                        help=f"FG_SCENERY env var (default: {DEFAULT_FG_SCENERY})")
     parser.add_argument("--no-kill-on-exit", action="store_true",
                         help="Leave FlightGear running when the launcher closes")
     parser.add_argument("--url", action="store_true",
@@ -580,6 +603,9 @@ def main():
     args = parser.parse_args()
 
     _fgfs_path   = args.fgfs
+    _fg_home     = args.fg_home
+    _fg_root     = args.fg_root
+    _fg_scenery  = args.fg_scenery
     _server_port = args.port
 
     # Check index.html exists
@@ -600,9 +626,12 @@ def main():
         sys.exit("ERROR: HTTP server failed to start within 5 seconds.")
     print(
         f"\n  COSMIC FlightGear Launcher\n"
-        f"  Server   :  http://localhost:{args.port}/\n"
-        f"  fgfs     :  {_fgfs_path}\n"
-        f"  Version  :  FlightGear {FG_VERSION}\n",
+        f"  Server     :  http://localhost:{args.port}/\n"
+        f"  fgfs       :  {_fgfs_path}\n"
+        f"  FG_HOME    :  {_fg_home}\n"
+        f"  FG_ROOT    :  {_fg_root}\n"
+        f"  FG_SCENERY :  {_fg_scenery}\n"
+        f"  Version    :  FlightGear {FG_VERSION}\n",
         flush=True,
     )
 

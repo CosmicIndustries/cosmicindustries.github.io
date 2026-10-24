@@ -24,8 +24,11 @@ import threading
 import time
 from urllib.parse import urlparse
 
-DEFAULT_PORT = 8765
-DEFAULT_FGFS = "/usr/local/bin/fgfs"
+DEFAULT_PORT     = 8765
+DEFAULT_FGFS     = "/home/radxa/builds/flightgear/build/src/Main/fgfs"
+DEFAULT_FG_HOME  = "/home/radxa/.fgfs"
+DEFAULT_FG_ROOT  = "/home/radxa/.fgfs/fgdata_2024_1"
+DEFAULT_FG_SCENERY = "/home/radxa/.fgfs/TerraSync:/home/radxa/.fgfs/fgdata_2024_1/Scenery"
 CORS_ORIGIN = "*"          # GitHub Pages can be any origin; restrict here if desired
 FG_VERSION = "2024.1.7"    # FlightGear release this launcher targets
 MAX_LAUNCH_ARGS = 40       # Safety limit on number of args
@@ -44,7 +47,10 @@ ALLOWED_ARG_PREFIXES = (   # Whitelist: only fgfs flags
     "--garmin", "--nav1=", "--nav2=", "--adf=", "--dme=", "--com1=", "--com2=",
 )
 
-fgfs_path = DEFAULT_FGFS
+fgfs_path  = DEFAULT_FGFS
+fg_home    = DEFAULT_FG_HOME
+fg_root    = DEFAULT_FG_ROOT
+fg_scenery = DEFAULT_FG_SCENERY
 active_process = None
 process_lock = threading.Lock()
 
@@ -83,11 +89,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path in ("/", "/status"):
             body = json.dumps({
-                "status": "running",
-                "fgfs": fgfs_path,
-                "fg_version": FG_VERSION,
+                "status":      "running",
+                "fgfs":        fgfs_path,
+                "fg_version":  FG_VERSION,
                 "fgfs_exists": os.path.isfile(fgfs_path),
-                "active": active_process is not None and active_process.poll() is None,
+                "active":      active_process is not None and active_process.poll() is None,
+                "fg_home":     fg_home,
+                "fg_root":     fg_root,
+                "fg_scenery":  fg_scenery,
             }).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -139,10 +148,18 @@ class Handler(http.server.BaseHTTPRequestHandler):
             # Kill any existing FG instance
             self._kill_fg()
 
+            fg_env = {
+                **os.environ,
+                "FG_HOME":    fg_home,
+                "FG_ROOT":    fg_root,
+                "FG_SCENERY": fg_scenery,
+            }
+
             with process_lock:
                 try:
                     active_process = subprocess.Popen(
                         cmd,
+                        env=fg_env,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
                         start_new_session=True,
@@ -200,12 +217,22 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 
 def main():
-    global fgfs_path
+    global fgfs_path, fg_home, fg_root, fg_scenery
     parser = argparse.ArgumentParser(description="COSMIC FlightGear Launcher Server")
-    parser.add_argument("--port", type=int, default=DEFAULT_PORT)
-    parser.add_argument("--fgfs", default=DEFAULT_FGFS)
+    parser.add_argument("--port",       type=int, default=DEFAULT_PORT)
+    parser.add_argument("--fgfs",       default=DEFAULT_FGFS,
+                        help=f"Path to fgfs binary (default: {DEFAULT_FGFS})")
+    parser.add_argument("--fg-home",    default=DEFAULT_FG_HOME,
+                        help=f"FG_HOME env var (default: {DEFAULT_FG_HOME})")
+    parser.add_argument("--fg-root",    default=DEFAULT_FG_ROOT,
+                        help=f"FG_ROOT env var (default: {DEFAULT_FG_ROOT})")
+    parser.add_argument("--fg-scenery", default=DEFAULT_FG_SCENERY,
+                        help=f"FG_SCENERY env var (default: {DEFAULT_FG_SCENERY})")
     args = parser.parse_args()
-    fgfs_path = args.fgfs
+    fgfs_path  = args.fgfs
+    fg_home    = args.fg_home
+    fg_root    = args.fg_root
+    fg_scenery = args.fg_scenery
 
     if not os.path.isfile(fgfs_path):
         print(f"WARNING: fgfs not found at {fgfs_path} — set --fgfs path")
