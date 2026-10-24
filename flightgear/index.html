@@ -727,10 +727,22 @@ const _WORLD_TOPO = {"arcs":[[[99478,40237],[69,98],[96,-171],[-46,-308],[-172,-
     return pts;
   }
   const land = _WORLD_TOPO.land;
-  if (land.type === 'MultiPolygon') {
-    worldGeom = { type: 'MultiPolygon', coordinates: land.arcs.map(p => p.map(ring)) };
-  } else if (land.type === 'Polygon') {
-    worldGeom = { type: 'Polygon', coordinates: land.arcs.map(ring) };
+  function geomCoords(g) {
+    if (g.type === 'MultiPolygon') return { type: 'MultiPolygon', coordinates: g.arcs.map(p => p.map(ring)) };
+    if (g.type === 'Polygon') return { type: 'Polygon', coordinates: g.arcs.map(ring) };
+    return null;
+  }
+  if (land.type === 'GeometryCollection') {
+    const polys = [];
+    for (const g of land.geometries) {
+      const c = geomCoords(g);
+      if (!c) continue;
+      if (c.type === 'MultiPolygon') polys.push(...c.coordinates);
+      else polys.push(c.coordinates);
+    }
+    worldGeom = { type: 'MultiPolygon', coordinates: polys };
+  } else {
+    worldGeom = geomCoords(land);
   }
 })();
 
