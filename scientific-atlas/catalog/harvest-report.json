@@ -1,13 +1,18 @@
 {
-  "harvested_at": "2026-10-29T13:19:15Z",
-  "records_seen": 9100,
-  "records_written": 9100,
+  "harvested_at": "2026-10-30T13:11:08Z",
+  "records_seen": 9000,
+  "records_written": 9000,
   "duplicates_removed": 0,
-  "errors": [],
+  "errors": [
+    {
+      "source": "noaa-ncei-search",
+      "error": "<HTTPError 500: ''>",
+      "time": "2026-10-30T13:11:07Z"
+    }
+  ],
   "sources": [
     "datacite-datasets",
     "nasa-cmr-collections",
-    "noaa-ncei-search",
     "usgs-sciencebase-data-releases"
   ]
 }
