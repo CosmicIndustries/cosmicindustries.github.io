@@ -573,7 +573,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       </div>
       
     </div>
-    <div class="fund-card" style="margin-top:1rem;"><div class="fund-name">Georgia HOPE / Zell Miller — excluded from this funding model</div><div class="fund-notes">The high-school graduation period already on record is outside the published HOPE/Zell time limit, and the GPA information on file is a high-school GPA rather than a qualifying postsecondary GPA. The current roadmap therefore assigns $0 from HOPE/Zell. Reopen only if GSFC/GAfutures provides a written exception or a current eligibility determination.</div><a class="fund-apply" href="https://gsfc.georgia.gov/hope" target="_blank" rel="noopener">Official GSFC eligibility rules ↗</a></div><div class="action-item urgent" style="margin-top:1rem">
+    <div class="fund-card" style="margin-top:1rem;"><div class="fund-name">Georgia HOPE / Zell Miller — excluded from this funding model</div><div class="fund-notes">The graduation-time eligibility window and current academic record do not support including this award in the funding plan. The roadmap assigns $0 unless GSFC/GAfutures provides a written current eligibility determination.</div><a class="fund-apply" href="https://gsfc.georgia.gov/hope" target="_blank" rel="noopener">Official GSFC eligibility rules ↗</a></div><div class="action-item urgent" style="margin-top:1rem">
       <div class="action-num">!</div>
       <div class="action-body">
         <div class="action-title">MGA must answer these five questions in writing</div>
@@ -621,12 +621,12 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <div class="fund-name">EAA Adapt to Fly Scholarship — conditional</div>
       <div class="fund-amount sky">Amount varies</div>
       <div class="fund-deadline amber">Dec 16, 2026 · same EAA cycle</div>
-      <div class="fund-notes">This is the EAA disability-specific flight-training award, not Able Flight. The published rule requires an ADA-defined disability and qualification for a third-class medical or Sport Pilot certificate, including ability to operate training-aircraft controls. Use only if the eligibility and medical requirements are met. Ask EAA whether training through the current flight school or MGA can be funded under this award.</div>
+      <div class="fund-notes">The published rule requires an ADA-defined disability and qualification for a third-class medical or Sport Pilot certificate, including ability to operate training-aircraft controls. Use only if the eligibility and medical requirements are met. Ask EAA whether training through the current flight school or MGA can be funded under this award.</div>
       <a class="fund-apply" href="https://www.eaa.org/eaa/learn-to-fly/scholarships/eaa-flight-training-scholarships" target="_blank" rel="noopener">EAA flight-training awards ↗</a>
     </div>
     <div class="fund-card">
       <div class="fund-name">AOPA Foundation Flight Training Scholarships</div>
-      <div class="fund-amount sky">$250–$14,000 across individual awards</div>
+      <div class="fund-amount sky">Individual matched awards vary</div>
       <div class="fund-deadline neutral">2026/2027 applications previously reported submitted</div>
       <div class="fund-notes">AOPA's general application matches current members to individual awards for which they qualify. Some individual awards have age, sex, location or certificate-stage restrictions; the published maximum is not a likely award estimate. Do not duplicate existing submissions. Fall-cycle decisions are notified by Apr 15, 2027.</div>
       <a class="fund-apply" href="https://www.aopa.org/training-and-safety/students/aopa-flight-training-scholarships" target="_blank" rel="noopener">Official scholarship rules ↗</a>
@@ -855,7 +855,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       </tbody>
     </table>
   </div>
-  <p class="fund-notes" style="margin-top:.65rem;">HOPE/Zell, Cobell, Cherokee Nation Foundation, BIA Higher Education, AAAE Native American and NBAA awards have been removed from the current application shortlist because published time, enrollment, class-standing or career-track gates do not fit the present record. Reconsider only if a sponsor's written determination changes a gate or the training stage advances.</p>
+  <p class="fund-notes" style="margin-top:.65rem;">Awards with unfulfilled age, enrollment, academic-standing, tribal-membership or career-track requirements are excluded from the active shortlist. Reconsider only if documentary eligibility changes or the training stage advances.</p>
 </section>
 
   
@@ -943,7 +943,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <button class="pf-btn pf-copy" onclick="copyProfile('full')">📋 Copy Full Profile</button>
       <button class="pf-btn pf-copy" onclick="copyProfile('eaa')">Copy for EAA</button>
       <button class="pf-btn pf-copy" onclick="copyProfile('aopa')">Copy for AOPA</button>
-      <button class="pf-btn pf-copy" onclick="copyProfile('bia')">Copy for BIA/Cherokee</button>
+      <button class="pf-btn pf-copy" onclick="copyProfile('native')">Copy for Native Forward</button>
       <button class="pf-btn pf-export" onclick="exportProfile()">📤 Download .txt</button>
     </div>
     <div id="pf-status" style="font-size:0.78rem;color:var(--green);margin-top:0.5rem;min-height:1.2em;"></div>
@@ -1035,8 +1035,8 @@ function buildText(mode){
   if(mode==='aopa'){
     return `AOPA SCHOLARSHIP APPLICATION — ${n}\n${sep}\nApplicant: ${n} | DOB: ${dob}\nContact: ${phone} | ${email}\nAddress: ${addr}, ${csz}\n\nAcademic:\nSchool: ${school}\nMajor/Program: ${program}\nGPA: ${gpa} | Status: ${enroll} | Grad: ${grad}\n\nFlight Experience:\nCerts/Ratings: ${certs}\nTotal Hours: ${hrs}\n\nCareer Objective: ${goal}\n\n${sep}\nPERSONAL STATEMENT:\n${sep}\n${ps}\n\n${sep}\nFINANCIAL NEED:\n${sep}\n${need}\n`;
   }
-  if(mode==='bia'){
-    return `BIA / CHEROKEE NATION SCHOLARSHIP APPLICATION — ${n}\n${sep}\nApplicant: ${n} | DOB: ${dob}\nContact: ${phone} | ${email}\nAddress: ${addr}, ${csz}\n\nTribal/Heritage Status: ${tribal}\nEthnicity/Heritage: ${heritage}\n\nAcademic:\nSchool: ${school}\nProgram: ${program}\nGPA: ${gpa} | Status: ${enroll} | Grad: ${grad}\n\nCareer Goal:\n${goal}\n\n${sep}\nPERSONAL STATEMENT:\n${sep}\n${ps}\n\n${sep}\nFINANCIAL NEED:\n${sep}\n${need}\n`;
+  if(mode==='native'){
+    return `NATIVE FORWARD SCHOLARSHIP APPLICATION PROFILE — ${n}\n${sep}\nApplicant: ${n} | DOB: ${dob}\nContact: ${phone} | ${email}\nAddress: ${addr}, ${csz}\n\nTribal/Descendancy Documentation: ${tribal}\nHeritage information (only if requested): ${heritage}\n\nAcademic:\nSchool: ${school}\nProgram: ${program}\nGPA: ${gpa} | Status: ${enroll} | Expected Graduation: ${grad}\n\nCareer Goal:\n${goal}\n\n${sep}\nPERSONAL STATEMENT:\n${sep}\n${ps}\n\n${sep}\nFINANCIAL NEED:\n${sep}\n${need}\n`;
   }
 
   // Full profile
