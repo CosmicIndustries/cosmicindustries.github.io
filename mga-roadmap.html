@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>MGA Flight Training Roadmap</title>
+<title>MGA Aviation Funding &amp; Five-Year Roadmap</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -410,879 +410,461 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
   .fund-grid { grid-template-columns: 1fr; }
   .rate-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── NOV 2026 ROADMAP ADDITIONS ─────────────────── */
+.fund-card a, .fund-notes a { color:var(--accent); text-decoration:underline; text-underline-offset:2px; }
+.fund-card a:hover, .fund-notes a:hover { opacity:.8; }
+.fund-card .fund-apply { text-decoration:none; }
+#sources .fund-notes { line-height:1.7; }
+#funding-ledger td { vertical-align:top; }
+#five-year td, #program-cost td { vertical-align:top; }
+#timeline .action-item { scroll-margin-top:5rem; }
+@media (max-width:560px) {
+  .header-total { text-align:left; }
+  .stat-grid { grid-template-columns:1fr 1fr; }
+  .stat-value { font-size:1.2rem; }
+  .leg-header { gap:.5rem; }
+}
 </style>
 
 <!-- STICKY HEADER -->
 <header class="page-header">
   <div>
-    <div class="header-title">✈ MGA Flight Training Roadmap</div>
-    <div class="header-sub">Middle Georgia State University · School of Aviation · Ag/Cargo Path + Part 107</div>
+    <div class="header-title">✈ MGA Aviation Funding &amp; Five-Year Roadmap</div>
+    <div class="header-sub">MGA · Flight track · Ag/Cargo career path · 2027–2031 funding plan</div>
     <a href="https://cosmicindustries.github.io/mga-roadmap.html" target="_blank" class="header-gh-link">🔗 cosmicindustries.github.io</a>
   </div>
   <div class="header-total">
     <div class="header-total-num">$94,342</div>
-    <div class="header-total-label">estimated program total</div>
+    <div class="header-total-label">original audit baseline</div>
   </div>
 </header>
 
+
 <div class="main">
 
-  <!-- CAREER PATH -->
-  <section>
-    <div class="section-title">Career Path</div>
-    <div class="career-path">
-      <div class="cp-pill active">PPL</div>
-      <div class="cp-arrow">→</div>
-      <div class="cp-pill">Instrument</div>
-      <div class="cp-arrow">→</div>
-      <div class="cp-pill">Commercial</div>
-      <div class="cp-arrow">→</div>
-      <div class="cp-pill">CFI</div>
-      <div class="cp-arrow">→</div>
-      <div class="cp-pill">CFII</div>
-      <div class="cp-arrow">→</div>
-      <div class="cp-pill">Multi-Engine</div>
-      <div class="cp-arrow">→</div>
-      <div class="cp-pill drone">Part 107 🚁</div>
-      <div class="cp-arrow">→</div>
-      <div class="cp-pill" style="background:var(--green-bg);border-color:var(--green);color:var(--green);">Ag Aviation / Cargo</div>
-    </div>
-  </section>
-
-  <!-- STAT CARDS -->
-  <section>
-    <div class="section-title">At a Glance</div>
+  <section id="dashboard">
+    <div class="section-title">Funding position · 3 November 2026</div>
     <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-label">Flight Training</div>
-        <div class="stat-value">$66,654</div>
-        <div class="stat-note">7 stages incl. Part 107</div>
+      <div class="stat-card"><div class="stat-label">Original program total</div><div class="stat-value">$94,342</div><div class="stat-note">Existing audit baseline retained</div></div>
+      <div class="stat-card"><div class="stat-label">Previously identified coverage</div><div class="stat-value">$79,860</div><div class="stat-note">Historical audit figure — reverify award notices</div></div>
+      <div class="stat-card"><div class="stat-label">Original remaining gap</div><div class="stat-value" style="color:var(--red)">$14,482</div><div class="stat-note">15% of the original program estimate</div></div>
+      <div class="stat-card"><div class="stat-label">Spring funding cutoff</div><div class="stat-value">Dec 15</div><div class="stat-note">2026 · no new debt or out-of-pocket target</div></div>
+    </div>
+    <div class="leg-card" style="margin-top:1rem;">
+      <div class="leg-header">
+        <div class="leg-title-block"><div class="leg-title">Original audit coverage — 85%</div><div class="leg-course">Do not treat the $79,860 as cash available until the underlying award/authorization is confirmed.</div></div>
+        <div class="leg-cost"><div class="leg-cost-main">$14,482</div><div class="leg-cost-sub">gap to close</div></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Academic Costs</div>
-        <div class="stat-value">$27,688</div>
-        <div class="stat-note">Tuition $24,240 + fees $3,448</div>
+      <div class="leg-progress-wrap">
+        <div class="leg-progress-label"><span>Previously identified funding</span><strong>85%</strong></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Max Scholarships</div>
-        <div class="stat-value">$30k+</div>
-        <div class="stat-note">HOPE, AOPA, EAA, NAAA…</div>
+      <div class="leg-rows">
+        <div class="leg-row"><span class="leg-row-label">Program estimate from original audit</span><span class="leg-row-val">$94,342</span></div>
+        <div class="leg-row"><span class="leg-row-label">Coverage identified in original audit</span><span class="leg-row-val">$79,860</span></div>
+        <div class="leg-row"><span class="leg-row-label">Original uncovered balance</span><span class="leg-row-val" style="color:var(--red)">$14,482</span></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Flight Hours Target</div>
-        <div class="stat-value">250 hr</div>
-        <div class="stat-note">CPL min; build to 1,500 via CFI</div>
+      <div class="leg-schips">
+        <span class="schip amber"><span class="schip-dot"></span>Commitments need reconciliation</span>
+        <span class="schip neutral"><span class="schip-dot"></span>Original cost model preserved</span>
+      </div>
+    </div>
+    <p class="fund-notes" style="margin-top:.75rem;"><strong>Accounting rule:</strong> this roadmap preserves the cost and coverage figures already researched in your audit. An application, published maximum, scholarship average, potential refund, or agency cap is not a confirmed award. A funding source moves to “confirmed” only when its written notice identifies the amount, eligible charge, and payment/credit timing.</p>
+  </section>
+
+  <section id="career-path">
+    <div class="section-title">Career and certification path</div>
+    <div class="career-path">
+      <div class="cp-pill active">PPL</div><div class="cp-arrow">→</div>
+      <div class="cp-pill">Instrument</div><div class="cp-arrow">→</div>
+      <div class="cp-pill">Commercial</div><div class="cp-arrow">→</div>
+      <div class="cp-pill">CFI / CFII</div><div class="cp-arrow">→</div>
+      <div class="cp-pill">Multi-engine</div><div class="cp-arrow">→</div>
+      <div class="cp-pill">Ag operator pathway</div><div class="cp-arrow">+</div>
+      <div class="cp-pill drone">Part 107 UAS</div>
+    </div>
+    <div class="leg-card" style="margin-top:1rem;">
+      <div class="leg-rows" style="padding-top:.65rem;padding-bottom:.65rem">
+        <div class="leg-row"><span class="leg-row-label">Target degree</span><span class="leg-row-val">B.S. Aviation Science &amp; Management</span></div>
+        <div class="leg-row"><span class="leg-row-label">Flight concentration</span><span class="leg-row-val">Flight track · Eastman</span></div>
+        <div class="leg-row"><span class="leg-row-label">Career direction</span><span class="leg-row-val">Agricultural / cargo aviation</span></div>
+        <div class="leg-row"><span class="leg-row-label">Supplemental pathway</span><span class="leg-row-val">UAS / precision-ag operations</span></div>
+      </div>
+      <div class="leg-schips">
+        <a class="schip sky" href="https://www.mga.edu/aviation/programs.php" target="_blank" rel="noopener">MGA aviation programs ↗</a>
+        <a class="schip sky" href="https://www.mga.edu/aviation/science-management/programs.php" target="_blank" rel="noopener">Degree / flight track ↗</a>
+      </div>
+    </div>
+    <p class="fund-notes" style="margin-top:.65rem;">Certificate hour requirements depend on the applicable FAA Part 61 or Part 141 course and approved syllabus. The 250-hour figure in the former page was not a universal minimum; confirm the exact MGA-approved training route and certificate requirements with the School of Aviation.</p>
+  </section>
+
+  <section id="program-cost">
+    <div class="section-title">Program cost model — original audit retained</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Flight training estimate</div><div class="stat-value">$66,654</div><div class="stat-note">Seven-stage estimate from original worksheet</div></div>
+      <div class="stat-card"><div class="stat-label">Academic estimate</div><div class="stat-value">$27,688</div><div class="stat-note">$24,240 tuition + $3,448 mandatory fees in original worksheet</div></div>
+      <div class="stat-card"><div class="stat-label">Combined audit total</div><div class="stat-value">$94,342</div><div class="stat-note">No change to your established baseline</div></div>
+    </div>
+    <div class="tbl-wrap" style="margin-top:1rem;">
+      <table>
+        <thead><tr><th>Training stage</th><th>Former course reference</th><th>Original estimate</th><th>Planning note</th></tr></thead>
+        <tbody>
+          <tr><td>Private Pilot</td><td>AVIA 3106</td><td class="mono">$9,725</td><td>40-hour minimum cited in prior model; actual syllabus may require more.</td></tr>
+          <tr><td>Instrument Rating</td><td>AVIA 3018</td><td class="mono">$9,188</td><td>Instrument instruction, simulator and checkride estimate.</td></tr>
+          <tr><td>Commercial Pilot</td><td>AVIA 3020</td><td class="mono">$28,536</td><td>Largest stage in the original flight-cost model.</td></tr>
+          <tr><td>Certified Flight Instructor</td><td>AVIA 3024</td><td class="mono">$7,119</td><td>Potential later hour-building / employment route.</td></tr>
+          <tr><td>Instrument Flight Instructor</td><td>AVIA 3026</td><td class="mono">$5,081</td><td>Instructor qualification; confirm sequencing.</td></tr>
+          <tr><td>Multi-engine add-on</td><td>AVIA 3022</td><td class="mono">$6,678</td><td>Additional rating; confirm career relevance and timing.</td></tr>
+          <tr><td>FAA Part 107 Remote Pilot</td><td>UAS</td><td class="mono">$327</td><td>Separate UAS credential; not a substitute for manned-aircraft certificates.</td></tr>
+          <tr><td><strong>Original flight estimate</strong></td><td></td><td class="mono">$66,654</td><td>Historical planning model, not a current invoice.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="fund-card" style="margin-top:1rem;">
+      <div class="fund-name">Current MGA tuition and fees must be checked separately</div>
+      <div class="fund-notes">The former $27,688 academic estimate is retained as part of the original $94,342 audit, not represented as the current 2026–27 bill. MGA has published its 2026–27 tuition and fee schedule. Ask for your actual Spring 2027 student-account charges, degree map, flight-account charges, required-hour schedule, refund rules and payment deadline.</div>
+      <a class="fund-apply" href="https://www.mga.edu/student-account-services/tuition-fees/index.php" target="_blank" rel="noopener">MGA tuition &amp; fees ↗</a>
+      <a class="fund-apply" href="https://www.mga.edu/aviation/scholarships.php" target="_blank" rel="noopener">MGA aviation scholarships ↗</a>
+    </div>
+  </section>
+
+  <section id="december-gap">
+    <div class="section-title">Spring 2027 — close the $14,482 gap</div>
+    <div class="fund-grid">
+      <div class="fund-card urgent">
+        <div class="fund-name">1 · GVRA Bud McCall Grant</div>
+        <div class="fund-amount amber">Up to $17,725 / year</div>
+        <div class="fund-deadline red">Spring file deadline · Dec 1, 2026</div>
+        <div class="fund-notes">Published annual category limits: tuition up to $7,395, maintenance up to $9,430 and books up to $900. Undergraduate support may continue up to five years, subject to eligibility and annual approval. Comparable aid, including Pell and state grants, is applied first. You must be an eligible GVRA client and have an approved employment goal. Flight-account charges are not automatically approved.</div>
+        <a class="fund-apply" href="https://gvs.georgia.gov/bud-mccall-grant" target="_blank" rel="noopener">Grant limits ↗</a>
+        <a class="fund-apply" href="https://gvs.georgia.gov/how-do-i-apply-bud-mccall-grant" target="_blank" rel="noopener">Spring documentation rules ↗</a>
+        <div class="fund-notes" style="margin-top:.5rem"><strong>Your status:</strong> GVRA case/process underway; actual Bud McCall approval and amount not confirmed. Obtain a written IPE and expense-category decision.</div>
+      </div>
+      <div class="fund-card urgent">
+        <div class="fund-name">2 · MGA student pilot fuel fund</div>
+        <div class="fund-amount sky">$1,000,000 program fund</div>
+        <div class="fund-deadline amber">Ask MGA now · Spring 2027 access unknown</div>
+        <div class="fund-notes">MGA announced a $1 million student pilot fuel fund within a larger federal aviation award. The announcement says it is intended to offset required flight-hour fuel costs. It does not state a per-student amount, entry-term rules, payment timing or whether it can be combined with GVRA and scholarships.</div>
+        <a class="fund-apply" href="https://ce.mga.edu/news/2026/09/middle-georgia-state-university-receives-federal-funds-for-aviation-school.php" target="_blank" rel="noopener">MGA announcement ↗</a>
+        <div class="fund-notes" style="margin-top:.5rem"><strong>Your status:</strong> funding pool announced; individual award is unconfirmed. Ask whether it credits the flight account before the Spring payment deadline.</div>
+      </div>
+      <div class="fund-card soon">
+        <div class="fund-name">3 · MGA Foundation / aviation scholarships</div>
+        <div class="fund-amount green">Amounts vary</div>
+        <div class="fund-deadline amber">Ask whether any award can post by Dec 15</div>
+        <div class="fund-notes">MGA Foundation says all MGA students are considered automatically for its general scholarships; no separate general application is required. The School of Aviation lists named awards, including Gardner Lowe, Great Oaks Bank, Republic Airways and Ocmulgee EMC Foundation awards. Selection timing and incoming-Spring eligibility vary.</div>
+        <a class="fund-apply" href="https://www.mga.edu/financial-aid/opportunities/scholarships.php" target="_blank" rel="noopener">Foundation scholarship process ↗</a>
+        <a class="fund-apply" href="https://www.mga.edu/aviation/scholarships.php" target="_blank" rel="noopener">Aviation award list ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">4 · Federal Pell Grant</div>
+        <div class="fund-amount green">2026–27 max $7,395</div>
+        <div class="fund-deadline neutral">FAFSA submitted · actual award unknown</div>
+        <div class="fund-notes">The published maximum is not your award amount. Eligibility depends on FAFSA/SAI, enrollment intensity, lifetime eligibility and program eligibility. Your submitted FAFSA should be packaged by MGA; request the actual award letter and disbursement dates.</div>
+        <a class="fund-apply" href="https://studentaid.gov/understand-aid/types/grants/pell" target="_blank" rel="noopener">Pell eligibility ↗</a>
+        <a class="fund-apply" href="https://fsapartners.ed.gov/knowledge-center/library/dear-colleague-letters/2026-01-30/2026-27-federal-pell-grant-maximum-and-minimum-award-amounts" target="_blank" rel="noopener">2026–27 maximum ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">5 · FSEOG / other need-based aid</div>
+        <div class="fund-amount sky">Campus-limited</div>
+        <div class="fund-deadline neutral">MGA award review required</div>
+        <div class="fund-notes">Federal Supplemental Educational Opportunity Grant is limited by participating-school funding and student eligibility. Do not assign the statutory maximum to your ledger. Ask whether MGA has awarded FSEOG and the actual amount.</div>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">6 · Georgia HOPE / Zell Miller</div>
+        <div class="fund-amount amber">Do not count yet</div>
+        <div class="fund-deadline neutral">Time-limit review is critical</div>
+        <div class="fund-notes">Your reported high-school GPA is 3.5+, but your high-school graduation window (2012–2015) creates a likely HOPE/Zell time-limit issue. HOPE has a ten-year time limit for many first-award cohorts; older cohorts can have a seven-year rule. Zell also has a separate GPA and test-score threshold. Ask MGA/GSFC to run your exact first-award and graduation history. No HOPE amount is included in the coverage stack until confirmed.</div>
+        <a class="fund-apply" href="https://gsfc.georgia.gov/hope" target="_blank" rel="noopener">GSFC HOPE rules ↗</a>
+      </div>
+    </div>
+    <div class="action-item urgent" style="margin-top:1rem">
+      <div class="action-num">!</div>
+      <div class="action-body">
+        <div class="action-title">MGA must answer these five questions in writing</div>
+        <div class="action-detail">1) What is the exact Spring 2027 amount due on the university account and flight account? 2) Is the $1 million pilot fuel fund available to incoming Spring 2027 flight-track students, and what is the student-level credit? 3) Which aviation/Foundation awards can be made before Dec 15? 4) Can approved outside awards or third-party authorizations protect registration while payment is pending? 5) What is the actual disbursement/credit date for Pell and other aid?</div>
       </div>
     </div>
   </section>
 
-  <!-- FLIGHT LEGS -->
-  <section>
-    <div class="section-title">Flight Training — Stage Breakdown</div>
-    <div class="legs-grid">
-
-      <!-- LEG 1: PPL -->
-      <div class="leg-card">
-        <div class="leg-header">
-          <div class="leg-num">1</div>
-          <div class="leg-title-block">
-            <div class="leg-title">Private Pilot Certificate</div>
-            <div class="leg-course">AVIA 3106 · 40 hr min dual + solo</div>
-          </div>
-          <div class="leg-cost">
-            <div class="leg-cost-main">$9,725</div>
-            <div class="leg-cost-sub">Running total: $9,725</div>
-          </div>
-        </div>
-        <div class="leg-progress-wrap">
-          <div class="leg-progress-label"><span>Program progress</span><span>10%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
-        </div>
-        <div class="leg-rows">
-          <div class="leg-row"><span class="leg-row-label">Warrior III (30 hr @ $159)</span><span class="leg-row-val">$4,770</span></div>
-          <div class="leg-row"><span class="leg-row-label">Frasca Sim (10 hr @ $80)</span><span class="leg-row-val">$800</span></div>
-          <div class="leg-row"><span class="leg-row-label">CFI fee (40 hr @ $20)</span><span class="leg-row-val">$800</span></div>
-          <div class="leg-row"><span class="leg-row-label">Books / supplies / checkride</span><span class="leg-row-val">$1,155</span></div>
-          <div class="leg-row"><span class="leg-row-label">Med cert + FAA fees</span><span class="leg-row-val">~$200</span></div>
-          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$9,725</span></div>
-        </div>
-        <div class="leg-schips">
-          <div class="schip green"><div class="schip-dot"></div>EAA Scholarship — avg $6,800 · Dec 16</div>
-          <div class="schip green"><div class="schip-dot"></div>HOPE / Zell Miller — academic</div>
-          <div class="schip green"><div class="schip-dot"></div>FAFSA / Pell — academic</div>
-        </div>
+  <section id="scholarships">
+    <div class="section-title">Scholarship pipeline — current and future cycles</div>
+    <div class="fund-grid">
+      <div class="fund-card urgent">
+        <div class="fund-name">Native Forward Direct Scholarship</div>
+        <div class="fund-amount green">Award amount varies</div>
+        <div class="fund-deadline red">Dec 2, 2026 · 11:59 PM Mountain</div>
+        <div class="fund-notes">Your application was previously reported as 44% complete; current portal status must be checked. The program accepts eligible first-/second-generation descendants of qualifying tribes with documentation from a tribal enrollment office, subject to the specific cycle rules. Requires FAFSA eligibility, transcript/SAP, four applicant responses and MGA Financial Need Form. Your prior contact indicated the school's FNF may be due Dec 18; confirm this separately from the Dec 2 applicant deadline.</div>
+        <a class="fund-apply" href="https://www.nativeforward.org/scholarships/native-forward-direct-scholarship-winter-spring/" target="_blank" rel="noopener">Direct Scholarship rules ↗</a>
+        <a class="fund-apply" href="https://www.nativeforward.org/scholarship-faq/" target="_blank" rel="noopener">Tribal eligibility FAQ ↗</a>
       </div>
-
-      <!-- LEG 2: Instrument -->
-      <div class="leg-card">
-        <div class="leg-header">
-          <div class="leg-num">2</div>
-          <div class="leg-title-block">
-            <div class="leg-title">Instrument Rating</div>
-            <div class="leg-course">AVIA 3018 · 50 hr instrument time</div>
-          </div>
-          <div class="leg-cost">
-            <div class="leg-cost-main">$9,188</div>
-            <div class="leg-cost-sub">Running total: $18,913</div>
-          </div>
-        </div>
-        <div class="leg-progress-wrap">
-          <div class="leg-progress-label"><span>Program progress</span><span>20%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
-        </div>
-        <div class="leg-rows">
-          <div class="leg-row"><span class="leg-row-label">Archer (30 hr @ $164)</span><span class="leg-row-val">$4,920</span></div>
-          <div class="leg-row"><span class="leg-row-label">Frasca Sim (20 hr @ $80)</span><span class="leg-row-val">$1,600</span></div>
-          <div class="leg-row"><span class="leg-row-label">CFI-I fee (50 hr @ $20)</span><span class="leg-row-val">$1,000</span></div>
-          <div class="leg-row"><span class="leg-row-label">Foggles / nav charts / checkride</span><span class="leg-row-val">~$668</span></div>
-          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$9,188</span></div>
-        </div>
-        <div class="leg-schips">
-          <div class="schip amber"><div class="schip-dot"></div>Lyons Aviation Scholarship — $1,500</div>
-          <div class="schip amber"><div class="schip-dot"></div">EAA Scholarships — Dec 16 deadline</div>
-          <div class="schip amber"><div class="schip-dot"></div">AOPA Foundation — Dec 31 deadline</div>
-        </div>
+      <div class="fund-card urgent">
+        <div class="fund-name">NEW · Native Forward Student Relief Funding</div>
+        <div class="fund-amount green">One-time relief · amount not published</div>
+        <div class="fund-deadline red">Dec 2, 2026 · 11:59 PM Mountain</div>
+        <div class="fund-notes">Separate application from Native Forward Direct. Supports emergency housing, food insecurity, travel, educational technology and other educational expenses. Requires full-time enrollment and tribal enrollment/descendancy proof meeting its cycle requirements. Ask Native Forward whether one tribal letter can support both applications.</div>
+        <a class="fund-apply" href="https://www.nativeforward.org/scholarships/native-forward-student-relief-funding-fall-2026-2027/" target="_blank" rel="noopener">Student Relief rules ↗</a>
       </div>
-
-      <!-- LEG 3: Commercial -->
-      <div class="leg-card">
-        <div class="leg-header">
-          <div class="leg-num">3</div>
-          <div class="leg-title-block">
-            <div class="leg-title">Commercial Pilot Certificate</div>
-            <div class="leg-course">AVIA 3020 · 250 total hr required</div>
-          </div>
-          <div class="leg-cost">
-            <div class="leg-cost-main">$28,536</div>
-            <div class="leg-cost-sub">Running total: $47,449</div>
-          </div>
-        </div>
-        <div class="leg-progress-wrap">
-          <div class="leg-progress-label"><span>Program progress</span><span>50%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
-        </div>
-        <div class="leg-rows">
-          <div class="leg-row"><span class="leg-row-label">Arrow (100 hr @ $179)</span><span class="leg-row-val">$17,900</span></div>
-          <div class="leg-row"><span class="leg-row-label">Archer cross-country (30 hr @ $164)</span><span class="leg-row-val">$4,920</span></div>
-          <div class="leg-row"><span class="leg-row-label">CFI fee (130 hr @ $20)</span><span class="leg-row-val">$2,600</span></div>
-          <div class="leg-row"><span class="leg-row-label">Checkride + supplies</span><span class="leg-row-val">~$1,116</span></div>
-          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$28,536</span></div>
-        </div>
-        <div class="leg-schips">
-          <div class="schip amber"><div class="schip-dot"></div>Lyons Aviation — $1,500</div>
-          <div class="schip amber"><div class="schip-dot"></div>EAA Alex Foss Memorial — strong match</div>
-          <div class="schip amber"><div class="schip-dot"></div>AOPA Foundation — 32 awards up to $14k</div>
-          <div class="schip sky"><div class="schip-dot"></div>NAAA — aerial application focus</div>
-        </div>
+      <div class="fund-card urgent">
+        <div class="fund-name">Professional Pilots of Tomorrow — Carmen John Lomando</div>
+        <div class="fund-amount sky">Amount not published</div>
+        <div class="fund-deadline red">Nov 16, 2026 · 8:00 AM Eastern</div>
+        <div class="fund-notes">2026 pilot-training award. Scholarship is paid directly to the flight school and enrollment is required at disbursement. Application status is not confirmed here. Internal target remains Nov 14. The published page does not guarantee payment by Dec 15.</div>
+        <a class="fund-apply" href="https://www.theppot.org/scholarships" target="_blank" rel="noopener">PPOT scholarship page ↗</a>
       </div>
-
-      <!-- LEG 4: CFI -->
-      <div class="leg-card">
-        <div class="leg-header">
-          <div class="leg-num">4</div>
-          <div class="leg-title-block">
-            <div class="leg-title">Certified Flight Instructor (CFI)</div>
-            <div class="leg-course">AVIA 3024 · Hour-builder stage</div>
-          </div>
-          <div class="leg-cost">
-            <div class="leg-cost-main">$7,119</div>
-            <div class="leg-cost-sub">Running total: $54,568</div>
-          </div>
-        </div>
-        <div class="leg-progress-wrap">
-          <div class="leg-progress-label"><span>Program progress</span><span>58%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:58%"></div></div>
-        </div>
-        <div class="leg-rows">
-          <div class="leg-row"><span class="leg-row-label">Ground / sim prep (20 hr @ $80)</span><span class="leg-row-val">$1,600</span></div>
-          <div class="leg-row"><span class="leg-row-label">Dual instruction received (25 hr @ $179)</span><span class="leg-row-val">$4,475</span></div>
-          <div class="leg-row"><span class="leg-row-label">Checkride + supplies</span><span class="leg-row-val">~$1,044</span></div>
-          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$7,119</span></div>
-        </div>
-        <div class="leg-schips">
-          <div class="schip amber"><div class="schip-dot"></div>AOPA Foundation</div>
-          <div class="schip amber"><div class="schip-dot"></div>EAA Scholarships</div>
-          <div class="schip green"><div class="schip-dot"></div>Teach → earn while building hours</div>
-        </div>
+      <div class="fund-card soon">
+        <div class="fund-name">Avfuel Pilot-in-Training Scholarship</div>
+        <div class="fund-amount green">$500–$1,500</div>
+        <div class="fund-deadline amber">Oct 31 deadline has passed</div>
+        <div class="fund-notes">Prior research reported that you submitted an application. Verify the receipt and award decision; do not submit a duplicate. Award use supports flight training/tuition/new pilot license, but a payment by Dec 15 is not guaranteed.</div>
+        <a class="fund-apply" href="https://www.avfuel.com/" target="_blank" rel="noopener">Avfuel ↗</a>
       </div>
-
-      <!-- LEG 5: CFII -->
-      <div class="leg-card">
-        <div class="leg-header">
-          <div class="leg-num">5</div>
-          <div class="leg-title-block">
-            <div class="leg-title">Instrument Flight Instructor (CFII)</div>
-            <div class="leg-course">AVIA 3026 · Adds instrument teaching</div>
-          </div>
-          <div class="leg-cost">
-            <div class="leg-cost-main">$5,081</div>
-            <div class="leg-cost-sub">Running total: $59,649</div>
-          </div>
-        </div>
-        <div class="leg-progress-wrap">
-          <div class="leg-progress-label"><span>Program progress</span><span>63%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:63%"></div></div>
-        </div>
-        <div class="leg-rows">
-          <div class="leg-row"><span class="leg-row-label">Sim time (15 hr @ $80)</span><span class="leg-row-val">$1,200</span></div>
-          <div class="leg-row"><span class="leg-row-label">Dual received (15 hr @ $164)</span><span class="leg-row-val">$2,460</span></div>
-          <div class="leg-row"><span class="leg-row-label">Checkride + materials</span><span class="leg-row-val">~$1,421</span></div>
-          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$5,081</span></div>
-        </div>
-        <div class="leg-schips">
-          <div class="schip neutral"><div class="schip-dot"></div>AOPA Foundation</div>
-          <div class="schip neutral"><div class="schip-dot"></div>EAA Scholarships</div>
-        </div>
+      <div class="fund-card soon">
+        <div class="fund-name">EAA Aviation Foundation — collegiate/post-secondary</div>
+        <div class="fund-amount sky">Multiple awards · amounts vary</div>
+        <div class="fund-deadline amber">Dec 16, 2026 · decision Mar 1, 2027</div>
+        <div class="fund-notes">One application matches applicants to eligible scholarships; a non-relative reference must submit by the deadline. For MGA, use the post-secondary route for a university professional-flight program. Ordinary EAA flight-training awards are intended for non-university flight schools. Too late for the Dec 15 Spring cutoff, but important for later training. EAA membership can improve priority but is not universally required.</div>
+        <a class="fund-apply" href="https://www.eaa.org/eaa/learn-to-fly/scholarships/post-secondary-scholarships" target="_blank" rel="noopener">Post-secondary awards ↗</a>
+        <a class="fund-apply" href="https://www.eaa.org/eaa/learn-to-fly/scholarships/eaa-flight-training-scholarships" target="_blank" rel="noopener">All flight scholarship guidance ↗</a>
       </div>
-
-      <!-- LEG 6: Multi-Engine -->
-      <div class="leg-card">
-        <div class="leg-header">
-          <div class="leg-num">6</div>
-          <div class="leg-title-block">
-            <div class="leg-title">Multi-Engine Add-On Rating</div>
-            <div class="leg-course">AVIA 3022 · Piper Seminole</div>
-          </div>
-          <div class="leg-cost">
-            <div class="leg-cost-main">$6,678</div>
-            <div class="leg-cost-sub">Running total: $66,327</div>
-          </div>
-        </div>
-        <div class="leg-progress-wrap">
-          <div class="leg-progress-label"><span>Program progress</span><span>70%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
-        </div>
-        <div class="leg-rows">
-          <div class="leg-row"><span class="leg-row-label">Piper Seminole (20 hr @ $298)</span><span class="leg-row-val">$5,960</span></div>
-          <div class="leg-row"><span class="leg-row-label">CFI fee (20 hr @ $20)</span><span class="leg-row-val">$400</span></div>
-          <div class="leg-row"><span class="leg-row-label">Checkride + supplies</span><span class="leg-row-val">~$318</span></div>
-          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$6,678</span></div>
-        </div>
-        <div class="leg-schips">
-          <div class="schip sky"><div class="schip-dot"></div>NAAA — aerial application / ag aviation</div>
-          <div class="schip neutral"><div class="schip-dot"></div>AOPA Foundation</div>
-        </div>
+      <div class="fund-card">
+        <div class="fund-name">AOPA Foundation scholarships</div>
+        <div class="fund-amount sky">Matched awards vary</div>
+        <div class="fund-deadline neutral">Applications previously reported submitted</div>
+        <div class="fund-notes">Do not duplicate your 2026/2027 submissions. Fall application window runs Oct 6–Dec 31, 2026, with notifications beginning in February. AOPA awards are future-stage funding, not a guaranteed Dec 15 account credit.</div>
+        <a class="fund-apply" href="https://www.aopa.org/news-and-media/all-news/2026/january/flight-training/you-can-fly-scholarship-opportunities" target="_blank" rel="noopener">Current AOPA cycle ↗</a>
       </div>
-
-      <!-- LEG 7: Part 107 -->
-      <div class="leg-card" style="border-color:var(--purple)">
-        <div class="leg-header">
-          <div class="leg-num drone">7</div>
-          <div class="leg-title-block">
-            <div class="leg-title">FAA Part 107 Commercial Drone</div>
-            <div class="leg-course">Remote Pilot Certificate · UAS operations</div>
-          </div>
-          <div class="leg-cost">
-            <div class="leg-cost-main">~$327</div>
-            <div class="leg-cost-sub">Running total: ~$66,654</div>
-          </div>
-        </div>
-        <div class="leg-progress-wrap">
-          <div class="leg-progress-label"><span>Program progress</span><span>71%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:71%;background:var(--purple)"></div></div>
-        </div>
-        <div class="leg-rows">
-          <div class="leg-row"><span class="leg-row-label">King Schools online course</span><span class="leg-row-val">~$150</span></div>
-          <div class="leg-row"><span class="leg-row-label">FAA Airman Knowledge Test fee</span><span class="leg-row-val">$175</span></div>
-          <div class="leg-row"><span class="leg-row-label">FAA IACRA registration</span><span class="leg-row-val">Free</span></div>
-          <div class="leg-row" style="font-weight:700"><span class="leg-row-label" style="color:var(--fg)">Stage subtotal (est.)</span><span class="leg-row-val">~$327</span></div>
-        </div>
-        <div class="leg-schips">
-          <div class="schip purple"><div class="schip-dot"></div>Lowest cost cert in the program</div>
-          <div class="schip purple"><div class="schip-dot"></div>Opens ag scouting + precision contracts</div>
-        </div>
+      <div class="fund-card soon">
+        <div class="fund-name">NEW · American Indian College Fund — Full Circle</div>
+        <div class="fund-amount green">Average awards $2,000–$3,000</div>
+        <div class="fund-deadline amber">Spring application by Jan 25, 2027</div>
+        <div class="fund-notes">One application matches students to multiple awards. Potential fit for a student who is an enrolled member of a qualifying tribe or a descendant of an enrolled member. Descendants need evidence such as a parent's or grandparent's tribal enrollment record plus birth certificates connecting the lineage. Requires at least 2.0 cumulative GPA and full-time attendance at an accredited nonprofit institution. Confirm Spring award timing and lineage documentation before relying on it.</div>
+        <a class="fund-apply" href="https://collegefund.org/scholarships-update/" target="_blank" rel="noopener">Full Circle application information ↗</a>
       </div>
-
-    </div><!-- /legs-grid -->
+      <div class="fund-card">
+        <div class="fund-name">NEW · Cobell Undergraduate Scholarship</div>
+        <div class="fund-amount sky">Up to $5,000 new / $8,000 returning</div>
+        <div class="fund-deadline neutral">Opens Dec 15, 2026 · closes Mar 31, 2027</div>
+        <div class="fund-notes">Can support tuition, fees, books and living expenses. Hard eligibility gate: applicant must be an enrolled member of a federally recognized U.S. tribe or Alaska Native Corporation, attending a nonprofit institution full-time and pursuing a first associate/bachelor's degree. Cherokee ancestry or a descendant letter by itself does not satisfy enrollment status.</div>
+        <a class="fund-apply" href="https://cobellscholar.org/scholarships/undergraduate/" target="_blank" rel="noopener">Cobell eligibility ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">Georgia Business Aviation Association — Professional Pilot</div>
+        <div class="fund-amount sky">Prior cycle: up to $5,000</div>
+        <div class="fund-deadline neutral">2026/27 date not yet published</div>
+        <div class="fund-notes">A past professional-pilot scholarship supported students in accredited college aviation programs. The previous cycle closed Apr 15, 2026. The next cycle and adult applicant eligibility should be confirmed directly; do not assume the older deadline or rules carry forward.</div>
+        <a class="fund-apply" href="https://www.gbaa.org/page-18060" target="_blank" rel="noopener">GBAA scholarship page ↗</a>
+        <div class="fund-notes" style="margin-top:.45rem">Contact: gbaaorg@gmail.com — ask about an adult career-transition applicant and the 2027 cycle.</div>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">NBAA International Operators Scholarship</div>
+        <div class="fund-amount sky">Up to $8,000</div>
+        <div class="fund-deadline neutral">Jan 6, 2027</div>
+        <div class="fund-notes">For eligible adults entering business aviation or current professionals expanding into international operations. Award supports relevant education/training; completion target is March 2028. This is a stretch fit unless your career plan includes international business-aviation operations. Full-time students may have awards paid to their school; other recipients may be reimbursed.</div>
+        <a class="fund-apply" href="https://nbaa.org/professional-development/scholarships/international-operators-scholarship/" target="_blank" rel="noopener">NBAA rules ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">NBAA James Sullivan Aviation Scholarship</div>
+        <div class="fund-amount sky">$5,000 · two awards</div>
+        <div class="fund-deadline neutral">Jun 15, 2027</div>
+        <div class="fund-notes">For aspiring business-aviation pilots and other aviation professionals accepted into a full-time aviation program at an eligible 2- or 4-year school or FAA-approved program. Requires recommendations, essay, résumé, transcript and acceptance documentation.</div>
+        <a class="fund-apply" href="https://nbaa.org/professional-development/scholarships/james-sullivan-aviation-scholarship/" target="_blank" rel="noopener">James Sullivan rules ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">NBAA Corporate Aircraft Association — Future Aviation Leaders</div>
+        <div class="fund-amount sky">Up to $1,250 · four awards</div>
+        <div class="fund-deadline neutral">Jun 15, 2027</div>
+        <div class="fund-notes">For eligible business-aviation students, including aspiring pilots. Awards are paid to the school. Application period is expected to open in April 2027.</div>
+        <a class="fund-apply" href="https://nbaa.org/professional-development/scholarships/corporate-aircraft-association-scholarship-future-aviation-leaders/" target="_blank" rel="noopener">CAA scholarship rules ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">NAAA Ag Wings of Tomorrow</div>
+        <div class="fund-amount sky">Up to $5,000</div>
+        <div class="fund-deadline neutral">2026 cycle closed Sep 8; 2027 date unannounced</div>
+        <div class="fund-notes">Five awards in the most recent cycle supported flight training, an operator-sponsored ag aviation apprenticeship, or eligible ag/aviation coursework. Requires a sponsoring NAAA Operator Member; only one applicant per sponsoring operator per year. Build an operator relationship now for the next cycle.</div>
+        <a class="fund-apply" href="https://www.agaviation.org/career/scholarships/ag-wings-of-tomorrow-scholarship/" target="_blank" rel="noopener">NAAA award rules ↗</a>
+      </div>
+    </div>
   </section>
 
-  <!-- ACADEMIC COSTS -->
-  <section>
-    <div class="section-title">Academic Costs (MGA Tuition + Fees)</div>
+  <section id="native-military">
+    <div class="section-title">Native, family-service and conditional eligibility</div>
+    <div class="fund-grid">
+      <div class="fund-card">
+        <div class="fund-name">Cherokee Nation Foundation / tribal education funding</div>
+        <div class="fund-amount amber">Enrollment-gated</div>
+        <div class="fund-notes">Cherokee ancestry alone is not the same as Cherokee Nation citizenship or enrollment in another federally recognized tribe. Cherokee Nation scholarships, Cobell and BIA higher-education funding have different enrollment and documentation rules. Do not include these awards in the funding stack until the specific tribal eligibility rule is met.</div>
+        <a class="fund-apply" href="https://www.cherokee.org/" target="_blank" rel="noopener">Cherokee Nation official site ↗</a>
+        <a class="fund-apply" href="https://www.bia.gov/service/education/education-grants" target="_blank" rel="noopener">BIA education programs ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">Father's Army service — dependent benefits screen</div>
+        <div class="fund-amount amber">Eligibility unknown</div>
+        <div class="fund-notes">Your father's four years of active-duty Army service do not by themselves establish eligibility for Georgia HERO or Chapter 35 DEA. The main unresolved question for Chapter 35 is whether VA has determined a qualifying permanent-and-total service-connected disability. Georgia HERO has separate qualifying Guard/Reserve combat-service rules. Obtain the VA award status/service dates only if readily available; do not count either benefit yet.</div>
+        <a class="fund-apply" href="https://www.va.gov/education/survivor-dependent-benefits/" target="_blank" rel="noopener">VA dependent education benefits ↗</a>
+        <a class="fund-apply" href="https://gsfc.georgia.gov/hope-state-aid-programs/hope-programs/georgia-heroes-scholarship" target="_blank" rel="noopener">Georgia HERO rules ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">GVRA supported self-employment pathway</div>
+        <div class="fund-amount sky">Case-by-case service plan</div>
+        <div class="fund-notes">NEW strategic route: Georgia's vocational-rehabilitation policy includes supported self-employment, business-plan development, training and certain reasonable start-up tools/equipment. The policy calls for a viable, wholly owned business and limits initial start-up support; it does not establish a routine aircraft purchase grant or five-year insurance/operating subsidy. Ask for a formal self-employment assessment against an agricultural aviation business plan.</div>
+        <a class="fund-apply" href="https://gvs.georgia.gov/vocational-rehabilitation" target="_blank" rel="noopener">GVRA service overview ↗</a>
+        <a class="fund-apply" href="https://gvs.georgia.gov/document/document/client-services-policy-manual-07-01-22/download" target="_blank" rel="noopener">Self-employment policy manual ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="workforce">
+    <div class="section-title">Workforce and return-to-work support</div>
+    <div class="fund-grid">
+      <div class="fund-card">
+        <div class="fund-name">WorkSource Coastal Georgia — Adult / Dislocated Worker</div>
+        <div class="fund-amount sky">Amount determined by approved training plan</div>
+        <div class="fund-deadline neutral">Rolling eligibility / local training authorization</div>
+        <div class="fund-notes">Glynn County is in the WorkSource Coastal region. The program offers eligible occupational training and scholarship assistance for certain classes, certification tests and related costs. It may support tuition, books and fees for an approved high-demand training program. MGA's Flight-track degree and specific flight fees are not yet confirmed eligible. Do not use WorkSource Middle Flint as the local workforce area for Glynn County.</div>
+        <a class="fund-apply" href="https://worksourcecoastal.org/services/adult-services/" target="_blank" rel="noopener">Adult / dislocated-worker services ↗</a>
+        <a class="fund-apply" href="https://worksourcecoastal.org/about/board/region-12-local-plan/" target="_blank" rel="noopener">Region 12 plan ↗</a>
+        <div class="fund-notes" style="margin-top:.45rem">Contact: 912-351-6379 · ContactWSC@savannahga.gov. Verify current in-person service locations before travel.</div>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">WorkSource employer OJT / apprenticeship</div>
+        <div class="fund-amount sky">Employer wage reimbursement / training support</div>
+        <div class="fund-notes">On-the-job training is an employer contract, not a direct student scholarship. A participating aviation operator may receive wage reimbursement while training a new employee. This could create a paid ground-operations or apprenticeship entry route while earning aviation experience.</div>
+        <a class="fund-apply" href="https://worksourcecoastal.org/services/employer-services/on-the-job-training/" target="_blank" rel="noopener">Employer OJT details ↗</a>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">Community Foundation of South Georgia — watchlist</div>
+        <div class="fund-amount sky">Amount / fit not confirmed</div>
+        <div class="fund-deadline neutral">2026–27 application opens Dec 15</div>
+        <div class="fund-notes">Potential regional lead for South Georgia college students. The Gaskins Environmental award and other funds have separate geographic, GPA and field-of-study criteria. MGA, Glynn residency and an aviation flight major must be confirmed against each award before applying.</div>
+        <a class="fund-apply" href="https://cfsga.net/our-scholarships/" target="_blank" rel="noopener">Foundation scholarship listings ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="five-year">
+    <div class="section-title">2027–2031 financial runway</div>
+    <p class="fund-notes" style="margin-bottom:.85rem;">Five-year coverage is larger than the $14,482 Spring program gap. Model education, living support, employment transition and aircraft ownership in separate ledgers. The scenarios below are planning sensitivities, not a claim that your actual monthly need is known.</p>
     <div class="tbl-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Credits / Detail</th>
-            <th>Per Semester</th>
-            <th>Total Est.</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Monthly living requirement</th><th>Annual requirement</th><th>Five-year requirement</th><th>Use</th></tr></thead>
         <tbody>
-          <tr>
-            <td>In-State Tuition</td>
-            <td><span class="badge-credit">~120 cr total</span></td>
-            <td class="mono">$3,030</td>
-            <td class="mono">$24,240</td>
-          </tr>
-          <tr>
-            <td>Mandatory Fees</td>
-            <td>Tech, activity, health, athletics</td>
-            <td class="mono">~$431</td>
-            <td class="mono">$3,448</td>
-          </tr>
-          <tr>
-            <td>Books / Supplies</td>
-            <td>Avg per semester est.</td>
-            <td class="mono">~$300</td>
-            <td class="mono">Varies</td>
-          </tr>
-          <tr>
-            <td>Room &amp; Board</td>
-            <td>On-campus option available</td>
-            <td class="mono">~$3,600</td>
-            <td class="mono">Separate</td>
-          </tr>
-          <tr>
-            <td>Academic Subtotal</td>
-            <td>Tuition + mandatory fees</td>
-            <td class="mono">—</td>
-            <td class="mono">$27,688</td>
-          </tr>
+          <tr><td class="mono">$1,000</td><td class="mono">$12,000</td><td class="mono">$60,000</td><td>Low-cost scenario</td></tr>
+          <tr><td class="mono">$1,500</td><td class="mono">$18,000</td><td class="mono">$90,000</td><td>Middle planning scenario</td></tr>
+          <tr><td class="mono">$2,000</td><td class="mono">$24,000</td><td class="mono">$120,000</td><td>Higher-cost scenario</td></tr>
         </tbody>
       </table>
     </div>
-    <div style="font-size:0.74rem;color:var(--fg-3);margin-top:0.55rem;">
-      HOPE Scholarship covers full in-state tuition (3.0+ GPA). Zell Miller covers tuition + fees (3.7+). Either eliminates the $24,240–$27,688 academic cost entirely.
-    </div>
-  </section>
-
-  <!-- FUNDING SOURCES -->
-  <section>
-    <div class="section-title">Funding Sources — Ranked by Urgency &amp; Payout Ease</div>
-    <div class="fund-grid">
-
-      <div class="fund-card soon">
-        <div class="fund-name">✈ EAA Aviation Foundation</div>
-        <div class="fund-amount amber">Avg $6,800 · 25+ named awards</div>
-        <div class="fund-deadline amber">⏰ Dec 16, 2026 — OPEN NOW</div>
-        <div class="fund-notes">No upper age limit (16+). One application covers all 25+ EAA named awards. University Part 141 eligible ("any accredited flight training or post-secondary program"). Free to apply. eaa.org/scholarships</div>
-        <a class="fund-apply" href="https://www.eaa.org/scholarships" target="_blank">↗ Apply at eaa.org</a>
-      </div>
-
-      <div class="fund-card soon">
-        <div class="fund-name">🔑 AOPA Foundation</div>
-        <div class="fund-amount amber">$250–$14,000 · Adults eligible</div>
-        <div class="fund-deadline amber">⏰ Dec 31, 2026 — OPEN NOW</div>
-        <div class="fund-notes">$69/yr AOPA membership required. One application covers 32 awards. Adults explicitly eligible — no upper age cap. Fall window closes Dec 31. Spring window opens Apr 1, 2027. aopa.org/scholarships</div>
-        <a class="fund-apply" href="https://www.aopa.org/scholarships" target="_blank">↗ Apply at aopa.org</a>
-      </div>
-
-      <div class="fund-card open">
-        <div class="fund-name">🎓 HOPE Scholarship (GA)</div>
-        <div class="fund-amount green">Full In-State Tuition</div>
-        <div class="fund-deadline green">Rolling — maintain 3.0 GPA</div>
-        <div class="fund-notes">Covers $24,240 tuition automatically for GA residents. Zell Miller (3.7+) adds fees. Apply via FAFSA + GSFC.</div>
-        <a class="fund-apply" href="https://www.gsfc.org" target="_blank">↗ Apply at gsfc.org</a>
-      </div>
-
-      <div class="fund-card open">
-        <div class="fund-name">💰 FAFSA / Federal Pell Grant</div>
-        <div class="fund-amount green">Up to $7,395/yr</div>
-        <div class="fund-deadline green">Annual — Oct FAFSA priority</div>
-        <div class="fund-notes">Free application. Pell Grant is gift aid (no repayment). File at studentaid.gov. Also unlocks subsidized loans.</div>
-        <a class="fund-apply" href="https://studentaid.gov" target="_blank">↗ Apply at studentaid.gov</a>
-      </div>
-
-      <div class="fund-card soon">
-        <div class="fund-name">✈ EAA Scholarships</div>
-        <div class="fund-amount amber">Avg $6,800 · 25+ awards</div>
-        <div class="fund-deadline amber">Dec 16, 2026</div>
-        <div class="fund-notes">Free application via eaa.org. Alex Foss Agricultural Aviation Memorial is a strong match. Multiple awards possible.</div>
-        <a class="fund-apply" href="https://www.eaa.org/scholarships" target="_blank">↗ Apply at eaa.org</a>
-      </div>
-
-      <div class="fund-card soon">
-        <div class="fund-name">🔑 AOPA Foundation</div>
-        <div class="fund-amount amber">$250–$14,000 · 32 awards</div>
-        <div class="fund-deadline amber">Dec 31, 2026</div>
-        <div class="fund-notes">$69/yr AOPA membership required. Apply for multiple awards in one application. aopa.org/scholarships</div>
-        <a class="fund-apply" href="https://www.aopa.org/scholarships" target="_blank">↗ Apply at aopa.org</a>
-      </div>
-
+    <div class="fund-grid" style="margin-top:1rem;">
       <div class="fund-card">
-        <div class="fund-name">🌾 NAAA — Ag Wings of Tomorrow</div>
-        <div class="fund-amount sky">$5,000 · up to 5 awards</div>
-        <div class="fund-deadline neutral">Sept 8, 2027 (2026 closed · watch agaviation.org)</div>
-        <div class="fund-notes">National Agricultural Aviation Association. Funds flight training, ag coursework, or NAAA apprenticeship. Requires sponsorship from an NAAA Operator Member — contact ag operators in your area now to line up a sponsor for 2027. No repeat winners. Strong match for commercial ag career path. agaviation.org</div>
-        <a class="fund-apply" href="https://www.agaviation.org/ag-wings-of-tomorrow-scholarship/" target="_blank">↗ Apply at agaviation.org</a>
-      </div>
-
-      <div class="fund-card">
-        <div class="fund-name">🎓 Lyons Aviation Scholarship</div>
-        <div class="fund-amount sky">$1,500</div>
-        <div class="fund-deadline neutral">Annual — check lyonsaviation.com</div>
-        <div class="fund-notes">Applicable at Instrument Rating and CPL stages. Relatively easy application process.</div>
-        <a class="fund-apply" href="https://www.lyonsaviation.com" target="_blank">↗ Apply at lyonsaviation.com</a>
-      </div>
-
-      <div class="fund-card soon">
-        <div class="fund-name">🦅 AAAE Native American</div>
-        <div class="fund-amount amber">$2,000</div>
-        <div class="fund-deadline amber">Opens Dec 2026 · apply early Jan 2027</div>
-        <div class="fund-notes">American Association of Airport Executives. Native American <em>origin</em> qualifies — no tribal enrollment required. Enrolled in aviation program at accredited 2- or 4-year school. 3.0+ GPA required. aaae.aero</div>
-        <a class="fund-apply" href="https://www.aaae.aero" target="_blank">↗ Apply at aaae.aero</a>
-      </div>
-
-      <div class="fund-card">
-        <div class="fund-name">✈ NBAA International Operators</div>
-        <div class="fund-amount amber">Up to $8,000</div>
-        <div class="fund-deadline neutral">Jan 2027 cycle (watch nbaa.org)</div>
-        <div class="fund-notes">For those entering business aviation or pursuing international ops careers. No stated age limit. One of the highest-value NBAA awards. nbaa.org/scholarships</div>
-        <a class="fund-apply" href="https://www.nbaa.org/scholarships" target="_blank">↗ Apply at nbaa.org</a>
-      </div>
-
-      <div class="fund-card">
-        <div class="fund-name">✊ OBAP Scholarships</div>
-        <div class="fund-amount sky">$1,000–$5,000 · partner-funded</div>
-        <div class="fund-deadline neutral">Apr 2027 &amp; Sep 2027 cycles</div>
-        <div class="fund-notes">Organization of Black Aerospace Professionals. Open to any race/ethnicity 17+. Part 141 eligible. Requires 3-month OBAP membership + volunteer hours before applying — join NOW to start the clock. obap.org</div>
-        <a class="fund-apply" href="https://www.obap.org" target="_blank">↗ Apply at obap.org</a>
-      </div>
-
-      <div class="fund-card">
-        <div class="fund-name">🌲 Cherokee Nation Foundation</div>
-        <div class="fund-amount purple">Varies · $500K+ awarded/yr</div>
-        <div class="fund-deadline neutral">Jan 31, 2027 deadline</div>
-        <div class="fund-notes">Requires Cherokee Nation citizenship (enrolled member). Min 2.0 GPA, full-time student. If you can establish CN citizenship, this stacks with all other awards. cherokee.org</div>
-        <a class="fund-apply" href="https://www.cherokee.org" target="_blank">↗ Apply at cherokee.org</a>
-      </div>
-
-      <div class="fund-card">
-        <div class="fund-name">🏛 BIA Higher Education Grant</div>
-        <div class="fund-amount purple">$2,500–$5,000/yr</div>
-        <div class="fund-deadline neutral">Apply via MGA by June 1</div>
-        <div class="fund-notes">Bureau of Indian Affairs. Requires enrollment in a federally recognized tribe. Supplemental aid for Native American students at accredited universities. Apply through MGA's financial aid office. bie.edu</div>
-        <a class="fund-apply" href="https://www.bie.edu" target="_blank">↗ Apply at bie.edu</a>
-      </div>
-
-      <div class="fund-card">
-        <div class="fund-name">📚 American Indian College Fund</div>
-        <div class="fund-amount purple">Varies</div>
-        <div class="fund-deadline neutral">Annual application cycle</div>
-        <div class="fund-notes">Requires tribal enrollment. Multiple award levels. collegefund.org for current amounts and deadlines.</div>
-        <a class="fund-apply" href="https://collegefund.org" target="_blank">↗ Apply at collegefund.org</a>
-      </div>
-
-      <div class="fund-card urgent">
-        <div class="fund-name">♿ Georgia DVR (Vocational Rehab)</div>
-        <div class="fund-amount green">$10K–$30K+ gap coverage</div>
-        <div class="fund-deadline red">⚠ Apply NOW — 60–90 day approval</div>
-        <div class="fund-notes">Georgia Vocational Services. ADHD qualifies as a disability. MGA's aviation degree requires flight training — the full program is eligible. Can fund tuition, fees, training costs, books, and supplies. Apply at gvs.georgia.gov or call 1-866-489-0001. This is your #1 gap-closer — start immediately.</div>
-        <a class="fund-apply" href="https://gvs.georgia.gov" target="_blank">↗ Apply at gvs.georgia.gov</a>
-      </div>
-      <div class="fund-card soon">
-        <div class="fund-name">💼 WIOA / WorkSource Georgia</div>
-        <div class="fund-amount amber">Up to full training cost</div>
-        <div class="fund-deadline amber">⏰ Apply now at local CareerCenter</div>
-        <div class="fund-notes">Workforce Innovation &amp; Opportunity Act. Commercial pilot = federally designated in-demand occupation. WorkSource Middle Flint (Bleckley Co.) can fund MGA training. Apply at Macon or Cochran area CareerCenter — bring your MGA program info. Stacks with DVR. worksourcegeorgia.com</div>
-        <a class="fund-apply" href="https://www.worksourcegeorgia.com" target="_blank">↗ Apply at worksourcegeorgia.com</a>
+        <div class="fund-name">SSI / SSDI eligibility review</div>
+        <div class="fund-notes">SSI depends on qualifying disability and limited income/resources. SSDI depends on qualifying disability and sufficient work credits. Having a diagnosis or currently having no income does not itself establish eligibility. Screen the work-credit history and SSA medical criteria before counting either program.</div>
+        <a class="fund-apply" href="https://www.ssa.gov/ssi/text-eligibility-ussi.htm" target="_blank" rel="noopener">SSI eligibility ↗</a>
+        <a class="fund-apply" href="https://www.ssa.gov/disability/eligibility" target="_blank" rel="noopener">SSDI eligibility ↗</a>
       </div>
       <div class="fund-card">
-        <div class="fund-name">🦽 Able Flight Scholarship</div>
-        <div class="fund-amount sky">Flight training + stipend · SIU</div>
-        <div class="fund-deadline neutral">Annual cycle · ableflight.siu.edu</div>
-        <div class="fund-notes">Scholarship for people with disabilities pursuing flight training. No stated age limit. Covers training, ground school, testing fees, and travel. Confirm ADHD eligibility directly: 618-453-8898 or victoria.mathieu@siu.edu. ableflight.siu.edu</div>
-        <a class="fund-apply" href="https://ableflight.siu.edu" target="_blank">↗ Apply at ableflight.siu.edu</a>
+        <div class="fund-name">SNAP / Medicaid / Georgia Gateway</div>
+        <div class="fund-notes">Use the state's central Gateway application to screen household eligibility for food assistance and applicable medical coverage. These programs reduce living costs; they do not pay flight-school or aircraft bills.</div>
+        <a class="fund-apply" href="https://gateway.ga.gov/" target="_blank" rel="noopener">Georgia Gateway ↗</a>
+        <a class="fund-apply" href="https://medicaid.georgia.gov/how-apply/basic-eligibility" target="_blank" rel="noopener">Medicaid requirements ↗</a>
       </div>
-
-      <div class="fund-card soon">
-        <div class="fund-name">🍑 GBAA Professional Pilot Scholarship</div>
-        <div class="fund-amount amber">Up to $5,000</div>
-        <div class="fund-deadline amber">⏰ ~April 15, 2027 (typical cycle)</div>
-        <div class="fund-notes">Georgia Business Aviation Association. For GA residents enrolled in an accredited U.S. college aviation program — MGA qualifies. High school seniors, recent grads, and current college students all eligible. No membership required. Check gbaa.com for exact 2027 cycle dates.</div>
-        <a class="fund-apply" href="https://gbaa.com" target="_blank">↗ Apply at gbaa.com</a>
-      </div>
-
       <div class="fund-card">
-        <div class="fund-name">🏫 NATA Foundation — Taylor Scholarship</div>
-        <div class="fund-amount sky">$1,500</div>
-        <div class="fund-deadline neutral">~March 2027 · nata.aero/foundation</div>
-        <div class="fund-notes">Richard L. Taylor Flight Training Scholarship. Must hold Private Pilot certificate, 3.0+ GPA, enrolled in aviation program with professional pilot career goal. Apply after your PPL checkride.</div>
-        <a class="fund-apply" href="https://nata.aero/foundation" target="_blank">↗ Apply at nata.aero</a>
-      </div>
-
-      <div class="fund-card">
-        <div class="fund-name">✈ NBAA Student Scholarships (3 awards)</div>
-        <div class="fund-amount sky">$1,000–$5,000 · one application</div>
-        <div class="fund-deadline neutral">June 15, 2027 cycle</div>
-        <div class="fund-notes">Three top picks covered by one NBAA application: Ginocchio ($4,500 · 5 awards), James Sullivan ($5,000 · 2 awards), Barden/UAA ($1,000+). Business aviation career path. NBAA membership not required for student awards. nbaa.org/scholarships</div>
-        <a class="fund-apply" href="https://www.nbaa.org/scholarships" target="_blank">↗ Apply at nbaa.org</a>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- FUNDING PAYOFF STACK -->
-  <section>
-    <div class="section-title">💰 Funding Payoff Stack — $94,342 → $0</div>
-    <div class="payoff-wrap">
-      <table class="payoff-tbl">
-        <thead>
-          <tr>
-            <th>Funding Source</th>
-            <th style="text-align:right">Amount Applied</th>
-            <th style="text-align:right">Remaining Balance</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="row-start">
-            <td class="src">📋 MGA Program Total (flight + academic)</td>
-            <td class="ded" style="color:var(--fg-3)">—</td>
-            <td class="bal" style="color:var(--red)">$94,342</td>
-          </tr>
-          <tr>
-            <td class="src">🎓 HOPE / Zell Miller (GA tuition grant) <span class="pbadge ok">Rolling</span></td>
-            <td class="ded">−$27,688</td>
-            <td class="bal" style="color:var(--amber)">$66,654</td>
-          </tr>
-          <tr>
-            <td class="src">💰 FAFSA / Pell Grant (3 yrs × $7,395) <span class="pbadge ok">Annual</span></td>
-            <td class="ded">−$22,185</td>
-            <td class="bal" style="color:var(--amber)">$44,469</td>
-          </tr>
-          <tr>
-            <td class="src">✈ EAA Aviation Foundation <span class="pbadge soon">Dec 16</span></td>
-            <td class="ded">−$6,800</td>
-            <td class="bal" style="color:var(--amber)">$37,669</td>
-          </tr>
-          <tr>
-            <td class="src">🔑 AOPA Foundation <span class="pbadge soon">Dec 31</span></td>
-            <td class="ded">−$14,000</td>
-            <td class="bal" style="color:var(--amber)">$23,669</td>
-          </tr>
-          <tr>
-            <td class="src">🦅 AAAE Native American Scholarship <span class="pbadge soon">Jan 2027</span></td>
-            <td class="ded">−$2,000</td>
-            <td class="bal" style="color:var(--amber)">$21,669</td>
-          </tr>
-          <tr>
-            <td class="src">✈ NBAA International Operators <span class="pbadge soon">Jan 2027</span></td>
-            <td class="ded">−$8,000</td>
-            <td class="bal" style="color:var(--amber)">$13,669</td>
-          </tr>
-          <tr>
-            <td class="src">✊ OBAP Scholarship <span class="pbadge soon">Apr 2027</span></td>
-            <td class="ded">−$5,000</td>
-            <td class="bal" style="color:var(--fg)">$8,669</td>
-          </tr>
-          <tr>
-            <td class="src">🏛 BIA Higher Education Grant <span class="pbadge ok">June 1</span></td>
-            <td class="ded">−$5,000</td>
-            <td class="bal" style="color:var(--fg)">$3,669</td>
-          </tr>
-          <tr>
-            <td class="src">🍑 GBAA Professional Pilot Scholarship <span class="pbadge soon">Apr 2027</span></td>
-            <td class="ded">−$3,669</td>
-            <td class="bal" style="color:var(--green)">$0 ✓</td>
-          </tr>
-          <tr class="row-gap">
-            <td class="src" style="font-weight:700">♿ Georgia DVR + 💼 WIOA (backup buffer) <span class="pbadge urgent">Apply NOW</span></td>
-            <td class="ded" style="color:var(--green)">+$10K–$30K cushion</td>
-            <td class="bal" style="font-size:1.15rem;color:var(--green)">Surplus ✓</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div style="font-size:0.73rem;color:var(--fg-3);margin-top:0.6rem;line-height:1.5;">
-      Uses maximum award amounts. EAA average = $6,800; AOPA top award = $14,000 — realistic if you apply all eligible awards in both programs. GBAA closes the $3,669 tail (Apr 2027); DVR + WIOA become a $10K–$30K+ buffer beyond zero. Any additional shortfall covered by CFI income (teach at MGA after certification). <strong>Stack is achievable — start with DVR and EAA this week.</strong> <em>New sources added Oct 23, 2026: GBAA, NATA Taylor, NBAA Student bundle (Ginocchio/Sullivan/Barden).</em>
-    </div>
-  </section>
-
-  <!-- AIRCRAFT RATES -->
-  <section>
-    <div class="section-title">MGA Fleet — Hourly Rates (Wet)</div>
-    <div class="rate-grid">
-      <div class="rate-card">
-        <div class="rate-icon">🛩</div>
-        <div>
-          <div class="rate-ac">Piper Warrior III</div>
-          <div class="rate-hr">$159/hr</div>
-          <div class="rate-note">PPL primary trainer</div>
-        </div>
-      </div>
-      <div class="rate-card">
-        <div class="rate-icon">✈</div>
-        <div>
-          <div class="rate-ac">Piper Archer</div>
-          <div class="rate-hr">$164/hr</div>
-          <div class="rate-note">Instrument / CPL XC</div>
-        </div>
-      </div>
-      <div class="rate-card">
-        <div class="rate-icon">✈</div>
-        <div>
-          <div class="rate-ac">Piper Arrow</div>
-          <div class="rate-hr">$179/hr</div>
-          <div class="rate-note">Complex / CPL maneuvers</div>
-        </div>
-      </div>
-      <div class="rate-card">
-        <div class="rate-icon">✈</div>
-        <div>
-          <div class="rate-ac">Piper Seminole</div>
-          <div class="rate-hr">$298/hr</div>
-          <div class="rate-note">Multi-engine rating</div>
-        </div>
-      </div>
-      <div class="rate-card">
-        <div class="rate-icon">🛩</div>
-        <div>
-          <div class="rate-ac">Citabria</div>
-          <div class="rate-hr">$132/hr</div>
-          <div class="rate-note">Aerobatics / tailwheel</div>
-        </div>
-      </div>
-      <div class="rate-card">
-        <div class="rate-icon">🖥</div>
-        <div>
-          <div class="rate-ac">Frasca Sim</div>
-          <div class="rate-hr">$80/hr</div>
-          <div class="rate-note">IFR / procedure practice</div>
-        </div>
-      </div>
-      <div class="rate-card">
-        <div class="rate-icon">👨‍✈️</div>
-        <div>
-          <div class="rate-ac">CFI Fee</div>
-          <div class="rate-hr">$20/hr</div>
-          <div class="rate-note">Added to all dual instruction</div>
-        </div>
+        <div class="fund-name">LIHEAP utility assistance</div>
+        <div class="fund-notes">Seasonal energy-bill support for eligible low-income households. The opening schedule differs for older/medically homebound applicants and the general population. Benefit amount and utility eligibility are determined by the program.</div>
+        <a class="fund-apply" href="https://dfcs.georgia.gov/services/low-income-home-energy-assistance-program-liheap" target="_blank" rel="noopener">Georgia LIHEAP ↗</a>
       </div>
     </div>
   </section>
 
-  <!-- HOUSING MARKET WATCH -->
-  <section>
-    <div class="section-title">🏠 Off-Campus Housing — Cochran / Eastman Market Watch</div>
-    <div style="font-size:0.73rem;color:var(--fg-2);margin-bottom:0.9rem">Last updated Oct 23, 2026 · Daily watch active (7:23 AM ET) · All options fit within MGA off-campus COA ($5k–$8k/semester)</div>
-    <div class="rate-grid" style="grid-template-columns:repeat(auto-fill,minmax(210px,1fr))">
-
-      <div class="rate-card" style="border-color:var(--green);flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">🏕</div>
-          <div>
-            <div class="rate-ac">Dream RV Park</div>
-            <div class="rate-hr" style="color:var(--green)">$750/mo</div>
-          </div>
-          <span style="margin-left:auto;background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:999px">LOWEST</span>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Eastman, GA · All-inclusive · Need own RV/camper · $200 deposit · Jeff: 478-636-1012 · dreamrvparks.com</div>
+  <section id="aircraft">
+    <div class="section-title">Aircraft acquisition and five-year ownership — separate capital plan</div>
+    <div class="leg-card">
+      <div class="leg-header">
+        <div class="leg-title-block"><div class="leg-title">No aircraft purchase is counted as funded</div><div class="leg-course">No verified scholarship or grant located that guarantees personal aircraft acquisition plus five years of insurance, maintenance and operating costs.</div></div>
+        <div class="leg-cost"><div class="leg-cost-main">TBD</div><div class="leg-cost-sub">sponsor / donation / shared use</div></div>
       </div>
-
-      <div class="rate-card" style="border-color:var(--amber);flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">🏕</div>
-          <div>
-            <div class="rate-ac">Jellystone Park™</div>
-            <div class="rate-hr" style="color:var(--amber)">Call for rate</div>
-          </div>
-          <span style="margin-left:auto;background:var(--amber-bg);color:var(--amber);font-size:0.65rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:999px">AT CAMPUS</span>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">592 GA-87 S, Cochran (steps from MGA) · Monthly stays available · Must call: 478-934-6694 · 30/50 AMP + water/sewer hookup</div>
+      <div class="tbl-wrap" style="margin:0 1rem 1rem;">
+        <table>
+          <thead><tr><th>Ownership cost bucket</th><th>Five-year planning status</th><th>Required evidence before commitment</th></tr></thead>
+          <tbody>
+            <tr><td>Aircraft acquisition</td><td class="mono">Unpriced</td><td>Specific aircraft, independent pre-buy, title/lien and logbook review.</td></tr>
+            <tr><td>Pre-purchase inspection / initial repairs</td><td class="mono">Unpriced</td><td>A&amp;P/IA inspection and written discrepancy estimate.</td></tr>
+            <tr><td>Insurance</td><td class="mono">Unquoted</td><td>Broker quote for named pilot, aircraft, hours and intended mission.</td></tr>
+            <tr><td>Annual inspection / maintenance</td><td class="mono">Unquoted</td><td>Local shop estimate plus reserve for unscheduled repairs.</td></tr>
+            <tr><td>Engine / propeller reserves</td><td class="mono">Unpriced</td><td>Aircraft-specific overhaul time, condition and component reserve plan.</td></tr>
+            <tr><td>Fuel / oil / hourly operating</td><td class="mono">Unpriced</td><td>Annual utilization, POH fuel burn and current local prices.</td></tr>
+            <tr><td>Hangar / tie-down / taxes / fees</td><td class="mono">Unquoted</td><td>Airport rates and applicable tax/registration fees.</td></tr>
+            <tr><td>Commercial / agricultural liability</td><td class="mono">Unquoted</td><td>Specialist broker confirmation for the intended commercial operation.</td></tr>
+          </tbody>
+        </table>
       </div>
-
-      <div class="rate-card" style="flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">🏠</div>
-          <div>
-            <div class="rate-ac">1-Bed Apartments</div>
-            <div class="rate-hr">from $633/mo</div>
-          </div>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Eastman, GA · Avg rent $751/mo (61% below national avg) · Very limited inventory (7 listings on market) · Search Zillow / Realtor.com</div>
+      <div class="leg-schips">
+        <span class="schip amber"><span class="schip-dot"></span>Not included in scholarship gap</span>
+        <span class="schip neutral"><span class="schip-dot"></span>No aircraft debt assumed</span>
       </div>
-
-      <div class="rate-card" style="flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">🏠</div>
-          <div>
-            <div class="rate-ac">Studio Apartments</div>
-            <div class="rate-hr">from $775/mo</div>
-          </div>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Eastman, GA · Only 3 studio listings active · 1234 College St area · Scarce — act fast when listed</div>
-      </div>
-
-      <div class="rate-card" style="flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">🏨</div>
-          <div>
-            <div class="rate-ac">Cochran Inn &amp; Suites</div>
-            <div class="rate-hr">Negotiate monthly</div>
-          </div>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Cochran, GA (at MGA campus) · Rated 8.8/10 · Ask for extended-stay monthly rate · Best motel option on campus</div>
-      </div>
-
-      <div class="rate-card" style="flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">🏨</div>
-          <div>
-            <div class="rate-ac">Quality Inn Eastman</div>
-            <div class="rate-hr">~$63/night</div>
-          </div>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Eastman, GA · Rated 8.0/10 · Pet-friendly · ~$900–1,200/mo extended-stay negotiate · Backup / transition option</div>
-      </div>
-
     </div>
-    <div style="margin-top:0.85rem;background:var(--accent-2);border:1.5px solid var(--accent);border-radius:10px;padding:0.65rem 0.85rem;font-size:0.73rem;color:var(--accent);line-height:1.5">
-      <strong>💡 Aid Coverage:</strong> Dream RV Park $750/mo × 5 months = $3,750 total — well under MGA's off-campus COA ($5k–$8k/semester). On-campus cheapest (Anderson Double): $2,820/semester. Call Jellystone Cochran for monthly RV rate — it's literally on campus. Daily watch runs every morning; new listings will surface here.
+    <div class="fund-grid" style="margin-top:1rem;">
+      <div class="fund-card">
+        <div class="fund-name">Preferred acquisition routes</div>
+        <div class="fund-notes">Seek a direct aircraft donation, industry sponsor, grantmaker that explicitly permits capital acquisition, or shared-ownership/flying-club arrangement. Do not assume a Pell refund or flight scholarship can be redirected to private aircraft ownership; verify award rules and financial-aid cost-of-attendance restrictions first.</div>
+      </div>
+      <div class="fund-card">
+        <div class="fund-name">Career-first alternative</div>
+        <div class="fund-notes">Personal ownership need not precede entry into agricultural aviation. A realistic route may involve commercial training, tailwheel/ag-specific preparation, pesticide-applicator requirements and supervised ground/operations work with an established operator. Build flight time and a sponsor relationship before assuming aircraft acquisition costs.</div>
+        <a class="fund-apply" href="https://www.agaviation.org/career/" target="_blank" rel="noopener">NAAA career pathway ↗</a>
+      </div>
     </div>
   </section>
 
-  <!-- AIRCRAFT MARKET WATCH -->
-  <section>
-    <div class="section-title">✈ Used Aircraft Market — Purchase Path</div>
-    <div style="font-size:0.73rem;color:var(--fg-2);margin-bottom:0.9rem">Last updated Oct 23, 2026 · Target: own a trainer to build solo hours cheaply post-PPL · Budget: $20k–$55k from aid refunds + scholarship cash · Daily watch active</div>
-    <div class="rate-grid" style="grid-template-columns:repeat(auto-fill,minmax(210px,1fr))">
-
-      <div class="rate-card" style="border-color:var(--green);flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">✈</div>
-          <div>
-            <div class="rate-ac">Cessna 150/152</div>
-            <div class="rate-hr" style="color:var(--green)">$18k–$55k</div>
-          </div>
-          <span style="margin-left:auto;background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:999px">CHEAPEST</span>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Most affordable trainers. 78 listings on Trade-a-Plane. Fuel-sippers (~5 gph). Limited cross-country but great for pattern work &amp; solo hours. barnstormers.com · trade-a-plane.com</div>
-      </div>
-
-      <div class="rate-card" style="border-color:var(--accent);flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">✈</div>
-          <div>
-            <div class="rate-ac">Piper Warrior PA-28-161</div>
-            <div class="rate-hr" style="color:var(--accent)">$50k–$90k</div>
-          </div>
-          <span style="margin-left:auto;background:var(--accent-2);color:var(--accent);font-size:0.65rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:999px">MGA MATCH</span>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Same type MGA flies — zero transition. 171 PA-28 listings on Trade-a-Plane. Cherokee 140s go lower (~$30k). Controller.com · trade-a-plane.com</div>
-      </div>
-
-      <div class="rate-card" style="flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">✈</div>
-          <div>
-            <div class="rate-ac">Piper Tomahawk PA-38</div>
-            <div class="rate-hr">$20k–$45k</div>
-          </div>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">T-tail trainer, side-by-side. Affordable. Many used for hour-building. Reputation for honest stall behavior. Check Controller.com</div>
-      </div>
-
-      <div class="rate-card" style="flex-direction:column;align-items:flex-start;gap:0.4rem">
-        <div style="display:flex;align-items:center;gap:0.6rem;width:100%">
-          <div class="rate-icon">✈</div>
-          <div>
-            <div class="rate-ac">Cherokee 140 (PA-28-140)</div>
-            <div class="rate-hr">$28k–$50k</div>
-          </div>
-        </div>
-        <div class="rate-note" style="font-size:0.72rem;line-height:1.45">Budget Piper — same low-wing feel as Warrior. Older avionics but airworthy. Parts plentiful. Good bridge to Warrior type familiarity.</div>
-      </div>
-
-    </div>
-    <div style="margin-top:0.85rem;display:grid;gap:0.65rem">
-      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:0.65rem 0.85rem;font-size:0.73rem;line-height:1.6">
-        <div style="font-weight:700;margin-bottom:0.25rem">💡 Monthly Ownership Cost Estimate (Cessna 150, ~$25k purchase)</div>
-        <span style="color:var(--fg-2)">Insurance (student pilot, hull+liability): ~$175/mo · Annual inspection (amortized): ~$100/mo · Tiedown at KEMN or KCZL: ~$75–150/mo · Fuel (~6 gph × $6.50/gal at MGA fuel pump): $39/hr flown · <strong>All-in: ~$450/mo fixed + $39/hr</strong> vs. $159/hr + $20 CFI = $179/hr at MGA</span>
-      </div>
-      <div style="background:var(--amber-bg);border:1.5px solid var(--amber);border-radius:10px;padding:0.65rem 0.85rem;font-size:0.73rem;color:var(--amber);line-height:1.5">
-        <strong>⚠ Aid Funds &amp; Aircraft Purchase:</strong> FAFSA/Pell goes to MGA — only the COA <em>excess refund</em> (if any) comes to you as cash. Most aviation scholarships pay flight training costs directly. Cash-award scholarships (GBAA $5k, NATA Taylor $1.5k, NBAA $1k–$5k) go to your account and <em>may</em> be usable for purchase. Confirm with each scholarship org. Part 141 dual instruction must remain in MGA aircraft regardless of ownership.
-      </div>
-    </div>
-    <div style="margin-top:0.65rem;font-size:0.7rem;color:var(--fg-3)">Market sources: trade-a-plane.com · controller.com · barnstormers.com · globalair.com · Cochran Airport KCZL · Eastman Airport KEMN</div>
-  </section>
-
-  <!-- ACTION ITEMS -->
-  <section>
-    <div class="section-title">Priority Action Items</div>
+  <section id="timeline">
+    <div class="section-title">Execution calendar — existing planner checkpoints</div>
     <div class="action-list">
-      <div class="action-item urgent">
-        <div class="action-num">1</div>
-        <div class="action-body">
-          <div class="action-title">⏰ Apply EAA Scholarships by Dec 16, 2026 — MOST URGENT</div>
-          <div class="action-detail">Free application at eaa.org. One submission covers 25+ named awards, avg $6,800. Flag Alex Foss Agricultural Aviation Memorial specifically. No age cap — adults fully eligible. Do this first.</div>
-        </div>
-      </div>
-      <div class="action-item urgent">
-        <div class="action-num">2</div>
-        <div class="action-body">
-          <div class="action-title">♿ Apply Georgia DVR NOW — biggest single gap-closer</div>
-          <div class="action-detail">ADHD qualifies as a disability under Georgia Vocational Services. MGA's aviation degree requires flight training — the whole program is eligible. Call 1-866-489-0001 or apply at gvs.georgia.gov. Takes 60–90 days to approve — start TODAY. Can cover training costs, tuition, fees, books, and supplies — potentially $10K–$30K+.</div>
-        </div>
-      </div>
-      <div class="action-item urgent">
-        <div class="action-num">3</div>
-        <div class="action-body">
-          <div class="action-title">💼 Apply WIOA / WorkSource Georgia — run in parallel with DVR</div>
-          <div class="action-detail">Commercial pilot is a federally designated in-demand occupation in Georgia. WorkSource Middle Flint serves Bleckley County (Cochran). Apply at the nearest CareerCenter (Macon area). Bring MGA program details. WIOA and DVR stack — apply for both at once. worksourcegeorgia.com</div>
-        </div>
-      </div>
-      <div class="action-item urgent">
-        <div class="action-num">4</div>
-        <div class="action-body">
-          <div class="action-title">⏰ Join AOPA &amp; Apply by Dec 31, 2026</div>
-          <div class="action-detail">$69/yr membership. One application covers 32 awards ($250–$14,000). Adults explicitly eligible — no upper age cap. Spring window opens Apr 1, 2027 if you miss fall. aopa.org/scholarships</div>
-        </div>
-      </div>
-      <div class="action-item soon">
-        <div class="action-num">5</div>
-        <div class="action-body">
-          <div class="action-title">✊ Join OBAP NOW — 3-month membership clock starts today</div>
-          <div class="action-detail">OBAP requires 3 months of membership + volunteer hours before you can apply for their $1,000–$5,000 scholarships. Open to any race/ethnicity 17+. Join at obap.org immediately so you're eligible for the Apr 2027 cycle.</div>
-        </div>
-      </div>
-      <div class="action-item soon">
-        <div class="action-num">6</div>
-        <div class="action-body">
-          <div class="action-title">🦅 AAAE Native American — Watch for Dec 2026 opening</div>
-          <div class="action-detail">$2,000 award, opens Dec 2026, apply early Jan 2027. Native American origin qualifies — no tribal enrollment required. Need 3.0+ GPA and enrollment in aviation program at accredited school. aaae.aero</div>
-        </div>
-      </div>
-      <div class="action-item soon">
-        <div class="action-num">7</div>
-        <div class="action-body">
-          <div class="action-title">⏰ File FAFSA for 2026–27 — Oct/Nov priority window</div>
-          <div class="action-detail">studentaid.gov. Unlocks Pell Grant (up to $7,395/yr gift aid) and subsidized loans. Filing early maximizes your institutional aid package.</div>
-        </div>
-      </div>
-      <div class="action-item">
-        <div class="action-num">8</div>
-        <div class="action-body">
-          <div class="action-title">Verify HOPE / Zell Miller eligibility</div>
-          <div class="action-detail">3.0+ GPA = HOPE (full tuition). 3.7+ GPA = Zell Miller (tuition + fees). Either eliminates $24,240–$27,688 in academic costs. Check at gsfc.org.</div>
-        </div>
-      </div>
-      <div class="action-item">
-        <div class="action-num">9</div>
-        <div class="action-body">
-          <div class="action-title">🌲 Explore Cherokee Nation citizenship enrollment</div>
-          <div class="action-detail">If you have Cherokee ancestry, look into establishing CN citizenship — it unlocks the Cherokee Nation Foundation (Jan 31, 2027 deadline) and the BIA Higher Education Grant ($2,500–$5,000/yr). Contact Cherokee Nation citizenship office at cherokee.org.</div>
-        </div>
-      </div>
-      <div class="action-item">
-        <div class="action-num">10</div>
-        <div class="action-body">
-          <div class="action-title">Book MGA admissions / aviation advising appointment</div>
-          <div class="action-detail">Get your Part 141 training plan locked in. Confirm current fleet availability and instructor assignments. Visit mga.edu/aviation or call the Cochran campus directly.</div>
-        </div>
-      </div>
-      <div class="action-item">
-        <div class="action-num">11</div>
-        <div class="action-body">
-          <div class="action-title">Study for Part 107 — lowest cost cert in the stack</div>
-          <div class="action-detail">King Schools course (~$150) + $175 knowledge test fee = ~$327 total. No flight test required. Opens commercial drone work in ag scouting, precision agriculture, and cargo support immediately after passing.</div>
-        </div>
-      </div>
+      <div class="action-item urgent"><div class="action-num">1</div><div class="action-body"><div class="action-title">Nov 4 · MGA written funding package</div><div class="action-detail">Confirm actual Spring balance, fuel-fund eligibility and amount, Foundation/aviation awards, Pell/FSEOG actual award, flight-account credits and any payment-protection mechanism.</div></div></div>
+      <div class="action-item urgent"><div class="action-num">2</div><div class="action-body"><div class="action-title">Nov 5 · GVRA / Bud McCall decision</div><div class="action-detail">Obtain the Spring file checklist, current client/case status, IPE employment goal, eligible tuition/maintenance/books, treatment of required flight fees, five-year review requirements and written award timeline.</div></div></div>
+      <div class="action-item urgent"><div class="action-num">3</div><div class="action-body"><div class="action-title">Nov 6 · Native Forward tribal eligibility</div><div class="action-detail">Ask the tribal enrollment office for an acceptable descendancy letter and ask Native Forward to confirm generation requirements for both Direct and Student Relief funding. Request MGA Financial Need Form.</div></div></div>
+      <div class="action-item soon"><div class="action-num">4</div><div class="action-body"><div class="action-title">Nov 10 · Funding ledger reconciliation</div><div class="action-detail">Reconcile the $79,860 historical coverage against individual award letters, authorized expenses, remaining disbursement and timing. Keep the $14,482 original gap intact until supported evidence changes it.</div></div></div>
+      <div class="action-item soon"><div class="action-num">5</div><div class="action-body"><div class="action-title">Nov 14 · PPOT internal submission target</div><div class="action-detail">Submit the Carmen John Lomando application before the Nov 16 published deadline. Save submission receipt; do not assume December payment.</div></div></div>
+      <div class="action-item soon"><div class="action-num">6</div><div class="action-body"><div class="action-title">Nov 30 / Dec 1 · GVRA final Spring packet</div><div class="action-detail">Complete required post-secondary documentation by the published Dec 1 Spring deadline. Keep the submission receipt and the counselor's written confirmation.</div></div></div>
+      <div class="action-item urgent"><div class="action-num">7</div><div class="action-body"><div class="action-title">Dec 2 · Native Forward Direct + Relief deadline</div><div class="action-detail">Submit each eligible application separately; attach accepted tribal proof and complete required institutional documents.</div></div></div>
+      <div class="action-item"><div class="action-num">8</div><div class="action-body"><div class="action-title">Dec 14 · Final Spring funding gap audit</div><div class="action-detail">Get a current MGA statement, all award notices and third-party authorization statuses. Check the timing and permitted uses of each source.</div></div></div>
+      <div class="action-item urgent"><div class="action-num">9</div><div class="action-body"><div class="action-title">Dec 15 · Hard cutoff — $0 new debt / $0 out-of-pocket</div><div class="action-detail">Proceed only when required Spring charges are fully covered by usable confirmed aid or MGA provides a written payment arrangement protecting registration. The goal is not met merely because applications are pending.</div></div></div>
+      <div class="action-item"><div class="action-num">10</div><div class="action-body"><div class="action-title">Dec 16 · EAA post-secondary application</div><div class="action-detail">Submit for 2027 training and degree costs; arrange the non-relative reference before the deadline. Awards are expected March 2027 and are not part of Dec 15 coverage.</div></div></div>
+      <div class="action-item"><div class="action-num">11</div><div class="action-body"><div class="action-title">Dec 15, 2026–Mar 31, 2027 · Cobell application window</div><div class="action-detail">Only pursue if federally recognized tribal enrollment requirement is met; ancestry alone is insufficient.</div></div></div>
+      <div class="action-item"><div class="action-num">12</div><div class="action-body"><div class="action-title">Jan 25 / Jun 15, 2027 · next scholarship wave</div><div class="action-detail">American Indian College Fund Spring priority deadline; NBAA International Operators Jan 6; later NBAA student award applications June 15. Recheck all criteria before submission.</div></div></div>
     </div>
   </section>
 
-  <!-- APPLICATION PROFILE BUILDER -->
+  <section id="funding-ledger">
+    <div class="section-title">Funding ledger — do not count hypothetical money as coverage</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Source</th><th>Current classification</th><th>Count toward $14,482 gap now?</th><th>Required proof</th></tr></thead>
+        <tbody>
+          <tr><td>Original identified coverage</td><td>Historical audit baseline · $79,860</td><td class="mono">Reconcile before counting as available cash</td><td>Original supporting funding notices / MGA account entries.</td></tr>
+          <tr><td>GVRA Bud McCall</td><td>In process; approval unconfirmed</td><td class="mono">No — pending</td><td>Written client eligibility, IPE, award categories and amount.</td></tr>
+          <tr><td>MGA fuel fund</td><td>Announced institutional funding pool</td><td class="mono">No — per-student credit unknown</td><td>MGA written student-level determination and posting date.</td></tr>
+          <tr><td>Pell / FSEOG / HOPE</td><td>Actual aid package not yet documented</td><td class="mono">No — award amount unknown</td><td>MGA/GSFC award notice and charges the funds may pay.</td></tr>
+          <tr><td>Native Forward / PPOT / Avfuel / AOPA</td><td>Applications in progress or previously submitted</td><td class="mono">No — no confirmed award/payment</td><td>Award notice, permitted use and disbursement schedule.</td></tr>
+          <tr><td>Later-cycle EAA / NBAA / GBAA / NAAA / College Fund</td><td>Prospective future awards</td><td class="mono">No — timing and award unknown</td><td>Eligibility, selection letter and paid-to-school/payment date.</td></tr>
+          <tr><td>SSI / SSDI / SNAP / Medicaid / LIHEAP</td><td>Eligibility review</td><td class="mono">No — not flight-account funding</td><td>Agency determination; use for eligible household expenses.</td></tr>
+          <tr><td>Aircraft sponsorship / donation / shared use</td><td>Unidentified prospect</td><td class="mono">No — separate ownership project</td><td>Written sponsor agreement, scope, insurance and reserve.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="sources">
+    <div class="section-title">Official source register</div>
+    <div class="fund-grid">
+      <div class="fund-card"><div class="fund-name">MGA</div><div class="fund-notes"><a href="https://www.mga.edu/aviation/programs.php" target="_blank" rel="noopener">Aviation programs</a> · <a href="https://www.mga.edu/aviation/scholarships.php" target="_blank" rel="noopener">Aviation scholarships</a> · <a href="https://www.mga.edu/financial-aid/opportunities/scholarships.php" target="_blank" rel="noopener">Foundation scholarships</a> · <a href="https://www.mga.edu/student-account-services/tuition-fees/index.php" target="_blank" rel="noopener">Tuition and fees</a> · <a href="https://ce.mga.edu/news/2026/09/middle-georgia-state-university-receives-federal-funds-for-aviation-school.php" target="_blank" rel="noopener">Pilot fuel fund announcement</a></div></div>
+      <div class="fund-card"><div class="fund-name">Georgia / Federal Aid</div><div class="fund-notes"><a href="https://gvs.georgia.gov/bud-mccall-grant" target="_blank" rel="noopener">Bud McCall Grant</a> · <a href="https://gsfc.georgia.gov/hope" target="_blank" rel="noopener">HOPE / Zell</a> · <a href="https://studentaid.gov/" target="_blank" rel="noopener">Federal Student Aid</a> · <a href="https://www.ssa.gov/benefits/disability/" target="_blank" rel="noopener">Social Security disability benefits</a> · <a href="https://gateway.ga.gov/" target="_blank" rel="noopener">Georgia Gateway</a></div></div>
+      <div class="fund-card"><div class="fund-name">Native / Tribal Funding</div><div class="fund-notes"><a href="https://www.nativeforward.org/scholarships/native-forward-direct-scholarship-winter-spring/" target="_blank" rel="noopener">Native Forward Direct</a> · <a href="https://www.nativeforward.org/scholarships/native-forward-student-relief-funding-fall-2026-2027/" target="_blank" rel="noopener">Native Forward Student Relief</a> · <a href="https://collegefund.org/scholarships-update/" target="_blank" rel="noopener">American Indian College Fund</a> · <a href="https://cobellscholar.org/scholarships/undergraduate/" target="_blank" rel="noopener">Cobell</a> · <a href="https://www.bia.gov/service/education/education-grants" target="_blank" rel="noopener">BIA education grants</a></div></div>
+      <div class="fund-card"><div class="fund-name">Aviation Scholarships / Workforce</div><div class="fund-notes"><a href="https://www.theppot.org/scholarships" target="_blank" rel="noopener">PPOT</a> · <a href="https://www.eaa.org/eaa/learn-to-fly/scholarships/post-secondary-scholarships" target="_blank" rel="noopener">EAA post-secondary</a> · <a href="https://www.aopa.org/news-and-media/all-news/2026/january/flight-training/you-can-fly-scholarship-opportunities" target="_blank" rel="noopener">AOPA</a> · <a href="https://nbaa.org/professional-development/scholarships/" target="_blank" rel="noopener">NBAA</a> · <a href="https://www.agaviation.org/career/scholarships/ag-wings-of-tomorrow-scholarship/" target="_blank" rel="noopener">NAAA Ag Wings</a> · <a href="https://worksourcecoastal.org/services/adult-services/" target="_blank" rel="noopener">WorkSource Coastal</a></div></div>
+    </div>
+    <p class="fund-notes" style="margin-top:.75rem">Research snapshot: November 3, 2026. Award cycles, eligibility, amounts, deadlines and program rules can change. Reconfirm at the official sponsor/agency site before applying. No automated daily housing or aircraft-market monitoring is claimed on this page.</p>
+  </section>
+
   <section id="profile-builder">
     <div class="section-title">📋 Scholarship Application Profile — Fill Once, Apply Everywhere</div>
     <p style="font-size:0.82rem;color:var(--fg-2);margin-bottom:1rem;">Enter your info once. Hit <strong>Save Profile</strong> (stored in your browser). Then use <strong>Export</strong> to copy or download a ready-to-paste packet for any scholarship portal.</p>
@@ -1305,7 +887,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <div class="profile-card">
         <div class="profile-card-title">🎓 Academic Info</div>
         <label class="pf-label">School / University<input class="pf-input" id="pf-school" value="Middle Georgia State University (MGA)"></label>
-        <label class="pf-label">Program / Major<input class="pf-input" id="pf-major" value="Aviation — Commercial Pilot Track (Part 141)"></label>
+        <label class="pf-label">Program / Major<input class="pf-input" id="pf-major" value="B.S. Aviation Science &amp; Management — Flight track"></label>
         <label class="pf-label">Enrollment Status<input class="pf-input" id="pf-enroll" value="Full-time undergraduate"></label>
         <label class="pf-label">GPA (current or projected)<input class="pf-input" id="pf-gpa" placeholder="3.0"></label>
         <label class="pf-label">Expected Graduation<input class="pf-input" id="pf-grad" placeholder="May 2028"></label>
@@ -1327,9 +909,9 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <!-- BACKGROUND / ELIGIBILITY FLAGS -->
       <div class="profile-card">
         <div class="profile-card-title">📄 Eligibility Flags</div>
-        <label class="pf-label">Disability / DVR Status<input class="pf-input" id="pf-dvr" value="ADHD diagnosed — Georgia DVR application in progress"></label>
-        <label class="pf-label">Tribal / Native American Status<input class="pf-input" id="pf-tribal" placeholder="Cherokee ancestry — enrollment status TBD"></label>
-        <label class="pf-label">WIOA / WorkSource Status<input class="pf-input" id="pf-wioa" value="Applied / in progress (WorkSource Middle Flint)"></label>
+        <label class="pf-label">Disability / DVR Status<input class="pf-input" id="pf-dvr" value="GVRA case in progress — counselor decision pending"></label>
+        <label class="pf-label">Tribal / Native American Status<input class="pf-input" id="pf-tribal" placeholder="Descendancy / enrollment status — document only as required"></label>
+        <label class="pf-label">WIOA / WorkSource Status<input class="pf-input" id="pf-wioa" value="WorkSource Coastal — eligibility review pending"></label>
         <label class="pf-label">OBAP Membership Date<input class="pf-input" id="pf-obap" placeholder="e.g. Oct 22, 2026 (join today)"></label>
         <label class="pf-label">AOPA Membership #<input class="pf-input" id="pf-aopa" placeholder="Will join — #pending"></label>
         <label class="pf-label">EAA Member #<input class="pf-input" id="pf-eaa" placeholder="Will join — #pending"></label>
@@ -1340,7 +922,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
     <div class="profile-card" style="margin-top:1rem;">
       <div class="profile-card-title">✍ Master Essays (adapt per application)</div>
       <label class="pf-label" style="margin-bottom:0.75rem;">Personal Statement / Why Aviation (400–600 words)
-        <textarea class="pf-textarea pf-essay" id="pf-ps" rows="8" placeholder="Write your core personal statement here. Cover: Cherokee heritage, ADHD journey, why agricultural aviation specifically, what MGA's Part 141 program means, long-term goal (ag cargo + drone ops). Adapt the opening sentence per application but keep this as your master draft."></textarea>
+        <textarea class="pf-textarea pf-essay" id="pf-ps" rows="8" placeholder="Write your core personal statement here. Cover: personal experiences, barriers navigated, why agricultural aviation specifically, what MGA's Part 141 program means, long-term goal (ag cargo + drone ops). Adapt the opening sentence per application but keep this as your master draft."></textarea>
       </label>
       <label class="pf-label" style="margin-bottom:0.75rem;">Career Goals Essay (250–400 words)
         <textarea class="pf-textarea pf-essay" id="pf-career" rows="6" placeholder="Describe your specific career path: PPL → Commercial → CFI → ag aviation. Mention Part 107 drone work as near-term revenue while building hours. Tie to Georgia's agricultural economy and community impact."></textarea>
@@ -1383,7 +965,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
   </section>
 
   <div style="font-size:0.72rem;color:var(--fg-3);text-align:center;padding-top:0.5rem;">
-    Cost estimates based on MGA School of Aviation published rates · Scholarships subject to annual cycle changes · All costs approximate · Updated Oct 2026
+    Research snapshot: Nov 3, 2026 · Original $94,342 audit baseline preserved · Funding is not secured until confirmed in writing · Zero-debt / zero-out-of-pocket goal
   </div>
 
 </div><!-- /main -->
