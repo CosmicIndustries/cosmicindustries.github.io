@@ -465,6 +465,32 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
 #dashboard,#profile-builder,#sources{scroll-margin-top:1rem}
 @media(max-width:600px){.roadmap-group{padding:.8rem;margin-left:-.25rem;margin-right:-.25rem}.waterfall-legend{grid-template-columns:1fr;gap:.65rem}.waterfall-equation{align-items:flex-start}.waterfall-total{text-align:left}}
 
+ 
+/* ── TRUE THREE-STEP WATERFALL ─────────────────── */
+.waterfall-chart{margin:1rem 0 1.1rem;padding:1rem 1.1rem;border:1.5px solid var(--border);border-radius:14px;background:var(--surface)}
+.waterfall-chart-top{display:flex;justify-content:space-between;gap:1rem;color:var(--fg-3);font-size:.65rem;margin-bottom:.7rem}
+.waterfall-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem;align-items:end}
+.waterfall-column{min-width:0;text-align:center}
+.waterfall-column-value{font:800 .88rem 'JetBrains Mono',monospace;color:var(--fg);margin-bottom:.45rem;white-space:nowrap}
+.waterfall-plot{height:174px;position:relative;border-bottom:1.5px solid var(--border);background:linear-gradient(to top,transparent 24.9%,var(--border) 25%,transparent 25.3%,transparent 49.9%,var(--border) 50%,transparent 50.3%,transparent 74.9%,var(--border) 75%,transparent 75.3%);overflow:visible}
+.waterfall-total-bar,.waterfall-coverage-bar,.waterfall-gap-bar{position:absolute;left:18%;width:64%;border-radius:7px 7px 0 0}
+.waterfall-total-bar{bottom:0;height:100%;background:var(--accent)}
+.waterfall-coverage-bar{bottom:15.34%;height:84.66%;background:var(--green);border-radius:7px}
+.waterfall-gap-bar{bottom:0;height:15.34%;min-height:10px;background:var(--amber)}
+.waterfall-column:nth-child(1) .waterfall-plot:after{content:"";position:absolute;left:82%;right:-55%;top:0;border-top:1.5px dashed var(--fg-3)}
+.waterfall-column:nth-child(2) .waterfall-plot:after{content:"";position:absolute;left:82%;right:-55%;top:84.66%;border-top:1.5px dashed var(--fg-3)}
+.waterfall-column-label{margin-top:.6rem;color:var(--fg);font-size:.73rem;font-weight:750;line-height:1.35}
+.waterfall-column-sub{margin-top:.15rem;color:var(--fg-3);font-size:.65rem;line-height:1.35}
+.waterfall-equation{margin-top:.95rem}
+@media(max-width:600px){
+ .waterfall-columns{gap:.45rem}
+ .waterfall-plot{height:132px}
+ .waterfall-column-value{font-size:.68rem}
+ .waterfall-column-label{font-size:.66rem}
+ .waterfall-column-sub{font-size:.6rem}
+ .waterfall-column:nth-child(1) .waterfall-plot:after,.waterfall-column:nth-child(2) .waterfall-plot:after{right:-32%}
+}
+
 </style>
 
 <!-- STICKY HEADER -->
@@ -490,29 +516,31 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <div class="stat-card"><div class="stat-label">Spring funding cutoff</div><div class="stat-value">Dec 15</div><div class="stat-note">2026 · no new debt or out-of-pocket target</div></div>
     </div><div class="waterfall-card" id="funding-waterfall" aria-label="Funding reconciliation: 79,860 dollars identified coverage plus 14,482 dollars remaining gap equals 94,342 dollars total">
 <div class="waterfall-head"><div><div class="waterfall-kicker">Funding waterfall · original audit reconciliation</div><div class="waterfall-title">Where the $94,342 program estimate stands</div></div><div class="waterfall-total"><strong>$94,342</strong><span>total program estimate</span></div></div>
-<div class="waterfall-bar" role="img" aria-label="84.66 percent identified coverage and 15.34 percent remaining gap"><div class="waterfall-covered"></div><div class="waterfall-gap"></div></div>
-<div class="waterfall-legend"><div class="waterfall-key"><span class="waterfall-swatch covered"></span><div><strong>$79,860</strong><span>Previously identified coverage · 84.66%</span></div></div><div class="waterfall-key"><span class="waterfall-swatch gap"></span><div><strong>$14,482</strong><span>Remaining gap · 15.34%</span></div></div></div>
-<div class="waterfall-equation"><span>$79,860 identified coverage</span><b>+</b><span>$14,482 open gap</span><b>=</b><strong>$94,342 total</strong></div>
-<p class="waterfall-note">This restores the original audit waterfall. “Identified coverage” is the amount in the original model, not a claim that every dollar is disbursed or irrevocably committed. The funding ledger tracks proof, permitted use and payment timing.</p></div>
-    <div class="leg-card" style="margin-top:1rem;">
-      <div class="leg-header">
-        <div class="leg-title-block"><div class="leg-title">Original audit coverage — 85%</div><div class="leg-course">Do not treat the $79,860 as cash available until the underlying award/authorization is confirmed.</div></div>
-        <div class="leg-cost"><div class="leg-cost-main">$14,482</div><div class="leg-cost-sub">gap to close</div></div>
-      </div>
-      <div class="leg-progress-wrap">
-        <div class="leg-progress-label"><span>Previously identified funding</span><strong>85%</strong></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
-      </div>
-      <div class="leg-rows">
-        <div class="leg-row"><span class="leg-row-label">Program estimate from original audit</span><span class="leg-row-val">$94,342</span></div>
-        <div class="leg-row"><span class="leg-row-label">Coverage identified in original audit</span><span class="leg-row-val">$79,860</span></div>
-        <div class="leg-row"><span class="leg-row-label">Original uncovered balance</span><span class="leg-row-val" style="color:var(--red)">$14,482</span></div>
-      </div>
-      <div class="leg-schips">
-        <span class="schip amber"><span class="schip-dot"></span>Commitments need reconciliation</span>
-        <span class="schip neutral"><span class="schip-dot"></span>Original cost model preserved</span>
-      </div>
+<div class="waterfall-chart" role="img" aria-label="Waterfall chart: 94,342 dollar total program estimate, less 79,860 dollars of previously identified coverage, leaves a 14,482 dollar gap">
+  <div class="waterfall-chart-top"><span>Amounts are proportions of the $94,342 baseline</span><span>USD</span></div>
+  <div class="waterfall-columns">
+    <div class="waterfall-column">
+      <div class="waterfall-column-value">$94,342</div>
+      <div class="waterfall-plot"><div class="waterfall-total-bar"></div></div>
+      <div class="waterfall-column-label">Total program estimate</div>
+      <div class="waterfall-column-sub">100% starting balance</div>
     </div>
+    <div class="waterfall-column">
+      <div class="waterfall-column-value">−$79,860</div>
+      <div class="waterfall-plot"><div class="waterfall-coverage-bar"></div></div>
+      <div class="waterfall-column-label">Previously identified coverage</div>
+      <div class="waterfall-column-sub">84.66% of total · deduction bridge</div>
+    </div>
+    <div class="waterfall-column">
+      <div class="waterfall-column-value">$14,482</div>
+      <div class="waterfall-plot"><div class="waterfall-gap-bar"></div></div>
+      <div class="waterfall-column-label">Remaining funding gap</div>
+      <div class="waterfall-column-sub">15.34% residual balance</div>
+    </div>
+  </div>
+  <div class="waterfall-equation"><span>$94,342 total</span><b>−</b><span>$79,860 identified coverage</span><b>=</b><strong>$14,482 remaining</strong></div>
+</div><p class="waterfall-note">This restores the original audit waterfall. “Identified coverage” is the amount in the original model, not a claim that every dollar is disbursed or irrevocably committed. The funding ledger tracks proof, permitted use and payment timing.</p></div>
+    
     <p class="fund-notes" style="margin-top:.75rem;"><strong>Accounting rule:</strong> this roadmap preserves the cost and coverage figures already researched in your audit. An application, published maximum, scholarship average, potential refund, or agency cap is not a confirmed award. A funding source moves to “confirmed” only when its written notice identifies the amount, eligible charge, and payment/credit timing.</p>
   </section><nav class="roadmap-nav" aria-label="Roadmap sections"><a href="#plan-group">Plan &amp; costs</a><a href="#spring-group">Spring 2027 funding</a><a href="#scholarship-group">Scholarships</a><a href="#fiveyear-group">Five-year coverage</a><a href="#tools-group">Tools &amp; sources</a></nav>
 <div class="roadmap-group" id="plan-group"><div class="roadmap-group-heading"><span>01 · THE PLAN</span><h2>Training route &amp; program cost</h2><p>Start with the aviation objective, then see the program components behind the original funding estimate.</p></div><section id="career-path">
