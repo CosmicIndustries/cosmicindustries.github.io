@@ -427,67 +427,73 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
 }
 
 /* ── ROADMAP INFORMATION ARCHITECTURE + WATERFALL ── */
-.section-title {
-  color:var(--fg-2);
-  font-size:.78rem;
-  letter-spacing:.075em;
-  margin-bottom:1rem;
-}
-.roadmap-nav {
-  display:flex;
-  flex-wrap:wrap;
-  gap:.55rem;
-  margin:0 0 1.5rem;
-  padding:.8rem;
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:12px;
-}
-.roadmap-nav a {
-  display:inline-flex;
-  align-items:center;
-  padding:.48rem .8rem;
-  border:1px solid var(--border);
-  border-radius:999px;
-  background:var(--surface-2);
-  color:var(--fg);
-  text-decoration:
-<div class="main">
-  <section id="dashboard">
+.section-title{color:var(--fg-2);font-size:.78rem;letter-spacing:.075em;margin-bottom:1rem}
+.roadmap-nav{display:flex;flex-wrap:wrap;gap:.55rem;margin:0 0 1.5rem;padding:.8rem;background:var(--surface);border:1.5px solid var(--border);border-radius:12px}
+.roadmap-nav a{display:inline-flex;align-items:center;padding:.48rem .8rem;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--fg);text-decoration:none;font-size:.75rem;font-weight:700}
+.roadmap-nav a:hover{border-color:var(--accent);color:var(--accent)}
+.roadmap-group{margin:0 0 1.5rem;padding:1.15rem;border:1.5px solid var(--border);border-radius:16px;background:var(--surface-2);scroll-margin-top:1rem}
+.roadmap-group>section{margin-bottom:1.8rem}
+.roadmap-group>section:last-of-type{margin-bottom:.35rem}
+.roadmap-group-heading{margin:0 0 1.2rem}
+.roadmap-group-heading>span{display:block;margin-bottom:.35rem;color:var(--accent);font-size:.67rem;font-weight:800;letter-spacing:.11em}
+.roadmap-group-heading h2{color:var(--fg);font-size:1.12rem;line-height:1.25;letter-spacing:-.025em;margin:0 0 .3rem}
+.roadmap-group-heading p{max-width:720px;color:var(--fg-2);font-size:.78rem;line-height:1.5}
+.waterfall-card{margin:1rem 0 1.2rem;padding:1.05rem 1.15rem;border:1.5px solid var(--border);border-radius:14px;background:var(--surface)}
+.waterfall-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem}
+.waterfall-kicker{color:var(--accent);font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.waterfall-title{margin-top:.2rem;font-size:.98rem;font-weight:750;color:var(--fg)}
+.waterfall-total{text-align:right}
+.waterfall-total strong{display:block;font:800 1.25rem 'JetBrains Mono',monospace;color:var(--fg)}
+.waterfall-total span{font-size:.67rem;color:var(--fg-3)}
+.waterfall-bar{display:flex;width:100%;height:17px;overflow:hidden;border-radius:999px;background:var(--surface-2);border:1px solid var(--border)}
+.waterfall-covered{width:84.66%;background:var(--green)}
+.waterfall-gap{width:15.34%;background:var(--amber)}
+.waterfall-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:.9rem}
+.waterfall-key{display:flex;align-items:flex-start;gap:.55rem;min-width:0}
+.waterfall-swatch{width:10px;height:10px;border-radius:3px;margin-top:.2rem;flex:none}
+.waterfall-swatch.covered{background:var(--green)}
+.waterfall-swatch.gap{background:var(--amber)}
+.waterfall-key strong{display:block;font:750 .9rem 'JetBrains Mono',monospace;color:var(--fg)}
+.waterfall-key span:not(.waterfall-swatch){display:block;margin-top:.12rem;color:var(--fg-2);font-size:.7rem;line-height:1.4}
+.waterfall-equation{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-top:.9rem;padding:.65rem .75rem;border-radius:8px;background:var(--surface-2);color:var(--fg-2);font-size:.73rem}
+.waterfall-equation b{color:var(--fg-3)}
+.waterfall-equation strong{color:var(--fg)}
+.waterfall-note{margin-top:.7rem;color:var(--fg-3);font-size:.68rem;line-height:1.5}
+.fund-grid{align-items:stretch}
+.fund-card{display:flex;flex-direction:column}
+.fund-card .fund-notes{line-height:1.52}
+#dashboard,#profile-builder,#sources{scroll-margin-top:1rem}
+@media(max-width:600px){.roadmap-group{padding:.8rem;margin-left:-.25rem;margin-right:-.25rem}.waterfall-legend{grid-template-columns:1fr;gap:.65rem}.waterfall-equation{align-items:flex-start}.waterfall-total{text-align:left}}
+
+</style>
+
+<!-- STICKY HEADER -->
+<header class="page-header">
+  <div>
+    <div class="header-title">✈ MGA Aviation Funding &amp; Five-Year Roadmap</div>
+    <div class="header-sub">MGA · Flight track · Ag/Cargo career path · 2027–2031 funding plan</div>
+    <a href="https://cosmicindustries.github.io/mga-roadmap.html" target="_blank" class="header-gh-link">🔗 cosmicindustries.github.io</a>
+  </div>
+  <div class="header-total">
+    <div class="header-total-num">$94,342</div>
+    <div class="header-total-label">original audit baseline</div>
+  </div>
+</header>
+
+
+<div class="main"><section id="dashboard">
     <div class="section-title">Funding position · 3 November 2026</div>
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-label">Original program total</div><div class="stat-value">$94,342</div><div class="stat-note">Existing audit baseline retained</div></div>
       <div class="stat-card"><div class="stat-label">Previously identified coverage</div><div class="stat-value">$79,860</div><div class="stat-note">Historical audit figure — reverify award notices</div></div>
       <div class="stat-card"><div class="stat-label">Original remaining gap</div><div class="stat-value" style="color:var(--red)">$14,482</div><div class="stat-note">15% of the original program estimate</div></div>
       <div class="stat-card"><div class="stat-label">Spring funding cutoff</div><div class="stat-value">Dec 15</div><div class="stat-note">2026 · no new debt or out-of-pocket target</div></div>
-    </div>
-    <div class="waterfall-card" id="funding-waterfall" aria-label="Funding waterfall: 79,860 dollars identified coverage plus 14,482 dollars remaining gap equals 94,342 dollars total program cost">
-      <div class="waterfall-head">
-        <div>
-          <div class="waterfall-kicker">Funding waterfall · original audit reconciliation</div>
-          <div class="waterfall-title">Where the $94,342 program estimate stands</div>
-        </div>
-        <div class="waterfall-total"><strong>$94,342</strong><span>total program estimate</span></div>
-      </div>
-      <div class="waterfall-bar" role="img" aria-label="84.66 percent previously identified coverage and 15.34 percent remaining gap">
-        <div class="waterfall-covered"></div>
-        <div class="waterfall-gap"></div>
-      </div>
-      <div class="waterfall-legend">
-        <div class="waterfall-key">
-          <span class="waterfall-swatch covered"></span>
-          <div><strong>$79,860</strong><span>Previously identified coverage · 84.66%</span></div>
-        </div>
-        <div class="waterfall-key">
-          <span class="waterfall-swatch gap"></span>
-          <div><strong>$14,482</strong><span>Remaining gap · 15.34%</span></div>
-        </div>
-      </div>
-      <div class="waterfall-equation">
-        <span>$79,860 identified coverage</span><b>+</b><span>$14,482 open gap</span><b>=</b><strong>$94,342 total</strong>
-      </div>
-      <p class="waterfall-note">This restores the original audit waterfall. “Identified coverage” is the amount in the original model, not a claim that every dollar is already disbursed or irrevocably committed. The detailed ledger below tracks proof, permitted use and payment timing.</p>
-    </div>
+    </div><div class="waterfall-card" id="funding-waterfall" aria-label="Funding reconciliation: 79,860 dollars identified coverage plus 14,482 dollars remaining gap equals 94,342 dollars total">
+<div class="waterfall-head"><div><div class="waterfall-kicker">Funding waterfall · original audit reconciliation</div><div class="waterfall-title">Where the $94,342 program estimate stands</div></div><div class="waterfall-total"><strong>$94,342</strong><span>total program estimate</span></div></div>
+<div class="waterfall-bar" role="img" aria-label="84.66 percent identified coverage and 15.34 percent remaining gap"><div class="waterfall-covered"></div><div class="waterfall-gap"></div></div>
+<div class="waterfall-legend"><div class="waterfall-key"><span class="waterfall-swatch covered"></span><div><strong>$79,860</strong><span>Previously identified coverage · 84.66%</span></div></div><div class="waterfall-key"><span class="waterfall-swatch gap"></span><div><strong>$14,482</strong><span>Remaining gap · 15.34%</span></div></div></div>
+<div class="waterfall-equation"><span>$79,860 identified coverage</span><b>+</b><span>$14,482 open gap</span><b>=</b><strong>$94,342 total</strong></div>
+<p class="waterfall-note">This restores the original audit waterfall. “Identified coverage” is the amount in the original model, not a claim that every dollar is disbursed or irrevocably committed. The funding ledger tracks proof, permitted use and payment timing.</p></div>
     <div class="leg-card" style="margin-top:1rem;">
       <div class="leg-header">
         <div class="leg-title-block"><div class="leg-title">Original audit coverage — 85%</div><div class="leg-course">Do not treat the $79,860 as cash available until the underlying award/authorization is confirmed.</div></div>
@@ -508,18 +514,8 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       </div>
     </div>
     <p class="fund-notes" style="margin-top:.75rem;"><strong>Accounting rule:</strong> this roadmap preserves the cost and coverage figures already researched in your audit. An application, published maximum, scholarship average, potential refund, or agency cap is not a confirmed award. A funding source moves to “confirmed” only when its written notice identifies the amount, eligible charge, and payment/credit timing.</p>
-  </section>
-  
-  <nav class="roadmap-nav" aria-label="Roadmap sections">
-    <a href="#plan-group">Plan &amp; costs</a>
-    <a href="#spring-group">Spring 2027 funding</a>
-    <a href="#scholarship-group">Scholarships</a>
-    <a href="#fiveyear-group">Five-year coverage</a>
-    <a href="#tools-group">Tools &amp; sources</a>
-  </nav>
-  <div class="roadmap-group" id="plan-group">
-    <div class="roadmap-group-heading"><span>01 · THE PLAN</span><h2>Training route &amp; program cost</h2><p>Start with the aviation objective, then see the program components behind the original funding estimate.</p></div>
-    <section id="career-path">
+  </section><nav class="roadmap-nav" aria-label="Roadmap sections"><a href="#plan-group">Plan &amp; costs</a><a href="#spring-group">Spring 2027 funding</a><a href="#scholarship-group">Scholarships</a><a href="#fiveyear-group">Five-year coverage</a><a href="#tools-group">Tools &amp; sources</a></nav>
+<div class="roadmap-group" id="plan-group"><div class="roadmap-group-heading"><span>01 · THE PLAN</span><h2>Training route &amp; program cost</h2><p>Start with the aviation objective, then see the program components behind the original funding estimate.</p></div><section id="career-path">
     <div class="section-title">Career and certification path</div>
     <div class="career-path">
       <div class="cp-pill active">PPL</div><div class="cp-arrow">→</div>
@@ -543,8 +539,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       </div>
     </div>
     <p class="fund-notes" style="margin-top:.65rem;">Certificate hour requirements depend on the applicable FAA Part 61 or Part 141 course and approved syllabus. The 250-hour figure in the former page was not a universal minimum; confirm the exact MGA-approved training route and certificate requirements with the School of Aviation.</p>
-  </section>
-    <section id="program-cost">
+  </section><section id="program-cost">
     <div class="section-title">Program cost model — original audit retained</div>
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-label">Flight training estimate</div><div class="stat-value">$66,654</div><div class="stat-note">Seven-stage estimate from original worksheet</div></div>
@@ -572,11 +567,8 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <a class="fund-apply" href="https://www.mga.edu/student-account-services/tuition-fees/index.php" target="_blank" rel="noopener">MGA tuition &amp; fees ↗</a>
       <a class="fund-apply" href="https://www.mga.edu/aviation/scholarships.php" target="_blank" rel="noopener">MGA aviation scholarships ↗</a>
     </div>
-  </section>
-  </div>
-<div class="roadmap-group" id="spring-group">
-    <div class="roadmap-group-heading"><span>02 · IMMEDIATE PRIORITY</span><h2>Spring 2027 funding</h2><p>Close the existing $14,482 gap by December 15, without counting pending applications as awards.</p></div>
-    <section id="december-gap">
+  </section></div>
+<div class="roadmap-group" id="spring-group"><div class="roadmap-group-heading"><span>02 · IMMEDIATE PRIORITY</span><h2>Spring 2027 funding</h2><p>Close the existing $14,482 gap by December 15, without counting pending applications as awards.</p></div><section id="december-gap">
     <div class="section-title">Spring 2027 — close the $14,482 gap</div>
     <div class="fund-grid">
       <div class="fund-card urgent">
@@ -620,15 +612,14 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       </div>
       
     </div>
-    <div class="action-item urgent" style="margin-top:1rem">
+    <div class="fund-card" style="margin-top:1rem;"><div class="fund-name">Georgia HOPE / Zell Miller — excluded from this funding model</div><div class="fund-notes">The graduation-time eligibility window and current academic record do not support including this award in the funding plan. The roadmap assigns $0 unless GSFC/GAfutures provides a written current eligibility determination.</div><a class="fund-apply" href="https://gsfc.georgia.gov/hope" target="_blank" rel="noopener">Official GSFC eligibility rules ↗</a></div><div class="action-item urgent" style="margin-top:1rem">
       <div class="action-num">!</div>
       <div class="action-body">
         <div class="action-title">MGA must answer these five questions in writing</div>
         <div class="action-detail">1) What is the exact Spring 2027 amount due on the university account and flight account? 2) Is the $1 million pilot fuel fund available to incoming Spring 2027 flight-track students, and what is the student-level credit? 3) Which aviation/Foundation awards can be made before Dec 15? 4) Can approved outside awards or third-party authorizations protect registration while payment is pending? 5) What is the actual disbursement/credit date for Pell and other aid?</div>
       </div>
     </div>
-  </section>
-    <section id="funding-ledger">
+  </section><section id="funding-ledger">
   <div class="section-title">Funding ledger — eligible, conditional and pending are separate</div>
   <div class="tbl-wrap">
     <table>
@@ -638,7 +629,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
         <tr><td>GVRA Bud McCall</td><td>Case in process; award unconfirmed</td><td class="mono">No — pending</td><td>Written client eligibility, IPE, expense categories, amount and payment date.</td></tr>
         <tr><td>MGA pilot fuel fund</td><td>Announced institutional funding pool</td><td class="mono">No — per-student credit unknown</td><td>MGA written student-level eligibility and flight-account posting date.</td></tr>
         <tr><td>Pell / FSEOG</td><td>FAFSA submitted; actual award package not documented here</td><td class="mono">No — exact amounts unknown</td><td>MGA award notice, eligible charges and disbursement dates.</td></tr>
-        <tr><td>Native Forward Direct / Student Relief</td><td>Direct application previously started; separate Relief application not confirmed submitted</td><td class="mono">No — pending selection</td><td>Accepted tribal documentation, full-time enrollment and award notice/payment terms.</td></tr>
+        <tr><td>Native Forward Direct / Student Relief</td><td>Applications in progress / separate relief application</td><td class="mono">No — pending selection</td><td>Accepted tribal documentation, full-time enrollment and award notice/payment terms.</td></tr>
         <tr><td>PPOT / Avfuel / AOPA</td><td>PPOT status to verify; Avfuel and AOPA previously reported submitted</td><td class="mono">No — no confirmed award/payment</td><td>Award notice, allowed use and school/payment timing.</td></tr>
         <tr><td>EAA / NWDS / MGA Foundation / UAA / GBAA / NAAA</td><td>Current, upcoming or stage-gated opportunities</td><td class="mono">No — no confirmed award</td><td>Individual eligibility, selection notice and payment/credit date.</td></tr>
         <tr><td>Full Circle / tribal descendant funding</td><td>Conditional; requires qualifying parent/grandparent enrollment proof</td><td class="mono">No — lineage gate not met on record</td><td>Tribal enrollment evidence and connecting birth records, plus current award criteria.</td></tr>
@@ -648,8 +639,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
     </table>
   </div>
   <p class="fund-notes" style="margin-top:.65rem;">Awards with unfulfilled age, enrollment, academic-standing, tribal-membership or career-track requirements are excluded from the active shortlist. Reconsider only if documentary eligibility changes or the training stage advances.</p>
-</section>
-    <section id="timeline">
+</section><section id="timeline">
   <div class="section-title">Execution calendar — current deadlines and stage gates</div>
   <div class="action-list">
     <div class="action-item urgent"><div class="action-num">1</div><div class="action-body"><div class="action-title">Nov 4 · MGA written funding package</div><div class="action-detail">Confirm actual Spring balance, fuel-fund eligibility and amount, Foundation/aviation awards, Pell/FSEOG actual award, flight-account credits and any payment-protection mechanism.</div></div></div>
@@ -667,11 +657,8 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
     <div class="action-item"><div class="action-num">13</div><div class="action-body"><div class="action-title">2027 GBAA cycle · watch for publication</div><div class="action-detail">Ask whether the next Professional Pilot award accepts nontraditional adult college entrants. Do not use the closed 2025–26 deadline or award criteria as if the next cycle is confirmed.</div></div></div>
     <div class="action-item"><div class="action-num">14</div><div class="action-body"><div class="action-title">Next NAAA annual cycle · operator sponsor first</div><div class="action-detail">Identify an NAAA Operator Member willing to sponsor the application. The 2026 deadline has passed; verify the 2027 application window when released.</div></div></div>
   </div>
-</section>
-  </div>
-<div class="roadmap-group" id="scholarship-group">
-    <div class="roadmap-group-heading"><span>03 · FUNDING PIPELINE</span><h2>Scholarships &amp; employment support</h2><p>Current-fit scholarships first; conditional lineage awards and workforce routes are kept separate.</p></div>
-    <section id="scholarships">
+</section></div>
+<div class="roadmap-group" id="scholarship-group"><div class="roadmap-group-heading"><span>03 · FUNDING PIPELINE</span><h2>Scholarships &amp; employment support</h2><p>Current-fit scholarships first; conditional lineage and workforce routes remain separate from the active shortlist.</p></div><section id="scholarships">
   <div class="section-title">Scholarship shortlist — eligibility screened for this route</div>
   <p class="fund-notes" style="margin-bottom:.85rem;">This list separates active applications from conditional and later-stage awards. A scholarship stays on the active shortlist only when its published rules fit the current training stage or the sponsor has a specific eligibility question to resolve. Published maximums are not expected awards.</p>
   <div class="fund-grid">
@@ -776,8 +763,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <div class="leg-row"><span class="leg-row-label"><strong>King Schools / NAFI Flight Instructor Scholarship</strong><br><span class="fund-notes">CFI-stage award; requires a commercial pilot certificate with instrument rating, or current CFI pursuing additional instructor ratings, plus NAFI membership. Revisit only after meeting the certificate and membership gates.</span></span><span class="leg-row-val">$5,000 cash + course value</span></div>
     </div>
   </div>
-</section>
-    <section id="native-military">
+</section><section id="native-military">
   <div class="section-title">Conditional lineage and career-business pathways</div>
   <div class="fund-grid">
     <div class="fund-card">
@@ -796,8 +782,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <a class="fund-apply" href="https://gvs.georgia.gov/document/document/client-services-policy-manual-07-01-22/download" target="_blank" rel="noopener">Self-employment policy manual ↗</a>
     </div>
   </div>
-</section>
-    <section id="workforce">
+</section><section id="workforce">
     <div class="section-title">Workforce and return-to-work support</div>
     <div class="fund-grid">
       <div class="fund-card">
@@ -823,11 +808,8 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
         <a class="fund-apply" href="https://cfsga.net/our-scholarships/" target="_blank" rel="noopener">Foundation scholarship listings ↗</a>
       </div>
     </div>
-  </section>
-  </div>
-<div class="roadmap-group" id="fiveyear-group">
-    <div class="roadmap-group-heading"><span>04 · LONG-RANGE FINANCIAL PLAN</span><h2>Five-year living and aircraft coverage</h2><p>Household support and aircraft ownership are separate financial problems, each with its own cost and funding evidence.</p></div>
-    <section id="five-year">
+  </section></div>
+<div class="roadmap-group" id="fiveyear-group"><div class="roadmap-group-heading"><span>04 · LONG-RANGE FINANCIAL PLAN</span><h2>Five-year living and aircraft coverage</h2><p>Household support and aircraft ownership are separate financial problems, each with its own cost and funding evidence.</p></div><section id="five-year">
     <div class="section-title">2027–2031 financial runway</div>
     <p class="fund-notes" style="margin-bottom:.85rem;">Five-year coverage is larger than the $14,482 Spring program gap. Model education, living support, employment transition and aircraft ownership in separate ledgers. The scenarios below are planning sensitivities, not a claim that your actual monthly need is known.</p>
     <div class="tbl-wrap">
@@ -859,8 +841,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
         <a class="fund-apply" href="https://dfcs.georgia.gov/services/low-income-home-energy-assistance-program-liheap" target="_blank" rel="noopener">Georgia LIHEAP ↗</a>
       </div>
     </div>
-  </section>
-    <section id="aircraft">
+  </section><section id="aircraft">
     <div class="section-title">Aircraft acquisition and five-year ownership — separate capital plan</div>
     <div class="leg-card">
       <div class="leg-header">
@@ -898,11 +879,8 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
         <a class="fund-apply" href="https://www.agaviation.org/career/" target="_blank" rel="noopener">NAAA career pathway ↗</a>
       </div>
     </div>
-  </section>
-  </div>
-<div class="roadmap-group" id="tools-group">
-    <div class="roadmap-group-heading"><span>05 · WORKSPACE</span><h2>Application tools &amp; source material</h2><p>Keep reusable applicant information and official program links together at the end.</p></div>
-    <section id="profile-builder">
+  </section></div>
+<div class="roadmap-group" id="tools-group"><div class="roadmap-group-heading"><span>05 · WORKSPACE</span><h2>Application tools &amp; source material</h2><p>Keep reusable applicant information and official program links together at the end.</p></div><section id="profile-builder">
     <div class="section-title">📋 Scholarship Application Profile — Fill Once, Apply Everywhere</div>
     <p style="font-size:0.82rem;color:var(--fg-2);margin-bottom:1rem;">Enter your info once. Hit <strong>Save Profile</strong> (stored in your browser). Then use <strong>Export</strong> to copy or download a ready-to-paste packet for any scholarship portal.</p>
 
@@ -999,77 +977,16 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <div id="gist-status" class="gist-status"></div>
       <p class="gist-note">🔑 Create a PAT at <strong>github.com → Settings → Developer settings → Personal access tokens → Fine-grained</strong> with only the <em>Gists</em> permission. Your data stays in your own GitHub account.</p>
     </div>
-  </section>
-    <section id="sources">
+  </section><section id="sources">
   <div class="section-title">Official source register — screened shortlist</div>
   <div class="fund-grid">
-    <div class="fund-card"><div class="fund-name">MGA / Federal / Georgia aid</div><div class="fund-notes"><a href="https://www.mga.edu/aviation/programs.php" target="_blank" rel="noopener">MGA aviation programs</a> · <a href="https://www.mga.edu/aviation/scholarships.php" target="_blank" rel="noopener">MGA aviation awards</a> · <a href="https://www.mga.edu/financial-aid/opportunities/scholarships.php" target="_blank" rel="noopener">MGA Foundation</a> · <a href="https://ce.mga.edu/news/2026/09/middle-georgia-state-university-receives-federal-funds-for-aviation-school.php" target="_blank" rel="noopener">MGA pilot fuel fund</a> · <a href="https://studentaid.gov/" target="_blank" rel="noopener">Federal Student Aid</a></div></div>
+    <div class="fund-card"><div class="fund-name">MGA / Federal / Georgia aid</div><div class="fund-notes"><a href="https://www.mga.edu/aviation/programs.php" target="_blank" rel="noopener">MGA aviation programs</a> · <a href="https://www.mga.edu/aviation/scholarships.php" target="_blank" rel="noopener">MGA aviation awards</a> · <a href="https://www.mga.edu/financial-aid/opportunities/scholarships.php" target="_blank" rel="noopener">MGA Foundation</a> · <a href="https://ce.mga.edu/news/2026/09/middle-georgia-state-university-receives-federal-funds-for-aviation-school.php" target="_blank" rel="noopener">MGA pilot fuel fund</a> · <a href="https://studentaid.gov/" target="_blank" rel="noopener">Federal Student Aid</a> · <a href="https://gsfc.georgia.gov/hope" target="_blank" rel="noopener">GSFC HOPE rules</a></div></div>
     <div class="fund-card"><div class="fund-name">Vocational rehabilitation / workforce</div><div class="fund-notes"><a href="https://gvs.georgia.gov/bud-mccall-grant" target="_blank" rel="noopener">Bud McCall Grant</a> · <a href="https://gvs.georgia.gov/how-do-i-apply-bud-mccall-grant" target="_blank" rel="noopener">Bud McCall application</a> · <a href="https://gvs.georgia.gov/vocational-rehabilitation" target="_blank" rel="noopener">GVRA services</a> · <a href="https://worksourcecoastal.org/services/adult-services/" target="_blank" rel="noopener">WorkSource Coastal Adult Services</a></div></div>
     <div class="fund-card"><div class="fund-name">Current scholarship applications</div><div class="fund-notes"><a href="https://www.nativeforward.org/scholarships/native-forward-direct-scholarship-winter-spring/" target="_blank" rel="noopener">Native Forward Direct</a> · <a href="https://www.nativeforward.org/scholarships/native-forward-student-relief-funding-fall-2026-2027/" target="_blank" rel="noopener">Native Forward Student Relief</a> · <a href="https://scholarship.theppot.org/" target="_blank" rel="noopener">PPOT</a> · <a href="https://www.eaa.org/eaa/learn-to-fly/scholarships/post-secondary-scholarships" target="_blank" rel="noopener">EAA Post-Secondary</a> · <a href="https://www.aopa.org/training-and-safety/students/aopa-flight-training-scholarships" target="_blank" rel="noopener">AOPA</a> · <a href="https://www.nwds-ak.com/About/Scholarship" target="_blank" rel="noopener">Aviation Safety Management</a></div></div>
     <div class="fund-card"><div class="fund-name">Future-stage aviation funding</div><div class="fund-notes"><a href="https://www.uaa.aero/uaa_scholarships.php" target="_blank" rel="noopener">UAA scholarships</a> · <a href="https://www.gbaa.org/scholarships" target="_blank" rel="noopener">GBAA scholarships</a> · <a href="https://www.agaviation.org/career/scholarships/ag-wings-of-tomorrow-scholarship/" target="_blank" rel="noopener">NAAA Ag Wings</a> · <a href="https://nata.aero/national-air-transportation-foundation/scholarships/" target="_blank" rel="noopener">NATA/NATF awards</a> · <a href="https://www.uaa.aero/2026_institutional_members.php" target="_blank" rel="noopener">UAA 2026 institutional members</a></div></div>
   </div>
   <p class="fund-notes" style="margin-top:.75rem">Research snapshot: November 3, 2026. Eligibility was filtered against the known record and current training stage. Where a requirement is not verified (for example, MGA's current UAA membership, exact tribal documentation, or enrollment timing), the opportunity is explicitly conditional and is not counted as confirmed funding.</p>
-</section>
-  </div>
-  <div class="page-bottom-note" style="font-size:0.72rem;color:var(--fg-3);text-align:center;padding-top:0.5rem;">
-    Research snapshot: Nov 3, 2026 · Original $94,342 audit baseline preserved · Funding is not secured until confirmed in writing · Zero-debt / zero-out-of-pocket goal
-  </div>
-pf-label">AOPA Membership #<input class="pf-input" id="pf-aopa" placeholder="Will join — #pending"></label>
-        <label class="pf-label">EAA Member #<input class="pf-input" id="pf-eaa" placeholder="Will join — #pending"></label>
-      </div>
-    </div>
-
-    <!-- ESSAYS -->
-    <div class="profile-card" style="margin-top:1rem;">
-      <div class="profile-card-title">✍ Master Essays (adapt per application)</div>
-      <label class="pf-label" style="margin-bottom:0.75rem;">Personal Statement / Why Aviation (400–600 words)
-        <textarea class="pf-textarea pf-essay" id="pf-ps" rows="8" placeholder="Write your core personal statement here. Cover: personal experiences, barriers navigated, why agricultural aviation specifically, what MGA's Part 141 program means, long-term goal (ag cargo + drone ops). Adapt the opening sentence per application but keep this as your master draft."></textarea>
-      </label>
-      <label class="pf-label" style="margin-bottom:0.75rem;">Career Goals Essay (250–400 words)
-        <textarea class="pf-textarea pf-essay" id="pf-career" rows="6" placeholder="Describe your specific career path: PPL → Commercial → CFI → ag aviation. Mention Part 107 drone work as near-term revenue while building hours. Tie to Georgia's agricultural economy and community impact."></textarea>
-      </label>
-      <label class="pf-label">Short Answer: Leadership / Community Involvement (150–250 words)
-        <textarea class="pf-textarea pf-essay" id="pf-leadership" rows="5" placeholder="e.g. CosmicIndustries, community involvement, any mentorship, Cherokee heritage community ties, ADHD advocacy."></textarea>
-      </label>
-    </div>
-
-    <!-- ACTION BUTTONS -->
-    <div class="profile-actions">
-      <button class="pf-btn pf-save" onclick="saveProfile()">💾 Save Profile</button>
-      <button class="pf-btn pf-copy" onclick="copyProfile('full')">📋 Copy Full Profile</button>
-      <button class="pf-btn pf-copy" onclick="copyProfile('eaa')">Copy for EAA</button>
-      <button class="pf-btn pf-copy" onclick="copyProfile('aopa')">Copy for AOPA</button>
-      <button class="pf-btn pf-copy" onclick="copyProfile('native')">Copy for Native Forward</button>
-      <button class="pf-btn pf-export" onclick="exportProfile()">📤 Download .txt</button>
-    </div>
-    <div id="pf-status" style="font-size:0.78rem;color:var(--green);margin-top:0.5rem;min-height:1.2em;"></div>
-
-    <!-- Cross-device Gist Sync -->
-    <div class="gist-sync-card">
-      <div class="gist-sync-title">☁️ Cross-Device Sync via GitHub Gist</div>
-      <p class="gist-note">Enter your GitHub Personal Access Token (PAT) with <code>gist</code> scope — stored only in this browser, never uploaded. Your profile saves to a <strong>private</strong> Gist accessible from any device where you enter the same PAT.</p>
-      <div class="gist-sync-row">
-        <label>GitHub PAT (gist scope)
-          <input id="gist-pat" type="password" placeholder="ghp_…" autocomplete="off" spellcheck="false">
-        </label>
-        <label>Gist ID (auto-filled after first sync)
-          <input id="gist-id" type="text" placeholder="Leave blank to create new" autocomplete="off" spellcheck="false">
-        </label>
-      </div>
-      <div class="gist-sync-btns">
-        <button class="pf-btn pf-save" onclick="syncToGist()">☁️ Sync to Gist</button>
-        <button class="pf-btn pf-copy" onclick="loadFromGist()">📥 Load from Gist</button>
-      </div>
-      <div id="gist-status" class="gist-status"></div>
-      <p class="gist-note">🔑 Create a PAT at <strong>github.com → Settings → Developer settings → Personal access tokens → Fine-grained</strong> with only the <em>Gists</em> permission. Your data stays in your own GitHub account.</p>
-    </div>
-  </section>
-
-  <div style="font-size:0.72rem;color:var(--fg-3);text-align:center;padding-top:0.5rem;">
-    Research snapshot: Nov 3, 2026 · Original $94,342 audit baseline preserved · Funding is not secured until confirmed in writing · Zero-debt / zero-out-of-pocket goal
-  </div>
-
-</div><!-- /main -->
+</section></div><div class="page-bottom-note" style="font-size:0.72rem;color:var(--fg-3);text-align:center;padding-top:0.5rem;">Research snapshot: Nov 3, 2026 · Original $94,342 audit baseline preserved · Funding is not secured until confirmed in writing · Zero-debt / zero-out-of-pocket goal</div></div><!-- /main -->
 
 <script>
 /* ── PROFILE FIELDS ─────────────────────────────── */
