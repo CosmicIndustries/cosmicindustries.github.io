@@ -491,6 +491,18 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
  .waterfall-column:nth-child(1) .waterfall-plot:after,.waterfall-column:nth-child(2) .waterfall-plot:after{right:-32%}
 }
 
+
+/* ── RESTORED FLEET / HOUSING / AIRCRAFT SECTIONS ── */
+.roadmap-nav a{white-space:normal}
+#mga-fleet-rates .rate-card{min-height:88px}
+#housing-board .tbl-wrap{margin:.75rem 0;overflow-x:auto}
+#housing-board table{min-width:700px}
+#housing-board .fund-card,#aircraft-market .fund-card{min-height:100%}
+#aircraft-market .fund-amount{line-height:1.35}
+#housing-board .fund-grid,#aircraft-market .fund-grid{align-items:stretch}
+#aircraft .leg-rows{padding-top:.25rem;padding-bottom:.75rem}
+@media(max-width:600px){.roadmap-nav a{font-size:.68rem;padding:.42rem .62rem}#mga-fleet-rates .rate-grid{grid-template-columns:1fr 1fr}}
+
 </style>
 
 <!-- STICKY HEADER -->
@@ -542,8 +554,9 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
 </div><p class="waterfall-note">This restores the original audit waterfall. “Identified coverage” is the amount in the original model, not a claim that every dollar is disbursed or irrevocably committed. The funding ledger tracks proof, permitted use and payment timing.</p></div>
     
     <p class="fund-notes" style="margin-top:.75rem;"><strong>Accounting rule:</strong> this roadmap preserves the cost and coverage figures already researched in your audit. An application, published maximum, scholarship average, potential refund, or agency cap is not a confirmed award. A funding source moves to “confirmed” only when its written notice identifies the amount, eligible charge, and payment/credit timing.</p>
-  </section><nav class="roadmap-nav" aria-label="Roadmap sections"><a href="#plan-group">Plan &amp; costs</a><a href="#spring-group">Spring 2027 funding</a><a href="#scholarship-group">Scholarships</a><a href="#fiveyear-group">Five-year coverage</a><a href="#tools-group">Tools &amp; sources</a></nav>
-<div class="roadmap-group" id="plan-group"><div class="roadmap-group-heading"><span>01 · THE PLAN</span><h2>Training route &amp; program cost</h2><p>Start with the aviation objective, then see the program components behind the original funding estimate.</p></div><section id="career-path">
+  </section><nav class="roadmap-nav" aria-label="Roadmap sections">
+<a href="#plan-group">Plan &amp; costs</a><a href="#spring-group">Spring 2027 funding</a><a href="#scholarship-group">Scholarships</a><a href="#fiveyear-group">Housing &amp; living</a><a href="#aircraft-group">Aircraft</a><a href="#tools-group">Tools &amp; sources</a></nav>
+<div class="roadmap-group" id="plan-group"><div class="roadmap-group-heading"><span>01 · THE PLAN</span><h2>Training route, program cost &amp; MGA fleet</h2><p>Career sequence, training estimate, and the fleet rate card used in the original model.</p></div><section id="career-path">
     <div class="section-title">Career and certification path</div>
     <div class="career-path">
       <div class="cp-pill active">PPL</div><div class="cp-arrow">→</div>
@@ -595,7 +608,27 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       <a class="fund-apply" href="https://www.mga.edu/student-account-services/tuition-fees/index.php" target="_blank" rel="noopener">MGA tuition &amp; fees ↗</a>
       <a class="fund-apply" href="https://www.mga.edu/aviation/scholarships.php" target="_blank" rel="noopener">MGA aviation scholarships ↗</a>
     </div>
-  </section></div>
+  </section><section id="mga-fleet-rates">
+  <div class="section-title">MGA Fleet — hourly training rates</div>
+  <div class="fund-card" style="margin-bottom:.85rem">
+    <div class="fund-name">Prior roadmap aircraft rate card</div>
+    <div class="fund-notes">These are the rates retained from the earlier MGA roadmap. They are useful for comparing aircraft and understanding the original training-cost model, but MGA's live 2026–27 flight-account schedule has not been independently confirmed in this update. Ask the School of Aviation for the current wet rate, instructor charge, simulator rate, fuel surcharge and any stage-specific checkout charge before using these as a current invoice.</div>
+  </div>
+  <div class="rate-grid">
+    <div class="rate-card"><div class="rate-icon">🛩</div><div><div class="rate-ac">Piper Warrior III</div><div class="rate-hr">$159/hr</div><div class="rate-note">PPL primary trainer · prior rate card</div></div></div>
+    <div class="rate-card"><div class="rate-icon">✈</div><div><div class="rate-ac">Piper Archer</div><div class="rate-hr">$164/hr</div><div class="rate-note">Instrument / commercial cross-country</div></div></div>
+    <div class="rate-card"><div class="rate-icon">✈</div><div><div class="rate-ac">Piper Arrow</div><div class="rate-hr">$179/hr</div><div class="rate-note">Complex / commercial maneuvers</div></div></div>
+    <div class="rate-card"><div class="rate-icon">✈</div><div><div class="rate-ac">Piper Seminole</div><div class="rate-hr">$298/hr</div><div class="rate-note">Multi-engine rating</div></div></div>
+    <div class="rate-card"><div class="rate-icon">🛩</div><div><div class="rate-ac">Citabria</div><div class="rate-hr">$132/hr</div><div class="rate-note">Aerobatics / tailwheel</div></div></div>
+    <div class="rate-card"><div class="rate-icon">🖥</div><div><div class="rate-ac">Frasca simulator</div><div class="rate-hr">$80/hr</div><div class="rate-note">IFR / procedure practice</div></div></div>
+    <div class="rate-card"><div class="rate-icon">👨‍✈️</div><div><div class="rate-ac">CFI instruction fee</div><div class="rate-hr">$20/hr</div><div class="rate-note">Prior model: added to dual instruction</div></div></div>
+  </div>
+  <div style="margin-top:.85rem" class="fund-card">
+    <div class="fund-name">How to use this rate card</div>
+    <div class="fund-notes">The original cost model multiplied aircraft hours by these wet rates and added instructor, simulator, checkride and supplies. Compare the current MGA rate sheet line by line before changing the $66,654 flight-training estimate or the $94,342 original program baseline.</div>
+    <a class="fund-apply" href="https://www.mga.edu/aviation/" target="_blank" rel="noopener">MGA School of Aviation ↗</a>
+  </div>
+</section></div>
 <div class="roadmap-group" id="spring-group"><div class="roadmap-group-heading"><span>02 · IMMEDIATE PRIORITY</span><h2>Spring 2027 funding</h2><p>Close the existing $14,482 gap by December 15, without counting pending applications as awards.</p></div><section id="december-gap">
     <div class="section-title">Spring 2027 — close the $14,482 gap</div>
     <div class="fund-grid">
@@ -837,7 +870,63 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
       </div>
     </div>
   </section></div>
-<div class="roadmap-group" id="fiveyear-group"><div class="roadmap-group-heading"><span>04 · LONG-RANGE FINANCIAL PLAN</span><h2>Five-year living and aircraft coverage</h2><p>Household support and aircraft ownership are separate financial problems, each with its own cost and funding evidence.</p></div><section id="five-year">
+<div class="roadmap-group" id="fiveyear-group"><div class="roadmap-group-heading"><span>04 · LIVING COSTS</span><h2>Housing, room &amp; board and five-year runway</h2><p>Compare campus housing, RV/student rates and local rentals before setting the five-year living budget.</p></div><section id="housing-board">
+  <div class="section-title">Housing, room &amp; board — Cochran / Eastman</div>
+  <div class="fund-card" style="margin-bottom:.9rem">
+    <div class="fund-name">2026–27 on-campus rates · verified from MGA</div>
+    <div class="fund-notes">MGA states that published residence-hall rates include electricity, water and high-speed internet. A $25 per-semester programming activity fee is listed separately. Residential students are assigned a default Fall/Spring meal plan of 19 meals per week plus $100 Dining Dollars; the current public meal-plan page describes plan choices but does not display the 2026–27 price. Do not use last year's meal-plan price as a current bill.</div>
+    <a class="fund-apply" href="https://ce.mga.edu/residence-life/housing/housing-rates.php" target="_blank" rel="noopener">2026–27 MGA housing rates ↗</a>
+    <a class="fund-apply" href="https://www.mga.edu/card/meal-plan.php" target="_blank" rel="noopener">Meal-plan options / changes ↗</a>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Residence</th><th>Lease</th><th>Published price / semester</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Anderson Hall · Cochran</td><td>10 months</td><td class="mono">$2,880 double / $3,935 single</td><td>Utilities and internet included</td></tr>
+        <tr><td>Gateway Hall · Cochran</td><td>10 months</td><td class="mono">$3,520 single</td><td>Utilities and internet included</td></tr>
+        <tr><td>Harris Hall · Cochran</td><td>12 months</td><td class="mono">$4,150 single</td><td>12-month campus option</td></tr>
+        <tr><td>Regents Hall · Cochran</td><td>10 months</td><td class="mono">$3,520 single</td><td>Utilities and internet included</td></tr>
+        <tr><td>Knights Hall · Cochran</td><td>10 months</td><td class="mono">$3,520 single</td><td>Utilities and internet included</td></tr>
+        <tr><td>Aviation Hall · Eastman</td><td>12 months</td><td class="mono">$4,360 single</td><td>Most directly associated with the aviation campus</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="fund-notes" style="margin-top:.65rem">All rates above are the published 2026–27 amounts; add the $25 programming activity fee and the assigned meal plan. FY26 meal-plan reference: 19 meals/week plus $100 Dining Dollars was listed at $1,850 for 2025–26, but that is not the confirmed 2026–27 price. Confirm the current rate in Knight Card / with Auxiliary Services before budgeting.</p>
+  <div class="fund-grid" style="margin-top:1rem">
+    <div class="fund-card">
+      <div class="fund-name">Dream RV Park · Eastman</div>
+      <div class="fund-amount green">$750/month · standard RV lot</div>
+      <div class="fund-deadline green">Aviation-student offer published</div>
+      <div class="fund-notes">Current website lists $750/month for standard RV lots, including sewer, water, electric, garbage, fiber Wi-Fi and gated access. It advertises a locked $750/month rate for MGA aviation students/parents for up to two years, subject to limited availability. Waterfront RV lots are listed at $850/month. A separate LOT 3 RV tiny-home listing advertises $1,100/month for pilots/aviation students. Verify the available lot/unit, deposit and written term before relying on any rate.</div>
+      <a class="fund-apply" href="https://www.dreamrvparks.com/" target="_blank" rel="noopener">Official rates / availability ↗</a>
+      <div class="fund-notes" style="margin-top:.4rem">Contact shown on the site: 478-636-1012. Earlier roadmap notes listed a $200 deposit; confirm current deposit directly.</div>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Jellystone Park · Cochran</div>
+      <div class="fund-amount green">$425–$485/month + electricity</div>
+      <div class="fund-notes">Current published monthly RV rates: $485 for 50/30-amp full hook-up with water/electric/sewer for two guests; $425 for 30-amp water/electric with weekly sewer service. Additional occupants may cost extra. Address: 592 GA-87 S, Cochran, GA 31014.</div>
+      <a class="fund-apply" href="https://cochrangajellystonepark.com/prices/" target="_blank" rel="noopener">Current RV-site prices ↗</a>
+      <div class="fund-notes" style="margin-top:.4rem">Contact: 478-934-6694. Rates and utility arrangements must be confirmed for the intended stay.</div>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Cochran apartment snapshot</div>
+      <div class="fund-amount sky">$750–$950/month examples</div>
+      <div class="fund-notes">Recent marketplace snapshots include a 1-bed at 124 W Peacock St around $750/month, a 1-bed at 175 S 4th St around $750/month, and a 2-bed example around $950/month. Listings change quickly; check availability, utilities, deposit and pet policy directly.</div>
+      <a class="fund-apply" href="https://www.trulia.com/for_rent/Cochran,GA/" target="_blank" rel="noopener">Cochran rentals ↗</a>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Eastman apartment snapshot</div>
+      <div class="fund-amount sky">$633+ listed starting points</div>
+      <div class="fund-notes">Recent listings include Legacy Villas from $633+ for one-bedroom units (income-restricted), one-bedroom examples around $900, and studios from about $775. Income limits, availability, fees, lease terms and actual rent vary by unit. Shared student housing at 312 5th Ave has also appeared in recent listings.</div>
+      <a class="fund-apply" href="https://www.zillow.com/eastman-ga/apartments/" target="_blank" rel="noopener">Eastman rentals ↗</a>
+      <a class="fund-apply" href="https://www.apartments.com/eastman-ga/1-bedrooms/" target="_blank" rel="noopener">Eastman 1-bedroom listings ↗</a>
+    </div>
+  </div>
+  <div class="fund-card" style="margin-top:1rem">
+    <div class="fund-name">Room-and-board budgeting rule</div>
+    <div class="fund-notes">For campus housing, budget the published room charge + $25 activity fee + the actual meal-plan charge. For off-campus housing, budget rent + utilities + food + internet + transport. Do not compare rent-only with an on-campus room-and-meal package. The old roadmap used a $5,000–$8,000/semester off-campus cost-of-attendance planning range; verify your personal MGA COA and how financial aid handles room and board before relying on that allowance.</div>
+  </div>
+</section><section id="five-year">
     <div class="section-title">2027–2031 financial runway</div>
     <p class="fund-notes" style="margin-bottom:.85rem;">Five-year coverage is larger than the $14,482 Spring program gap. Model education, living support, employment transition and aircraft ownership in separate ledgers. The scenarios below are planning sensitivities, not a claim that your actual monthly need is known.</p>
     <div class="tbl-wrap">
@@ -869,46 +958,95 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
         <a class="fund-apply" href="https://dfcs.georgia.gov/services/low-income-home-energy-assistance-program-liheap" target="_blank" rel="noopener">Georgia LIHEAP ↗</a>
       </div>
     </div>
-  </section><section id="aircraft">
-    <div class="section-title">Aircraft acquisition and five-year ownership — separate capital plan</div>
-    <div class="leg-card">
-      <div class="leg-header">
-        <div class="leg-title-block"><div class="leg-title">No aircraft purchase is counted as funded</div><div class="leg-course">No verified scholarship or grant located that guarantees personal aircraft acquisition plus five years of insurance, maintenance and operating costs.</div></div>
-        <div class="leg-cost"><div class="leg-cost-main">TBD</div><div class="leg-cost-sub">sponsor / donation / shared use</div></div>
-      </div>
-      <div class="tbl-wrap" style="margin:0 1rem 1rem;">
-        <table>
-          <thead><tr><th>Ownership cost bucket</th><th>Five-year planning status</th><th>Required evidence before commitment</th></tr></thead>
-          <tbody>
-            <tr><td>Aircraft acquisition</td><td class="mono">Unpriced</td><td>Specific aircraft, independent pre-buy, title/lien and logbook review.</td></tr>
-            <tr><td>Pre-purchase inspection / initial repairs</td><td class="mono">Unpriced</td><td>A&amp;P/IA inspection and written discrepancy estimate.</td></tr>
-            <tr><td>Insurance</td><td class="mono">Unquoted</td><td>Broker quote for named pilot, aircraft, hours and intended mission.</td></tr>
-            <tr><td>Annual inspection / maintenance</td><td class="mono">Unquoted</td><td>Local shop estimate plus reserve for unscheduled repairs.</td></tr>
-            <tr><td>Engine / propeller reserves</td><td class="mono">Unpriced</td><td>Aircraft-specific overhaul time, condition and component reserve plan.</td></tr>
-            <tr><td>Fuel / oil / hourly operating</td><td class="mono">Unpriced</td><td>Annual utilization, POH fuel burn and current local prices.</td></tr>
-            <tr><td>Hangar / tie-down / taxes / fees</td><td class="mono">Unquoted</td><td>Airport rates and applicable tax/registration fees.</td></tr>
-            <tr><td>Commercial / agricultural liability</td><td class="mono">Unquoted</td><td>Specialist broker confirmation for the intended commercial operation.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="leg-schips">
-        <span class="schip amber"><span class="schip-dot"></span>Not included in scholarship gap</span>
-        <span class="schip neutral"><span class="schip-dot"></span>No aircraft debt assumed</span>
-      </div>
-    </div>
-    <div class="fund-grid" style="margin-top:1rem;">
-      <div class="fund-card">
-        <div class="fund-name">Preferred acquisition routes</div>
-        <div class="fund-notes">Seek a direct aircraft donation, industry sponsor, grantmaker that explicitly permits capital acquisition, or shared-ownership/flying-club arrangement. Do not assume a Pell refund or flight scholarship can be redirected to private aircraft ownership; verify award rules and financial-aid cost-of-attendance restrictions first.</div>
-      </div>
-      <div class="fund-card">
-        <div class="fund-name">Career-first alternative</div>
-        <div class="fund-notes">Personal ownership need not precede entry into agricultural aviation. A realistic route may involve commercial training, tailwheel/ag-specific preparation, pesticide-applicator requirements and supervised ground/operations work with an established operator. Build flight time and a sponsor relationship before assuming aircraft acquisition costs.</div>
-        <a class="fund-apply" href="https://www.agaviation.org/career/" target="_blank" rel="noopener">NAAA career pathway ↗</a>
-      </div>
-    </div>
   </section></div>
-<div class="roadmap-group" id="tools-group"><div class="roadmap-group-heading"><span>05 · WORKSPACE</span><h2>Application tools &amp; source material</h2><p>Keep reusable applicant information and official program links together at the end.</p></div><section id="profile-builder">
+<div class="roadmap-group" id="aircraft-group"><div class="roadmap-group-heading"><span>05 · AIRCRAFT OWNERSHIP</span><h2>Purchase market and operating plan</h2><p>Restore the aircraft shortlist, then separate acquisition price from the cost to keep an aircraft airworthy and insured.</p></div><section id="aircraft-market">
+  <div class="section-title">Used aircraft market — purchase shortlist</div>
+  <p class="fund-notes" style="margin-bottom:.85rem">This restores the prior purchase-path section and updates the headline asking-price snapshots. Asking prices are not transaction prices, listings are not inspections, and no aircraft is endorsed without an independent pre-buy inspection.</p>
+  <div class="fund-grid">
+    <div class="fund-card urgent">
+      <div class="fund-name">Cessna 150</div>
+      <div class="fund-amount green">$42,250 median asking · Nov 2, 2026</div>
+      <div class="fund-notes">51 listed on Barnstormers in the current snapshot; 44 priced listings had a middle-half asking range of $34,000–$61,000. Two-seat, economical local trainer and hour-building option. It is not a cargo airplane and has limited useful load; use case is local solo/time building, not hauling.</div>
+      <a class="fund-apply" href="https://planesnipe.com/models/cessna-150/" target="_blank" rel="noopener">Live market snapshot ↗</a>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Cessna 152</div>
+      <div class="fund-amount sky">$69,000 median asking · Nov 1, 2026</div>
+      <div class="fund-notes">A recent market snapshot reported 11 for sale, with asking prices from $7,500 to $89,900 and a median of $69,000. It is a two-seat trainer; verify engine, airframe and maintenance condition rather than selecting on advertised price alone.</div>
+      <a class="fund-apply" href="https://planesnipe.com/models/cessna-152/" target="_blank" rel="noopener">Live market snapshot ↗</a>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Piper Warrior PA-28-161</div>
+      <div class="fund-amount sky">$100,350 average asking · current listing snapshot</div>
+      <div class="fund-notes">Recent market feed showed 21 listings, about $65,000–$127,000 asking, with an average around $100,350. This is the closest ownership match to MGA's Warrior training fleet, but it is substantially above the prior roadmap's $50k–$90k planning band. Same type does not mean same equipment, avionics or maintenance condition.</div>
+      <a class="fund-apply" href="https://fyiaero.com/aircraft-for-sale/piper/warrior" target="_blank" rel="noopener">Current Warrior listings ↗</a>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Cherokee 140 · PA-28-140</div>
+      <div class="fund-amount sky">$63,500 median asking snapshot</div>
+      <div class="fund-notes">A recent PlaneSnipe sub-model dataset showed a $63,500 median ask across the recorded PA-28-140 listings. Older aircraft vary substantially by engine time, corrosion, avionics, damage history and logs. Treat the median as market context, not a purchase budget.</div>
+      <a class="fund-apply" href="https://planesnipe.com/models/piper-pa-28-cherokee/" target="_blank" rel="noopener">PA-28 market snapshot ↗</a>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Piper Tomahawk PA-38</div>
+      <div class="fund-amount sky">$38,000–$60,000 prior market sample</div>
+      <div class="fund-notes">A July 2026 snapshot showed four asking-price listings in the $38k–$59,950 range. This is an older snapshot, not a live November median. Inspect stall-strip AD compliance, corrosion, engine condition, logs and airworthiness directives carefully.</div>
+      <a class="fund-apply" href="https://www.findmywings.com/aircraft/piper-pa38-tomahawk" target="_blank" rel="noopener">PA-38 market / buyer notes ↗</a>
+    </div>
+  </div>
+  <div class="fund-card" style="margin-top:1rem">
+    <div class="fund-name">What the original $20k–$55k acquisition target means now</div>
+    <div class="fund-notes">That was the old roadmap's target band for a low-cost trainer, not a confirmed acquisition budget. Current Cessna 150/152 and Warrior market snapshots show that the target may buy a project/older airframe rather than a turnkey aircraft. Do not use financial-aid refunds or restricted scholarships as aircraft purchase cash unless MGA and each sponsor confirm that use is permitted in writing.</div>
+    <div style="margin-top:.45rem;display:flex;flex-wrap:wrap;gap:.4rem">
+      <a class="fund-apply" href="https://www.barnstormers.com/" target="_blank" rel="noopener">Barnstormers ↗</a>
+      <a class="fund-apply" href="https://www.trade-a-plane.com/" target="_blank" rel="noopener">Trade-A-Plane ↗</a>
+      <a class="fund-apply" href="https://www.controller.com/" target="_blank" rel="noopener">Controller ↗</a>
+    </div>
+  </div>
+</section><section id="aircraft">
+  <div class="section-title">Aircraft acquisition and five-year ownership — separate capital plan</div>
+  <div class="leg-card">
+    <div class="leg-header">
+      <div class="leg-title-block"><div class="leg-title">No aircraft purchase is counted as funded</div><div class="leg-course">Personal aircraft ownership is separate from the $14,482 education/flight-program gap.</div></div>
+      <div class="leg-cost"><div class="leg-cost-main">TBD</div><div class="leg-cost-sub">sponsor / donation / shared use</div></div>
+    </div>
+    <div class="tbl-wrap" style="margin:0 1rem 1rem">
+      <table><thead><tr><th>Ownership cost bucket</th><th>Status</th><th>Required evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Aircraft acquisition</td><td class="mono">Unfunded / unpriced for target aircraft</td><td>Specific aircraft, records review, title/lien check and independent pre-buy inspection.</td></tr>
+        <tr><td>Pre-purchase inspection / initial repairs</td><td class="mono">Unquoted</td><td>A&amp;P/IA inspection, discrepancy list and written repair estimates.</td></tr>
+        <tr><td>Insurance</td><td class="mono">Unquoted</td><td>Broker quote for named pilot, aircraft, hours and mission.</td></tr>
+        <tr><td>Annual inspection / maintenance</td><td class="mono">Unquoted</td><td>Shop estimate plus reserve for unscheduled repairs.</td></tr>
+        <tr><td>Engine / propeller reserve</td><td class="mono">Unpriced</td><td>Aircraft-specific time, condition and overhaul reserve.</td></tr>
+        <tr><td>Fuel / oil / hourly operating</td><td class="mono">Unpriced</td><td>Annual utilization, POH fuel burn and local fuel quotes.</td></tr>
+        <tr><td>Hangar / tie-down / taxes / fees</td><td class="mono">Unquoted</td><td>Airport rates and applicable tax/registration fees.</td></tr>
+        <tr><td>Commercial / agricultural liability</td><td class="mono">Unquoted</td><td>Specialist broker confirmation for intended commercial/ag operation.</td></tr>
+      </tbody></table>
+    </div>
+    <div class="leg-rows">
+      <div class="leg-row"><span class="leg-row-label">Prior Cessna 150 ownership example</span><span class="leg-row-val">~$450/mo fixed + $39/hr</span></div>
+      <div class="leg-row"><span class="leg-row-label">Underlying example purchase price</span><span class="leg-row-val">~$25,000</span></div>
+    </div>
+    <div class="leg-schips"><span class="schip amber"><span class="schip-dot"></span>Historical rough scenario only</span><span class="schip neutral"><span class="schip-dot"></span>Not a current quote</span></div>
+    <p class="fund-notes" style="padding:0 1.15rem 1rem">The old $450/month + $39/hour estimate is retained for continuity only. It was built around an assumed ~$25,000 Cessna 150 and must be re-priced; it is not a full ownership budget and does not prove that engine reserves, major repairs or commercial/ag insurance are covered.</p>
+  </div>
+  <div class="fund-grid" style="margin-top:1rem">
+    <div class="fund-card">
+      <div class="fund-name">Preferred acquisition routes</div>
+      <div class="fund-notes">Prioritize a direct aircraft donation, industry sponsor, grantmaker that explicitly permits capital acquisition, or shared-ownership/flying-club arrangement. No current scholarship is counted toward aircraft purchase or a five-year operating reserve. Keep purchase, inspection, insurance and maintenance funds ring-fenced.</div>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Career-first alternative</div>
+      <div class="fund-notes">Personal ownership need not precede agricultural-aviation employment. The career route can include commercial training, tailwheel/ag-specific preparation, pesticide-applicator requirements and supervised ground/operations work with an established operator. Build experience and an operator relationship before making ownership a prerequisite.</div>
+      <a class="fund-apply" href="https://www.agaviation.org/career/" target="_blank" rel="noopener">NAAA career pathway ↗</a>
+    </div>
+    <div class="fund-card">
+      <div class="fund-name">Training / ownership boundary</div>
+      <div class="fund-notes">Owning a trainer does not automatically replace required MGA flight labs or authorize use of personal-aircraft hours in a university course. Obtain written School of Aviation approval for any personal-aircraft training, insurance and reimbursement plan before purchase.</div>
+    </div>
+  </div>
+</section></div>
+<div class="roadmap-group" id="tools-group"><div class="roadmap-group-heading"><span>06 · WORKSPACE</span><h2>Application tools &amp; source material</h2><p>Keep the reusable application profile and official source links together.</p></div><section id="profile-builder">
     <div class="section-title">📋 Scholarship Application Profile — Fill Once, Apply Everywhere</div>
     <p style="font-size:0.82rem;color:var(--fg-2);margin-bottom:1rem;">Enter your info once. Hit <strong>Save Profile</strong> (stored in your browser). Then use <strong>Export</strong> to copy or download a ready-to-paste packet for any scholarship portal.</p>
 
@@ -1014,7 +1152,7 @@ tr:last-child td { font-weight: 700; color: var(--fg); background: var(--surface
     <div class="fund-card"><div class="fund-name">Future-stage aviation funding</div><div class="fund-notes"><a href="https://www.uaa.aero/uaa_scholarships.php" target="_blank" rel="noopener">UAA scholarships</a> · <a href="https://www.gbaa.org/scholarships" target="_blank" rel="noopener">GBAA scholarships</a> · <a href="https://www.agaviation.org/career/scholarships/ag-wings-of-tomorrow-scholarship/" target="_blank" rel="noopener">NAAA Ag Wings</a> · <a href="https://nata.aero/national-air-transportation-foundation/scholarships/" target="_blank" rel="noopener">NATA/NATF awards</a> · <a href="https://www.uaa.aero/2026_institutional_members.php" target="_blank" rel="noopener">UAA 2026 institutional members</a></div></div>
   </div>
   <p class="fund-notes" style="margin-top:.75rem">Research snapshot: November 3, 2026. Eligibility was filtered against the known record and current training stage. Where a requirement is not verified (for example, MGA's current UAA membership, exact tribal documentation, or enrollment timing), the opportunity is explicitly conditional and is not counted as confirmed funding.</p>
-</section></div><div class="page-bottom-note" style="font-size:0.72rem;color:var(--fg-3);text-align:center;padding-top:0.5rem;">Research snapshot: Nov 3, 2026 · Original $94,342 audit baseline preserved · Funding is not secured until confirmed in writing · Zero-debt / zero-out-of-pocket goal</div></div><!-- /main -->
+</section></div><div class="page-bottom-note" style="font-size:.72rem;color:var(--fg-3);text-align:center;padding-top:.5rem">Updated Nov 3, 2026 · Original audit waterfall preserved · Housing and aircraft market details require confirmation before purchase or lease · Zero-debt / zero-out-of-pocket funding goal</div></div><!-- /main -->
 
 <script>
 /* ── PROFILE FIELDS ─────────────────────────────── */
