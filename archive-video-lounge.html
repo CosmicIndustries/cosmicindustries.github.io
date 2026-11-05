@@ -762,6 +762,9 @@ body {
     tabsEl.appendChild(btn);
   });
 
+  // Initial load — fetch the first tab's content on page load
+  fetchVideos(COLLECTIONS[0].q, 1, false);
+
   /* ── ESCAPE ── */
   function escQ(s) { return encodeURIComponent(s); }
 
