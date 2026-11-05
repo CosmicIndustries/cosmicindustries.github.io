@@ -1001,9 +1001,10 @@ body {
     const video = document.createElement('video');
     video.controls = true;
     video.preload  = 'auto';
-    video.muted    = false;
-    video.volume   = 1;
-    video.src      = src;
+    video.muted        = false;
+    video.defaultMuted = false;
+    video.volume       = 1;
+    video.src          = src;
     video.style.cssText = 'width:100%;height:100%;display:block;background:#000';
 
     let spinnerCleared = false;
@@ -1013,7 +1014,11 @@ body {
     // Failsafe: reveal video after 12 s even if no events fired
     const spinnerTimeout = setTimeout(clearSpinner, 12000);
 
-    video.addEventListener('loadedmetadata', clearSpinner);
+    video.addEventListener('loadedmetadata', () => {
+      clearSpinner();
+      video.muted  = false;
+      video.volume = 1;
+    });
     video.addEventListener('loadeddata',     clearSpinner);
     video.addEventListener('canplay',        clearSpinner);
     video.addEventListener('error', () => {
