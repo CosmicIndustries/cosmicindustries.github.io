@@ -1,0 +1,1115 @@
+<title>Archive Video Lounge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ── TOKENS ── dark-first ── */
+:root {
+  --bg-deep:    #07090f;
+  --bg-panel:   #0e1118;
+  --bg-glass:   rgba(255,255,255,0.045);
+  --bg-glass-h: rgba(255,255,255,0.075);
+  --bg-modal:   rgba(0,0,0,0.88);
+  --border:     rgba(255,255,255,0.09);
+  --border-h:   rgba(255,255,255,0.18);
+  --fg:         #e8ecf4;
+  --fg-muted:   #7a8498;
+  --fg-dim:     #3e4659;
+  --accent:     #ff8c00;
+  --accent-dim: rgba(255,140,0,0.18);
+  --accent-glow:rgba(255,140,0,0.28);
+  --accent-fg:  #07090f;
+  --shadow-card:0 2px 12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.055);
+  --shadow-modal:0 24px 80px rgba(0,0,0,0.9);
+  --radius-card:12px;
+  --radius-btn: 8px;
+  --header-h:   58px;
+  --tabs-h:     48px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg-deep:    #edf0f7;
+    --bg-panel:   #ffffff;
+    --bg-glass:   rgba(0,0,0,0.04);
+    --bg-glass-h: rgba(0,0,0,0.07);
+    --bg-modal:   rgba(0,0,0,0.75);
+    --border:     rgba(0,0,0,0.1);
+    --border-h:   rgba(0,0,0,0.2);
+    --fg:         #1a1e2e;
+    --fg-muted:   #5a6378;
+    --fg-dim:     #aab2c4;
+    --accent:     #d97800;
+    --accent-dim: rgba(217,120,0,0.14);
+    --accent-glow:rgba(217,120,0,0.24);
+    --accent-fg:  #fff;
+    --shadow-card:0 2px 12px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.07);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg-deep:    #edf0f7;
+  --bg-panel:   #ffffff;
+  --bg-glass:   rgba(0,0,0,0.04);
+  --bg-glass-h: rgba(0,0,0,0.07);
+  --bg-modal:   rgba(0,0,0,0.75);
+  --border:     rgba(0,0,0,0.1);
+  --border-h:   rgba(0,0,0,0.2);
+  --fg:         #1a1e2e;
+  --fg-muted:   #5a6378;
+  --fg-dim:     #aab2c4;
+  --accent:     #d97800;
+  --accent-dim: rgba(217,120,0,0.14);
+  --accent-glow:rgba(217,120,0,0.24);
+  --accent-fg:  #fff;
+  --shadow-card:0 2px 12px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.07);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg-deep:    #07090f;
+  --bg-panel:   #0e1118;
+  --bg-glass:   rgba(255,255,255,0.045);
+  --bg-glass-h: rgba(255,255,255,0.075);
+  --bg-modal:   rgba(0,0,0,0.88);
+  --border:     rgba(255,255,255,0.09);
+  --border-h:   rgba(255,255,255,0.18);
+  --fg:         #e8ecf4;
+  --fg-muted:   #7a8498;
+  --fg-dim:     #3e4659;
+  --accent:     #ff8c00;
+  --accent-dim: rgba(255,140,0,0.18);
+  --accent-glow:rgba(255,140,0,0.28);
+  --accent-fg:  #07090f;
+  --shadow-card:0 2px 12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.055);
+  color-scheme: dark;
+}
+
+/* ── RESET / BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  background: var(--bg-deep);
+  color: var(--fg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 40;
+  height: var(--header-h);
+  background: rgba(7,9,15,0.82);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding-left:  max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  gap: 12px;
+}
+[data-theme="light"] .header,
+@media (prefers-color-scheme: light) { .header { background: rgba(237,240,247,0.88); } }
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.header-logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.header-logo-icon svg { width: 18px; height: 18px; fill: var(--accent-fg); }
+.header-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.3px;
+  color: var(--fg);
+  line-height: 1;
+}
+.header-title span { color: var(--accent); }
+.header-search {
+  flex: 1;
+  max-width: 540px;
+  margin: 0 auto;
+  position: relative;
+}
+.header-search input {
+  width: 100%;
+  height: 36px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 0 36px 0 12px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.header-search input::placeholder { color: var(--fg-muted); }
+.header-search input:focus {
+  border-color: var(--accent);
+  background: var(--bg-glass-h);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.header-search-btn {
+  position: absolute;
+  right: 8px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--fg-muted); padding: 2px;
+  display: flex; align-items: center;
+}
+.header-search-btn:hover { color: var(--accent); }
+.header-search-btn svg { width: 16px; height: 16px; }
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.btn-icon {
+  width: 34px; height: 34px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--fg-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.btn-icon:hover { color: var(--fg); background: var(--bg-glass-h); border-color: var(--border-h); }
+.btn-icon svg { width: 16px; height: 16px; }
+.ia-link {
+  height: 34px;
+  padding: 0 12px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  display: flex; align-items: center; gap: 5px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.ia-link:hover { color: var(--accent); border-color: var(--accent); }
+.ia-link svg { width: 13px; height: 13px; }
+
+/* ── TABS ── */
+.tabs-wrap {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
+  z-index: 30;
+  background: rgba(7,9,15,0.76);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px max(16px, env(safe-area-inset-left, 0px));
+  min-width: max-content;
+}
+.tab {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 20px;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--fg-muted);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tab:hover { color: var(--fg); border-color: var(--border); background: var(--bg-glass); }
+.tab.active {
+  color: var(--accent-fg);
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+[data-theme="light"] .tab.active,
+.tab.active { color: #07090f; }
+
+/* ── MAIN ── */
+.main {
+  padding: 20px max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  min-height: calc(100vh - var(--header-h) - var(--tabs-h) - 48px);
+}
+.section-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 14px;
+}
+.results-meta {
+  font-size: 12px;
+  color: var(--fg-muted);
+  margin-bottom: 16px;
+}
+.results-meta strong { color: var(--fg); font-weight: 500; }
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  box-shadow: var(--shadow-card);
+  display: flex; flex-direction: column;
+}
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-h);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px var(--border-h);
+}
+.card-thumb {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: var(--bg-panel);
+  overflow: hidden;
+}
+.card-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s;
+}
+.card-thumb img.errored {
+  opacity: 0;
+}
+.card-thumb-fallback {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--bg-panel) 0%, #12161f 100%);
+  pointer-events: none;
+}
+.card-thumb-fallback svg {
+  width: 36px; height: 36px;
+  color: var(--fg-dim);
+  opacity: 0.6;
+}
+.card-play-badge {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0);
+  transition: background 0.15s;
+}
+.card:hover .card-play-badge { background: rgba(0,0,0,0.35); }
+.card-play-badge-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255,140,0,0.9);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(255,140,0,0.4);
+}
+.card:hover .card-play-badge-btn { opacity: 1; transform: scale(1); }
+.card-play-badge-btn svg { width: 18px; height: 18px; fill: #07090f; margin-left: 2px; }
+.card-info {
+  padding: 10px 12px 12px;
+  flex: 1;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--fg);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-wrap: balance;
+}
+.card-meta {
+  font-size: 11px;
+  color: var(--fg-muted);
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.card-meta-sep { color: var(--fg-dim); }
+
+/* ── SKELETON ── */
+.skeleton { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; }
+.skel-shine {
+  background: linear-gradient(90deg, var(--bg-glass) 25%, var(--bg-glass-h) 50%, var(--bg-glass) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.skel-thumb { aspect-ratio: 16/9; }
+.skel-line { height: 12px; border-radius: 6px; margin: 10px 12px 4px; }
+.skel-line.short { width: 60%; }
+
+/* ── LOAD MORE ── */
+.load-more-wrap { display: flex; justify-content: center; padding: 32px 0; }
+.load-more-btn {
+  height: 42px;
+  padding: 0 28px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--fg-muted);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.load-more-btn:hover { color: var(--fg); border-color: var(--accent); background: var(--accent-dim); }
+.load-more-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── EMPTY / ERROR ── */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--fg-muted);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.empty-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: var(--fg); margin-bottom: 8px; }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  z-index: 100;
+  background: var(--bg-modal);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow-y: auto;
+  padding: max(24px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.modal {
+  width: 100%;
+  max-width: 900px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+}
+.modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  z-index: 10;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.1); border-color: var(--border-h); }
+.modal-close svg { width: 16px; height: 16px; }
+.modal-video-wrap {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-video-wrap video {
+  width: 100%; height: 100%;
+  display: block;
+}
+.modal-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px;
+  background: #000;
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.modal-body {
+  padding: 20px 24px 24px;
+}
+.modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 10px;
+  text-wrap: balance;
+}
+.modal-meta-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 14px;
+}
+.modal-badge {
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 20px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--fg-muted);
+  display: flex; align-items: center; gap: 5px;
+}
+.modal-badge svg { width: 11px; height: 11px; }
+.modal-desc {
+  font-size: 13px;
+  color: var(--fg-muted);
+  line-height: 1.65;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+.modal-desc.expanded { -webkit-line-clamp: unset; }
+.modal-desc-toggle {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: var(--accent); padding: 0;
+  margin-bottom: 16px; display: block;
+}
+.modal-actions {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 16px;
+}
+.modal-actions .btn-primary {
+  height: 38px; padding: 0 18px;
+  background: var(--accent); border: none;
+  border-radius: var(--radius-btn);
+  color: #07090f; font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  box-shadow: 0 0 12px var(--accent-glow);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.modal-actions .btn-primary:hover { opacity: 0.88; }
+.modal-actions .btn-primary svg { width: 14px; height: 14px; }
+.modal-actions .btn-sec {
+  height: 38px; padding: 0 18px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--fg-muted);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.modal-actions .btn-sec:hover { color: var(--fg); border-color: var(--border-h); background: var(--bg-glass-h); }
+.modal-actions .btn-sec svg { width: 14px; height: 14px; }
+.format-selector {
+  margin-bottom: 10px;
+}
+.format-selector label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--fg-dim); display: block; margin-bottom: 6px;
+}
+.format-selector select {
+  height: 34px; padding: 0 10px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--fg); font-size: 12px;
+  cursor: pointer; outline: none;
+  max-width: 100%;
+}
+.format-selector select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.modal-error {
+  padding: 20px 24px;
+  color: var(--fg-muted);
+  font-size: 13px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+/* ── FOOTER ── */
+.footer {
+  padding: 24px max(16px, env(safe-area-inset-left, 0px));
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+.footer-copy {
+  font-size: 11px; color: var(--fg-dim);
+}
+.footer-copy a { color: var(--fg-muted); text-decoration: none; }
+.footer-copy a:hover { color: var(--accent); }
+.footer-badge {
+  font-size: 11px; color: var(--fg-dim);
+  display: flex; align-items: center; gap: 5px;
+}
+
+/* ── LIGHT HEADER OVERRIDES ── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .header { background: rgba(237,240,247,0.9); }
+  :root:not([data-theme="dark"]) .tabs-wrap { background: rgba(237,240,247,0.88); }
+}
+:root[data-theme="light"] .header { background: rgba(237,240,247,0.9); }
+:root[data-theme="light"] .tabs-wrap { background: rgba(237,240,247,0.88); }
+</style>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="header-logo" href="#" onclick="return false">
+    <div class="header-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <span class="header-title">Archive <span>Video</span> Lounge</span>
+  </a>
+
+  <div class="header-search">
+    <input type="text" id="searchInput" placeholder="Search videos, collections, skate…" autocomplete="off" spellcheck="false">
+    <button class="header-search-btn" id="searchBtn" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="header-actions">
+    <a class="ia-link" href="https://archive.org" target="_blank" rel="noopener" title="Open Internet Archive">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+      archive.org
+    </a>
+    <button class="btn-icon" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
+      <svg id="themeIconMoon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg id="themeIconSun" viewBox="0 0 24 24" fill="currentColor" hidden>
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs-wrap">
+  <div class="tabs" id="tabsContainer"></div>
+</nav>
+
+<!-- MAIN -->
+<main class="main" id="main">
+  <p class="results-meta" id="resultsMeta"></p>
+  <div class="grid" id="grid"></div>
+  <div class="load-more-wrap" id="loadMoreWrap" hidden>
+    <button class="load-more-btn" id="loadMoreBtn">Load more</button>
+  </div>
+  <div id="emptyState" hidden></div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p class="footer-copy">
+    Videos served from <a href="https://archive.org" target="_blank">archive.org</a> under their open access policy.
+    Archive.org holds §108 library protections. No content is hosted here.
+  </p>
+  <p class="footer-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+    </svg>
+    Archive Video Lounge
+  </p>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Video player">
+    <button class="modal-close" id="modalClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <div class="modal-video-wrap" id="modalVideoWrap">
+      <div class="modal-loading" id="modalLoading">
+        <div class="spinner"></div>
+        <span>Loading video…</span>
+      </div>
+    </div>
+    <div id="modalBody" class="modal-body"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONSTANTS ── */
+  const BASE = 'https://archive.org';
+  const PAGE_SIZE = 24;
+  const VIDEO_EXTS = ['mp4', 'mov', 'webm', 'ogv', 'mpg', 'mpeg', 'avi', 'mkv', 'divx', 'm4v'];
+  const FORMAT_RANK = { mp4: 1, m4v: 2, webm: 3, ogv: 4, mov: 5, mpg: 6, mpeg: 7, mkv: 8, avi: 9, divx: 10 };
+
+  /* ── COLLECTIONS ── */
+  const COLLECTIONS = [
+    { label: 'All Videos',   q: 'mediatype:movies' },
+    { label: 'Skate',        q: '(skateboarding OR "skate video" OR CKY OR "Zero Skateboards" OR "Baker" OR skating) AND mediatype:movies' },
+    { label: 'VHS Rips',     q: 'collection:vhsrip' },
+    { label: 'Classic TV',   q: 'collection:classic_tv' },
+    { label: 'Short Films',  q: 'collection:shortfilms' },
+    { label: 'Concerts',     q: '(concert OR "live performance" OR gig) AND (punk OR hardcore OR metal OR rock) AND mediatype:movies' },
+    { label: 'Sports',       q: 'collection:sports AND mediatype:movies' },
+    { label: 'Open Source',  q: 'collection:open_source_movies' },
+    { label: 'Feature Films',q: 'collection:feature_films' },
+    { label: 'News',         q: '(news OR broadcast OR newsreel) AND mediatype:movies' },
+  ];
+
+  /* ── STATE ── */
+  let currentTab = 0;
+  let currentQuery = '';
+  let currentPage = 1;
+  let totalItems = 0;
+  let loading = false;
+  let currentVideoId = null;
+  let currentVideoFiles = [];
+  let descExpanded = false;
+
+  /* ── DOM ── */
+  const root        = document.documentElement;
+  const grid        = document.getElementById('grid');
+  const resultsMeta = document.getElementById('resultsMeta');
+  const loadMoreWrap= document.getElementById('loadMoreWrap');
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  const emptyState  = document.getElementById('emptyState');
+  const tabsEl      = document.getElementById('tabsContainer');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn   = document.getElementById('searchBtn');
+  const themeBtn    = document.getElementById('themeBtn');
+  const themeIconMoon = document.getElementById('themeIconMoon');
+  const themeIconSun  = document.getElementById('themeIconSun');
+  const modalOverlay= document.getElementById('modalOverlay');
+  const modalVideoWrap=document.getElementById('modalVideoWrap');
+  const modalLoading= document.getElementById('modalLoading');
+  const modalBody   = document.getElementById('modalBody');
+  const modalClose  = document.getElementById('modalClose');
+
+  /* ── THEME ── */
+  function getStoredTheme() {
+    try { return localStorage.getItem('avl-theme'); } catch { return null; }
+  }
+  function setTheme(t) {
+    root.setAttribute('data-theme', t);
+    themeIconMoon.hidden = t === 'dark';
+    themeIconSun.hidden  = t === 'light';
+    try { localStorage.setItem('avl-theme', t); } catch {}
+  }
+  (function initTheme() {
+    const stored = getStoredTheme();
+    if (stored) setTheme(stored);
+    else {
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      themeIconMoon.hidden = dark;
+      themeIconSun.hidden  = !dark;
+    }
+  })();
+  themeBtn.addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme');
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ── TABS ── */
+  COLLECTIONS.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (i === 0 ? ' active' : '');
+    btn.textContent = c.label;
+    btn.addEventListener('click', () => {
+      if (currentTab === i) return;
+      tabsEl.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+      currentTab = i;
+      currentQuery = '';
+      searchInput.value = '';
+      currentPage = 1;
+      grid.innerHTML = '';
+      fetchVideos(COLLECTIONS[i].q, 1, false);
+    });
+    tabsEl.appendChild(btn);
+  });
+
+  /* ── ESCAPE ── */
+  function escQ(s) { return encodeURIComponent(s); }
+
+  /* ── SKELETON ── */
+  function renderSkeletons(n) {
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('div');
+      s.className = 'skeleton';
+      s.innerHTML = `
+        <div class="skel-thumb skel-shine"></div>
+        <div class="skel-line skel-shine"></div>
+        <div class="skel-line short skel-shine" style="margin-top:4px;margin-bottom:12px"></div>
+      `;
+      grid.appendChild(s);
+    }
+  }
+  function clearSkeletons() {
+    grid.querySelectorAll('.skeleton').forEach(s => s.remove());
+  }
+
+  /* ── CARD ── */
+  function createCard(doc) {
+    const id    = doc.identifier || '';
+    const title = doc.title || id || 'Untitled';
+    const year  = doc.year || '';
+    const creator = Array.isArray(doc.creator) ? doc.creator[0] : (doc.creator || '');
+    const thumb = `${BASE}/services/img/${encodeURIComponent(id)}`;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `Play ${title}`);
+
+    card.innerHTML = `
+      <div class="card-thumb">
+        <div class="card-thumb-fallback">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="2" width="20" height="20" rx="4"/>
+            <polygon points="10,8 16,12 10,16" fill="currentColor"/>
+          </svg>
+        </div>
+        <img src="${thumb}" alt="${title.replace(/"/g,"&quot;")}" loading="lazy">
+        <div class="card-play-badge">
+          <div class="card-play-badge-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="card-title">${escHtml(title)}</div>
+        <div class="card-meta">
+          ${year ? `<span>${escHtml(String(year))}</span>` : ''}
+          ${year && creator ? `<span class="card-meta-sep">·</span>` : ''}
+          ${creator ? `<span>${escHtml(String(creator))}</span>` : ''}
+        </div>
+      </div>
+    `;
+
+    const img = card.querySelector('img');
+    img.addEventListener('error', () => img.classList.add('errored'));
+
+    card.addEventListener('click', () => openVideo(id, title));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVideo(id, title); } });
+    return card;
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── FETCH VIDEOS ── */
+  async function fetchVideos(query, page, append) {
+    if (loading) return;
+    loading = true;
+    loadMoreBtn.disabled = true;
+
+    if (!append) {
+      grid.innerHTML = '';
+      resultsMeta.textContent = '';
+      emptyState.hidden = true;
+      loadMoreWrap.hidden = true;
+    }
+    renderSkeletons(append ? 8 : PAGE_SIZE);
+
+    let q = query.trim();
+    if (!q.includes('mediatype:')) q += ' AND mediatype:movies';
+    const start = (page - 1) * PAGE_SIZE + 1;
+    const fields = ['identifier','title','description','creator','year','mediatype','subject'].join('&fl[]=');
+    const url = `${BASE}/advancedsearch.php?q=${escQ(q)}&fl[]=${fields}&rows=${PAGE_SIZE}&start=${start}&output=json&sort[]=week+desc`;
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const docs = data.response?.docs ?? [];
+      totalItems = data.response?.numFound ?? 0;
+
+      clearSkeletons();
+
+      if (docs.length === 0 && !append) {
+        emptyState.hidden = false;
+        emptyState.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">📼</div>
+            <div class="empty-title">No videos found</div>
+            <p>Try a different search or browse a collection tab.</p>
+          </div>`;
+      } else {
+        docs.forEach(doc => grid.appendChild(createCard(doc)));
+        const loaded = (page - 1) * PAGE_SIZE + docs.length;
+        resultsMeta.innerHTML = `Showing <strong>${loaded.toLocaleString()}</strong> of <strong>${totalItems.toLocaleString()}</strong> results`;
+        currentPage = page;
+        const hasMore = loaded < totalItems && docs.length === PAGE_SIZE;
+        loadMoreWrap.hidden = !hasMore;
+        loadMoreBtn.disabled = false;
+      }
+    } catch (err) {
+      clearSkeletons();
+      emptyState.hidden = false;
+      emptyState.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">⚠️</div>
+          <div class="empty-title">Could not reach archive.org</div>
+          <p>Check your connection and try again.</p>
+        </div>`;
+    }
+    loading = false;
+  }
+
+  /* ── LOAD MORE ── */
+  loadMoreBtn.addEventListener('click', () => {
+    const q = currentQuery || COLLECTIONS[currentTab].q;
+    fetchVideos(q, currentPage + 1, true);
+  });
+
+  /* ── SEARCH ── */
+  function doSearch() {
+    const val = searchInput.value.trim();
+    if (!val) return;
+    tabsEl.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    currentTab = -1;
+    currentQuery = val;
+    currentPage = 1;
+    grid.innerHTML = '';
+    fetchVideos(val + ' AND mediatype:movies', 1, false);
+  }
+  searchBtn.addEventListener('click', doSearch);
+  searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  /* ── MODAL ── */
+  function openModal() {
+    modalOverlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    descExpanded = false;
+  }
+  function closeModal() {
+    modalOverlay.hidden = true;
+    document.body.style.overflow = '';
+    // stop any playing video
+    const v = modalVideoWrap.querySelector('video');
+    if (v) { try { v.pause(); v.src = ''; } catch {} }
+    modalVideoWrap.innerHTML = '';
+    modalVideoWrap.appendChild(modalLoading);
+    modalLoading.hidden = false;
+    modalBody.innerHTML = '';
+    currentVideoId = null;
+    currentVideoFiles = [];
+  }
+  modalClose.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modalOverlay.hidden) closeModal(); });
+
+  /* ── FORMAT RANK ── */
+  function rankFmt(f) {
+    const ext = (f.name || '').split('.').pop().toLowerCase();
+    return FORMAT_RANK[ext] || 99;
+  }
+
+  /* ── OPEN VIDEO ── */
+  async function openVideo(id, title) {
+    currentVideoId = id;
+    openModal();
+    modalLoading.hidden = false;
+
+    // clear old video
+    const oldV = modalVideoWrap.querySelector('video');
+    if (oldV) { try { oldV.pause(); oldV.src = ''; } catch {} oldV.remove(); }
+    modalBody.innerHTML = '';
+
+    try {
+      const res = await fetch(`${BASE}/metadata/${encodeURIComponent(id)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const meta  = data.metadata || {};
+      const files = data.files    || [];
+
+      const videoFiles = files
+        .filter(f => VIDEO_EXTS.some(ext => (f.name || '').toLowerCase().endsWith('.' + ext)))
+        .sort((a, b) => rankFmt(a) - rankFmt(b));
+
+      currentVideoFiles = videoFiles;
+
+      if (videoFiles.length === 0) {
+        modalLoading.hidden = true;
+        showModalError(id, title, meta, 'No playable video file found in this item.');
+        return;
+      }
+
+      buildModalBody(id, title, meta, videoFiles);
+      loadVideoFile(id, videoFiles[0]);
+
+    } catch (err) {
+      modalLoading.hidden = true;
+      modalBody.innerHTML = `
+        <div class="modal-error">
+          <strong>Could not load video metadata.</strong>
+          <p>Try opening this item directly on archive.org.</p>
+          <a class="btn-sec" href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener">
+            Open on archive.org ↗
+          </a>
+        </div>`;
+    }
+  }
+
+  function loadVideoFile(id, fileObj) {
+    // remove any existing video
+    const old = modalVideoWrap.querySelector('video');
+    if (old) { try { old.pause(); old.src = ''; } catch {} old.remove(); }
+    modalLoading.hidden = false;
+
+    const src = `${BASE}/download/${encodeURIComponent(id)}/${encodeURIComponent(fileObj.name)}`;
+    const video = document.createElement('video');
+    video.controls = true;
+    video.preload  = 'metadata';
+    video.src      = src;
+    video.style.cssText = 'width:100%;height:100%;display:block;background:#000';
+
+    video.addEventListener('loadedmetadata', () => { modalLoading.hidden = true; });
+    video.addEventListener('canplay',        () => { modalLoading.hidden = true; });
+    video.addEventListener('error', () => {
+      modalLoading.hidden = true;
+      // show fallback inside video area
+      video.hidden = true;
+      const fb = document.createElement('div');
+      fb.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#7a8498;font-size:13px;background:#000';
+      fb.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Video failed to load</span>
+        <a href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener" style="color:#ff8c00;text-decoration:none;font-size:12px">Watch on archive.org ↗</a>`;
+      modalVideoWrap.appendChild(fb);
+    });
+
+    modalVideoWrap.appendChild(video);
+  }
+
+  function buildModalBody(id, title, meta, videoFiles) {
+    const year       = Array.isArray(meta.year)     ? meta.year[0]     : (meta.year     || '');
+    const creator    = Array.isArray(meta.creator)  ? meta.creator.join(', ') : (meta.creator  || '');
+    const subject    = Array.isArray(meta.subject)  ? meta.subject.slice(0,6).join(' · ') : (meta.subject || '');
+    const descRaw    = Array.isArray(meta.description) ? meta.description.join(' ') : (meta.description || '');
+    const desc       = descRaw.replace(/<[^>]*>/g, '');
+
+    let html = `<h2 class="modal-title">${escHtml(title)}</h2>`;
+
+    // badges
+    html += `<div class="modal-meta-row">`;
+    if (year) html += `<span class="modal-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>${escHtml(String(year))}</span>`;
+    if (creator) html += `<span class="modal-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>${escHtml(creator)}</span>`;
+    html += `</div>`;
+
+    if (subject) html += `<p class="card-meta" style="margin-bottom:12px;color:var(--fg-dim);font-size:11px">${escHtml(subject)}</p>`;
+
+    // desc
+    if (desc) {
+      html += `<p class="modal-desc" id="modalDesc">${escHtml(desc)}</p>`;
+      if (desc.length > 240) {
+        html += `<button class="modal-desc-toggle" id="descToggle">Show more</button>`;
+      }
+    }
+
+    // format selector
+    if (videoFiles.length > 1) {
+      html += `<div class="format-selector"><label>Format</label><select id="formatSelect">`;
+      videoFiles.forEach((f, i) => {
+        const size = f.size ? ` · ${formatBytes(Number(f.size))}` : '';
+        html += `<option value="${i}">${escHtml(f.name)}${escHtml(size)}</option>`;
+      });
+      html += `</select></div>`;
+    }
+
+    // action buttons
+    html += `<div class="modal-actions">
+      <a class="btn-primary" href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        View on archive.org
+      </a>
+      <a class="btn-sec" href="${BASE}/download/${encodeURIComponent(id)}/${encodeURIComponent(videoFiles[0].name)}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </a>
+    </div>`;
+
+    modalBody.innerHTML = html;
+
+    // desc toggle
+    const descEl    = document.getElementById('modalDesc');
+    const descToggle= document.getElementById('descToggle');
+    if (descToggle && descEl) {
+      descToggle.addEventListener('click', () => {
+        descExpanded = !descExpanded;
+        descEl.classList.toggle('expanded', descExpanded);
+        descToggle.textContent = descExpanded ? 'Show less' : 'Show more';
+      });
+    }
+
+    // format select
+    const formatSel = document.getElementById('formatSelect');
+    if (formatSel) {
+      formatSel.addEventListener('change', () => {
+        const idx = Number(formatSel.value);
+        loadVideoFile(id, currentVideoFiles[idx]);
+      });
+    }
+  }
+
+  function showModalError(id, title, meta, msg) {
+    modalBody.innerHTML = `
+      <div class="modal-error">
+        <h2 class="modal-title" style="font-size:17px">${escHtml(title)}</h2>
+        <p>${escHtml(msg)}</p>
+        <a class="btn-sec" href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open on archive.org ↗
+        </a>
+      </div>`;
+  }
+
+  function formatBytes(b) {
+    if (!b || isNaN(b)) return '';
+    if (b < 1024) return b + ' B';
+    if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+    if (b < 1024*1024*1024) return (b/1024/1024).toFixed(1) + ' MB';
+    return (b/1024/1024/1024).toFixed(2) + ' GB';
+  }
+
+  /* ── BOOT ── */
+  fetchVideos(COLLECTIONS[0].q, 1, false);
+
+})();
+</script>
