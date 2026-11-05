@@ -113,8 +113,7 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   gap: 12px;
 }
-[data-theme="light"] .header,
-@media (prefers-color-scheme: light) { .header { background: rgba(237,240,247,0.88); } }
+
 .header-logo {
   display: flex;
   align-items: center;
@@ -674,8 +673,8 @@ body {
   /* ── CONSTANTS ── */
   const BASE = 'https://archive.org';
   const PAGE_SIZE = 24;
-  const VIDEO_EXTS = ['mp4', 'mov', 'webm', 'ogv', 'mpg', 'mpeg', 'avi', 'mkv', 'divx', 'm4v'];
-  const FORMAT_RANK = { mp4: 1, m4v: 2, webm: 3, ogv: 4, mov: 5, mpg: 6, mpeg: 7, mkv: 8, avi: 9, divx: 10 };
+  const VIDEO_EXTS = ['mp4', 'm4v', 'webm', 'ogv'];
+  const FORMAT_RANK = { mp4: 1, m4v: 2, webm: 3, ogv: 4 };
 
   /* ── COLLECTIONS ── */
   const COLLECTIONS = [
