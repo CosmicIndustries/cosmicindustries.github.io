@@ -1019,6 +1019,16 @@ body {
       video.muted  = false;
       video.volume = 1;
     });
+    video.addEventListener('play', () => {
+      video.muted  = false;
+      video.volume = 1;
+    });
+    video.addEventListener('volumechange', () => {
+      if (video.muted) {
+        video.muted  = false;
+        video.volume = 1;
+      }
+    });
     video.addEventListener('loadeddata',     clearSpinner);
     video.addEventListener('canplay',        clearSpinner);
     video.addEventListener('error', () => {
