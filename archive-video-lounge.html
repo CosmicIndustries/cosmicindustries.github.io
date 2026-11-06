@@ -762,9 +762,6 @@ body {
     tabsEl.appendChild(btn);
   });
 
-  // Initial load — fetch the first tab's content on page load
-  fetchVideos(COLLECTIONS[0].q, 1, false);
-
   /* ── ESCAPE ── */
   function escQ(s) { return encodeURIComponent(s); }
 
@@ -924,9 +921,9 @@ body {
   function closeModal() {
     modalOverlay.hidden = true;
     document.body.style.overflow = '';
-    // stop any playing video
-    const v = modalVideoWrap.querySelector('video');
-    if (v) { try { v.pause(); v.src = ''; } catch {} }
+    // stop any playing video/iframe
+    const v = modalVideoWrap.querySelector('video,iframe');
+    if (v) { try { v.src = ''; } catch {} }
     modalVideoWrap.innerHTML = '';
     modalVideoWrap.appendChild(modalLoading);
     modalLoading.hidden = false;
@@ -950,9 +947,9 @@ body {
     openModal();
     modalLoading.hidden = false;
 
-    // clear old video
-    const oldV = modalVideoWrap.querySelector('video');
-    if (oldV) { try { oldV.pause(); oldV.src = ''; } catch {} oldV.remove(); }
+    // clear old video/iframe
+    const oldV = modalVideoWrap.querySelector('video,iframe');
+    if (oldV) { try { oldV.src = ''; } catch {} oldV.remove(); }
     modalBody.innerHTML = '';
 
     try {
@@ -992,59 +989,27 @@ body {
   }
 
   function loadVideoFile(id, fileObj) {
-    // remove any existing video
-    const old = modalVideoWrap.querySelector('video');
-    if (old) { try { old.pause(); old.src = ''; } catch {} old.remove(); }
+    // remove any existing player
+    const old = modalVideoWrap.querySelector('video,iframe');
+    if (old) { try { old.src = ''; } catch {} old.remove(); }
     modalLoading.hidden = false;
-
-    const src = `${BASE}/download/${encodeURIComponent(id)}/${encodeURIComponent(fileObj.name)}`;
-    const video = document.createElement('video');
-    video.controls = true;
-    video.preload  = 'auto';
-    video.muted        = false;
-    video.defaultMuted = false;
-    video.volume       = 1;
-    video.src          = src;
-    video.style.cssText = 'width:100%;height:100%;display:block;background:#000';
 
     let spinnerCleared = false;
     const clearSpinner = () => {
       if (!spinnerCleared) { spinnerCleared = true; modalLoading.hidden = true; }
     };
-    // Failsafe: reveal video after 12 s even if no events fired
-    const spinnerTimeout = setTimeout(clearSpinner, 12000);
+    // Failsafe: reveal embed after 8 s even if load event doesn't fire
+    const spinnerTimeout = setTimeout(clearSpinner, 8000);
 
-    video.addEventListener('loadedmetadata', () => {
-      clearSpinner();
-      video.muted  = false;
-      video.volume = 1;
-    });
-    video.addEventListener('play', () => {
-      video.muted  = false;
-      video.volume = 1;
-    });
-    video.addEventListener('volumechange', () => {
-      if (video.muted) {
-        video.muted  = false;
-        video.volume = 1;
-      }
-    });
-    video.addEventListener('loadeddata',     clearSpinner);
-    video.addEventListener('canplay',        clearSpinner);
-    video.addEventListener('error', () => {
-      clearTimeout(spinnerTimeout);
-      modalLoading.hidden = true;
-      // show fallback inside video area
-      video.hidden = true;
-      const fb = document.createElement('div');
-      fb.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#7a8498;font-size:13px;background:#000';
-      fb.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span>Video failed to load</span>
-        <a href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener" style="color:#ff8c00;text-decoration:none;font-size:12px">Watch on archive.org ↗</a>`;
-      modalVideoWrap.appendChild(fb);
-    });
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://archive.org/embed/${encodeURIComponent(id)}?autoplay=1`;
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('allow', 'autoplay; fullscreen');
+    iframe.setAttribute('frameborder', '0');
+    iframe.style.cssText = 'width:100%;height:100%;display:block;border:0;background:#000';
+    iframe.addEventListener('load', () => { clearTimeout(spinnerTimeout); clearSpinner(); });
 
-    modalVideoWrap.appendChild(video);
+    modalVideoWrap.appendChild(iframe);
   }
 
   function buildModalBody(id, title, meta, videoFiles) {
