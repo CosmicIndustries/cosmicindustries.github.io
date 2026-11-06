@@ -1121,10 +1121,13 @@ body {
   async function loadEpisodes(id, collection) {
     const episodeEl = document.getElementById('episodeList');
     if (!episodeEl) return;
-    // prefer the most specific (last) collection; skip broad buckets
     const colls = Array.isArray(collection) ? collection : (collection ? [collection] : []);
-    const SKIP = /^(opensource|community|additional_collections|fav-|uploads|test_|stream_only)/i;
-    const coll = [...colls].reverse().find(c => !SKIP.test(c)) || colls[colls.length - 1];
+    // Skip broad/generic buckets; keep first remaining specific collection
+    const BROAD_PREFIX = /^(opensource|community|additional_collections|fav-|uploads|test_|stream_only|feature_films|animationandcartoons|preloaded_videos)/i;
+    const BROAD_EXACT  = new Set(['television','movies','classic_tv','arts','audio','texts','web','data','tv','image','software','etree','education']);
+    const coll = colls.find(c => !BROAD_PREFIX.test(c) && !BROAD_EXACT.has(c.toLowerCase()))
+              || colls.find(c => !BROAD_PREFIX.test(c))
+              || colls[0];
     if (!coll) { episodeEl.hidden = true; return; }
     try {
       const url = `${BASE}/advancedsearch.php?q=collection:(${encodeURIComponent(coll)})+AND+mediatype:(movies)&fl[]=identifier&fl[]=title&output=json&rows=200&sort[]=titleSorter+asc`;
@@ -1134,7 +1137,6 @@ body {
       const data = await res.json();
       if (currentVideoId !== id) return;
       const docs = (data.response?.docs || []).filter(d => d.identifier);
-      // need at least 2 results, OR 1 result that isn't the current item (siblings exist)
       if (docs.length === 0) { episodeEl.hidden = true; return; }
       if (docs.length === 1 && docs[0].identifier === id) { episodeEl.hidden = true; return; }
       const el = document.getElementById('episodeList');
@@ -1143,12 +1145,18 @@ body {
       for (const doc of docs) {
         const isCurrent = doc.identifier === id;
         const t = doc.title || doc.identifier;
+        // use data attributes + event delegation — avoids needing openVideo in global scope
         html += `<li class="episode-item${isCurrent ? ' current' : ''}">
-          <button onclick="openVideo(${JSON.stringify(doc.identifier)},${JSON.stringify(t)})">${escHtml(t)}</button>
+          <button data-epid="${escHtml(doc.identifier)}" data-eptitle="${escHtml(t)}">${escHtml(t)}</button>
         </li>`;
       }
       html += `</ul>`;
       el.innerHTML = html;
+      // delegate clicks so openVideo (inside IIFE) is reachable
+      el.onclick = ev => {
+        const btn = ev.target.closest('button[data-epid]');
+        if (btn) openVideo(btn.dataset.epid, btn.dataset.eptitle);
+      };
       el.hidden = false;
       const cur = el.querySelector('.current button');
       if (cur) cur.scrollIntoView({ block: 'nearest' });
