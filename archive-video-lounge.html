@@ -562,6 +562,28 @@ body {
   font-size: 13px;
   display: flex; flex-direction: column; gap: 10px;
 }
+.episode-section {
+  margin-top: 14px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.episode-section-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--fg-dim); margin: 0 0 6px;
+}
+.episode-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 1px;
+  max-height: 190px; overflow-y: auto;
+}
+.episode-item button {
+  width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+  padding: 6px 8px; border-radius: var(--radius-btn);
+  color: var(--fg); font-size: 12px; line-height: 1.4;
+  transition: background 0.15s;
+}
+.episode-item button:hover { background: var(--bg-glass-h); }
+.episode-item.current button { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
 
 /* ── FOOTER ── */
 .footer {
@@ -983,6 +1005,7 @@ body {
 
       buildModalBody(id, title, meta, videoFiles);
       loadVideoFile(id, videoFiles[0]);
+      loadEpisodes(id, meta.collection);
 
     } catch (err) {
       if (currentVideoId !== id) return;
@@ -1057,6 +1080,9 @@ body {
       html += `</select></div>`;
     }
 
+    // episode list placeholder (populated async by loadEpisodes)
+    html += `<div id="episodeList" class="episode-section" hidden></div>`;
+
     // action buttons
     html += `<div class="modal-actions">
       <a class="btn-primary" href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener">
@@ -1089,6 +1115,43 @@ body {
         const idx = Number(formatSel.value);
         loadVideoFile(id, currentVideoFiles[idx]);
       });
+    }
+  }
+
+  async function loadEpisodes(id, collection) {
+    const episodeEl = document.getElementById('episodeList');
+    if (!episodeEl) return;
+    const coll = Array.isArray(collection) ? collection[0] : collection;
+    if (!coll) { episodeEl.hidden = true; return; }
+    try {
+      const url = `${BASE}/advancedsearch.php?q=collection:(${encodeURIComponent(coll)})&fl[]=identifier&fl[]=title&output=json&rows=100&sort[]=titleSorter+asc`;
+      const res = await fetch(url);
+      if (currentVideoId !== id) return;
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (currentVideoId !== id) return;
+      const docs = (data.response?.docs || []).filter(d => d.identifier);
+      if (docs.length <= 1) { episodeEl.hidden = true; return; }
+      const el = document.getElementById('episodeList');
+      if (!el || currentVideoId !== id) return;
+      let html = `<p class="episode-section-label">More in this series</p><ul class="episode-list">`;
+      for (const doc of docs) {
+        const isCurrent = doc.identifier === id;
+        const t = doc.title || doc.identifier;
+        html += `<li class="episode-item${isCurrent ? ' current' : ''}">
+          <button onclick="openVideo(${JSON.stringify(doc.identifier)},${JSON.stringify(t)})">${escHtml(t)}</button>
+        </li>`;
+      }
+      html += `</ul>`;
+      el.innerHTML = html;
+      el.hidden = false;
+      const cur = el.querySelector('.current button');
+      if (cur) cur.scrollIntoView({ block: 'nearest' });
+    } catch(e) {
+      if (currentVideoId === id) {
+        const el = document.getElementById('episodeList');
+        if (el) el.hidden = true;
+      }
     }
   }
 
