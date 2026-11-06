@@ -1121,17 +1121,22 @@ body {
   async function loadEpisodes(id, collection) {
     const episodeEl = document.getElementById('episodeList');
     if (!episodeEl) return;
-    const coll = Array.isArray(collection) ? collection[0] : collection;
+    // prefer the most specific (last) collection; skip broad buckets
+    const colls = Array.isArray(collection) ? collection : (collection ? [collection] : []);
+    const SKIP = /^(opensource|community|additional_collections|fav-|uploads|test_|stream_only)/i;
+    const coll = [...colls].reverse().find(c => !SKIP.test(c)) || colls[colls.length - 1];
     if (!coll) { episodeEl.hidden = true; return; }
     try {
-      const url = `${BASE}/advancedsearch.php?q=collection:(${encodeURIComponent(coll)})&fl[]=identifier&fl[]=title&output=json&rows=100&sort[]=titleSorter+asc`;
+      const url = `${BASE}/advancedsearch.php?q=collection:(${encodeURIComponent(coll)})+AND+mediatype:(movies)&fl[]=identifier&fl[]=title&output=json&rows=200&sort[]=titleSorter+asc`;
       const res = await fetch(url);
       if (currentVideoId !== id) return;
       if (!res.ok) throw new Error();
       const data = await res.json();
       if (currentVideoId !== id) return;
       const docs = (data.response?.docs || []).filter(d => d.identifier);
-      if (docs.length <= 1) { episodeEl.hidden = true; return; }
+      // need at least 2 results, OR 1 result that isn't the current item (siblings exist)
+      if (docs.length === 0) { episodeEl.hidden = true; return; }
+      if (docs.length === 1 && docs[0].identifier === id) { episodeEl.hidden = true; return; }
       const el = document.getElementById('episodeList');
       if (!el || currentVideoId !== id) return;
       let html = `<p class="episode-section-label">More in this series</p><ul class="episode-list">`;
