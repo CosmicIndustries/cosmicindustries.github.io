@@ -962,6 +962,9 @@ body {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
+      // Stale-fetch guard: user may have clicked a different card while this fetch was in-flight
+      if (currentVideoId !== id) return;
+
       const meta  = data.metadata || {};
       const files = data.files    || [];
 
@@ -972,6 +975,7 @@ body {
       currentVideoFiles = videoFiles;
 
       if (videoFiles.length === 0) {
+        if (currentVideoId !== id) return;
         modalLoading.hidden = true;
         showModalError(id, title, meta, 'No playable video file found in this item.');
         return;
@@ -981,6 +985,7 @@ body {
       loadVideoFile(id, videoFiles[0]);
 
     } catch (err) {
+      if (currentVideoId !== id) return;
       modalLoading.hidden = true;
       modalBody.innerHTML = `
         <div class="modal-error">
