@@ -21,6 +21,78 @@ class PDFLabCoreTests(unittest.TestCase):
     def tearDown(self):
         self.conn.close()
 
+    def test_pptx_extraction_reads_slide_text(self):
+        import io, zipfile
+        payload = io.BytesIO()
+        with zipfile.ZipFile(payload, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("ppt/presentation.xml", "<p:presentation xmlns:p='p'/>")
+            archive.writestr(
+                "ppt/slides/slide1.xml",
+                "<p:sld xmlns:p='p' xmlns:a='a'><a:p><a:r><a:t>Aircraft performance</a:t></a:r></a:p></p:sld>",
+            )
+            archive.writestr(
+                "ppt/slides/slide2.xml",
+                "<p:sld xmlns:p='p' xmlns:a='a'><a:p><a:r><a:t>Flight planning</a:t></a:r></a:p></p:sld>",
+            )
+        text, pages, records = worker.extract_document(payload.getvalue(), "aviation.pptx")
+        self.assertEqual(pages, 2)
+        self.assertIn("[Slide 1]", text)
+        self.assertIn("Aircraft performance", text)
+        self.assertIn("[Slide 2]", text)
+        self.assertEqual(len(records), 2)
+
+    def test_docx_extraction_reads_paragraphs(self):
+        import io, zipfile
+        payload = io.BytesIO()
+        with zipfile.ZipFile(payload, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr(
+                "word/document.xml",
+                "<w:document xmlns:w='w'><w:body>"
+                "<w:p><w:r><w:t>Aircraft systems</w:t></w:r></w:p>"
+                "<w:p><w:r><w:t>Maintenance procedures</w:t></w:r></w:p>"
+                "</w:body></w:document>",
+            )
+        text, pages, records = worker.extract_document(payload.getvalue(), "systems.docx")
+        self.assertEqual(pages, 1)
+        self.assertIn("Aircraft systems", text)
+        self.assertIn("Maintenance procedures", text)
+        self.assertEqual(len(records), 2)
+
+    def test_xlsx_extraction_reads_shared_strings(self):
+        import io, zipfile
+        payload = io.BytesIO()
+        with zipfile.ZipFile(payload, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("xl/workbook.xml", "<workbook/>")
+            archive.writestr(
+                "xl/sharedStrings.xml",
+                "<sst xmlns='x'><si><t>Aircraft</t></si><si><t>Hours</t></si></sst>",
+            )
+            archive.writestr(
+                "xl/worksheets/sheet1.xml",
+                "<worksheet xmlns='x'><sheetData><row>"
+                "<c r='A1' t='s'><v>0</v></c><c r='B1' t='s'><v>1</v></c>"
+                "</row></sheetData></worksheet>",
+            )
+        text, pages, records = worker.extract_document(payload.getvalue(), "flight-hours.xlsx")
+        self.assertEqual(pages, 1)
+        self.assertIn("Aircraft | Hours", text)
+        self.assertEqual(len(records), 1)
+
+    def test_store_document_preserves_original_format_extension(self):
+        import io, zipfile
+        payload = io.BytesIO()
+        with zipfile.ZipFile(payload, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("word/document.xml", "<w:document xmlns:w='w'><w:body/></w:document>")
+        body, pages, _ = worker.extract_document(payload.getvalue(), "briefing.docx")
+        doc_id, created = worker.store_document(
+            "https://example.edu/briefing.docx", "briefing.docx",
+            payload.getvalue(), "Briefing", body, pages,
+        )
+        row = self.conn.execute("SELECT path,filename FROM documents WHERE id=?", (doc_id,)).fetchone()
+        self.assertTrue(created)
+        self.assertEqual(row["filename"], "briefing.docx")
+        self.assertTrue(row["path"].endswith(".docx"))
+
     def test_archive_import_source_falls_back_after_live_url(self):
         original = "https://example.edu/handbook.pdf"
         archived = (
