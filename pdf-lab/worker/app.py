@@ -54,6 +54,7 @@ def _roman_value(value):
 
 def derive_document_metadata(url, filename, title, text=""):
     """Extract a document series and explicit year/chapter/part/edition markers."""
+    url=canonical_document_url(url)
     host=(urlparse(url).hostname or "").lower().removeprefix("www.")
     title_text=str(title or "").strip()
     filename_text=Path(filename).stem
