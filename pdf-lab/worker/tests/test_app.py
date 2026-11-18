@@ -278,6 +278,18 @@ class PDFLabCoreTests(unittest.TestCase):
             worker.document_duplicate_key(body, next_chapter),
         )
 
+    def test_version_metadata_can_read_year_and_chapter_from_title_page_text(self):
+        metadata = worker.derive_document_metadata(
+            "https://mga.edu/aviation/manuals/pa28.pdf",
+            "pa28.pdf",
+            "PA-28 Warrior Flight Manual",
+            "Middle Georgia State University | 2024 Edition | Chapter 3 | Aircraft Systems",
+        )
+        self.assertEqual(metadata["domain"], "mga.edu")
+        self.assertEqual(metadata["year"], 2024)
+        self.assertEqual(metadata["chapter"], 3)
+        self.assertEqual(metadata["series_title"], "PA 28 Warrior Flight Manual")
+
     def test_store_document_skips_same_version_text_duplicate(self):
         body = "Aircraft operating limitations and procedures. " * 12
         data_a = b"document bytes with different metadata A"
