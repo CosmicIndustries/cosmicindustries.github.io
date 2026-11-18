@@ -41,6 +41,82 @@ robots_cache: dict[str, RobotFileParser] = {}
 robots_locks: dict[str, asyncio.Lock] = {}
 host_validation_cache: dict[str, tuple[float, bool]] = {}
 
+def _roman_value(value):
+    value=(value or "").upper()
+    values={"I":1,"V":5,"X":10,"L":50,"C":100,"D":500,"M":1000}
+    total=0; previous=0
+    for char in reversed(value):
+        current=values.get(char,0)
+        total += -current if current<previous else current
+        previous=max(previous,current)
+    return total or None
+
+
+def derive_document_metadata(url, filename, title, text=""):
+    """Extract a document series and explicit year/chapter/part/edition markers."""
+    host=(urlparse(url).hostname or "").lower().removeprefix("www.")
+    raw=" ".join([str(title or ""),Path(filename).stem]).strip()
+    year_match=re.search(r"(?<!\d)(?:19|20)\d{2}(?!\d)",raw)
+    year=int(year_match.group(0)) if year_match else None
+
+    def find_unit(label):
+        match=re.search(rf"\b(?:{label})\s*[-_.:#]?\s*(\d{{1,3}}|[ivxlcdm]+)\b",raw,re.I)
+        if not match:return None
+        value=match.group(1)
+        return int(value) if value.isdigit() else _roman_value(value)
+
+    chapter=find_unit("chapter|chap|ch")
+    part=find_unit("part|pt|unit|module|lesson|volume|vol")
+    edition_match=re.search(
+        r"\b(?:(\d+(?:st|nd|rd|th)?)\s+edition|edition\s*(\d+)|rev(?:ision)?\s*([A-Z0-9.]+)|v(?:ersion)?\s*([0-9]+(?:\.[0-9]+)*))\b",
+        raw,re.I
+    )
+    edition=next((x for x in edition_match.groups() if x),None) if edition_match else None
+
+    series=re.sub(r"(?<!\d)(?:19|20)\d{2}(?!\d)"," ",raw)
+    series=re.sub(
+        r"\b(?:chapter|chap|ch|part|pt|unit|module|lesson|volume|vol)\s*[-_.:#]?\s*(?:\d{1,3}|[ivxlcdm]+)\b",
+        " ",series,flags=re.I
+    )
+    series=re.sub(
+        r"\b(?:(?:\d+(?:st|nd|rd|th)\s+)?edition|edition\s*\d+|rev(?:ision)?\s*[A-Z0-9.]+|v(?:ersion)?\s*[0-9]+(?:\.[0-9]+)*)\b",
+        " ",series,flags=re.I
+    )
+    series=re.sub(r"\b(final|copy|draft|updated|revised)\b"," ",series,flags=re.I)
+    series=re.sub(r"[_\-.]+"," ",series)
+    series=re.sub(r"\s+"," ",series).strip(" -_")
+    if len(series)<4:series=Path(filename).stem
+    normalized=re.sub(r"[^a-z0-9]+"," ",series.casefold()).strip()
+    series_key=(host+"::"+normalized) if host else normalized
+    version_bits=[]
+    if year:version_bits.append(str(year))
+    if chapter is not None:version_bits.append("Chapter "+str(chapter))
+    if part is not None:version_bits.append("Part "+str(part))
+    if edition:version_bits.append("Edition "+edition)
+    return {
+        "domain":host,"series_key":series_key,"series_title":series,
+        "year":year,"chapter":chapter,"part":part,"edition":edition,
+        "version_label":" · ".join(version_bits) or "Unversioned",
+    }
+
+
+def normalize_document_url(url):
+    parts=urlsplit((url or "").strip())
+    host=(parts.hostname or "").lower()
+    port=parts.port
+    netloc=host+(f":{port}" if port and not ((parts.scheme=="https" and port==443) or (parts.scheme=="http" and port==80)) else "")
+    return urlunsplit((parts.scheme.lower(),netloc,parts.path or "/",parts.query,""))
+
+
+def document_duplicate_key(text, metadata):
+    """Detect same-content duplicates but keep different years/chapters/parts."""
+    normalized=re.sub(r"\s+"," ",(text or "").casefold()).strip()
+    if len(normalized)<160:return None
+    version=(metadata.get("year"),metadata.get("chapter"),metadata.get("part"),metadata.get("edition"))
+    payload=normalized+chr(31)+json.dumps(version,separators=(",",":"))
+    return hashlib.sha256(payload.encode("utf-8","ignore")).hexdigest()
+
+
 def connect():
     c=sqlite3.connect(DB); c.row_factory=sqlite3.Row
     c.execute("""CREATE TABLE IF NOT EXISTS documents(
@@ -54,6 +130,27 @@ def connect():
                  USING fts5(id UNINDEXED, filename, title, url, body,
                  tokenize='porter unicode61 remove_diacritics 2')""")
     c.execute("CREATE TABLE IF NOT EXISTS pdf_lab_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+    c.execute("""CREATE TABLE IF NOT EXISTS document_metadata(
+      doc_id TEXT PRIMARY KEY, domain TEXT, series_key TEXT, series_title TEXT,
+      year INTEGER, chapter INTEGER, part INTEGER, edition TEXT,
+      version_label TEXT, duplicate_key TEXT UNIQUE)""")
+    metadata_migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='document_metadata_v1'").fetchone()
+    if not metadata_migrated:
+        for row in c.execute("SELECT id,url,filename,title,text FROM documents").fetchall():
+            metadata=derive_document_metadata(row["url"],row["filename"],row["title"],row["text"])
+            duplicate_key=document_duplicate_key(row["text"],metadata)
+            try:
+                c.execute(
+                    "INSERT OR IGNORE INTO document_metadata"
+                    "(doc_id,domain,series_key,series_title,year,chapter,part,edition,version_label,duplicate_key) "
+                    "VALUES(?,?,?,?,?,?,?,?,?,?)",
+                    (row["id"],metadata["domain"],metadata["series_key"],metadata["series_title"],
+                     metadata["year"],metadata["chapter"],metadata["part"],metadata["edition"],
+                     metadata["version_label"],duplicate_key)
+                )
+            except sqlite3.IntegrityError:
+                pass
+        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('document_metadata_v1','done')")
     migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='linguistic_fts_v1'").fetchone()
     if not migrated:
         c.execute("""INSERT INTO document_fts_linguistic(id,filename,title,url,body)
