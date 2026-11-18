@@ -250,10 +250,9 @@ def normalize_glob(pattern):
 def commoncrawl_query_pattern(pattern):
     # CDX is efficient for domain wildcards; the complete glob is applied locally afterward.
     p=normalize_glob(pattern)
-    m=re.search(r"\\*([a-z0-9.-]+\\.[a-z]{2,})",p)
+    m=re.search(r"\\.([a-z]{2,})(?:[./*]|$)",p)
     if m:
-        suffix=m.group(1).lstrip(".")
-        return "*."+suffix+"/*"
+        return "*."+m.group(1)+"/*"
     host=re.search(r"https?://([^/]+)",p)
     if host and "*" not in host.group(1):
         return host.group(1)+"/*"
