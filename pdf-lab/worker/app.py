@@ -531,6 +531,7 @@ async def arquivo_text_discovery(client, query, pattern, mode, matcher, max_resu
                 "title":item.get("title"),
                 "snippet":item.get("snippet"),
                 "archive_url":item.get("linkToArchive"),
+                "query_match":True,
             })
             if len(found)>=max_results:
                 break
@@ -548,7 +549,7 @@ def discovery_sort_key(item):
     # Right-pad to a common precision, then sort newest first.
     stamp_number=int(stamp.ljust(14,"0")) if stamp.isdigit() else 0
     source_priority={"commoncrawl":0,"arquivo-textsearch":1,"arquivo-cdx":2,"wayback-cdx":3}.get(item.get("collection"),4)
-    return (0 if is_pdf else 1, -stamp_number, source_priority, item["url"].casefold())
+    return (0 if item.get("query_match") else 1, 0 if is_pdf else 1, -stamp_number, source_priority, item["url"].casefold())
 
 
 async def wayback_discovery(client, pattern, mode, matcher, max_results, errors):
@@ -660,6 +661,19 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
     providers={"commoncrawl":"not-run","arquivo-textsearch":"not-run","arquivo":"not-run","wayback":"not-run"}
     timeout=httpx.Timeout(22.0,connect=6.0)
     async with httpx.AsyncClient(timeout=timeout,headers={"User-Agent":UA},limits=httpx.Limits(max_connections=12,max_keepalive_connections=6)) as client:
+        # When a plain-term/phrase query is supplied, search archived PDF text
+        # before falling back to URL-only CDX results.
+        if len(results)<req.max_results:
+            text_results,text_requests,text_state=await arquivo_text_discovery(
+                client,req.content_query,pattern,req.match_mode,matcher,
+                req.max_results-len(results),errors
+            )
+            pages_fetched+=text_requests
+            providers["arquivo-textsearch"]=text_state
+            for item in text_results:
+                if item["url"] not in seen:
+                    seen.add(item["url"]); results.append(item)
+
         collections=[]
         try:
             info=await client.get("https://index.commoncrawl.org/collinfo.json",timeout=httpx.Timeout(12.0,connect=5.0))
@@ -746,19 +760,6 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             providers["commoncrawl"]="unavailable"
         elif collections:
             providers["commoncrawl"]="empty"
-        # When a plain-term/phrase query is supplied, search archived PDF text
-        # before falling back to URL-only CDX results.
-        if len(results)<req.max_results:
-            text_results,text_requests,text_state=await arquivo_text_discovery(
-                client,req.content_query,pattern,req.match_mode,matcher,
-                req.max_results-len(results),errors
-            )
-            pages_fetched+=text_requests
-            providers["arquivo-textsearch"]=text_state
-            for item in text_results:
-                if item["url"] not in seen:
-                    seen.add(item["url"]); results.append(item)
-
         # Arquivo.pt is an independent CDX source and is queried before Wayback.
         # It is a supplement, not a complete mirror of the global web.
         if len(results)<req.max_results:
@@ -796,7 +797,13 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             if len(results)>before: providers["live-recursive"]="results"
             else: providers["live-recursive"]="empty"
 
-    # Stable, relevance-aware ordering: direct PDF MIME/extension first, then newest capture.
+    # Distinguish genuine archive full-text hits from URL-only candidates.
+    # URL indexes cannot prove a document contains the requested search terms;
+    # the import step still applies the full local Boolean content expression.
+    if req.content_query.strip():
+        for item in results:
+            item["query_verified"]=bool(item.get("query_match"))
+    # Verified keyword hits first, then PDFs, then newest archive capture.
     results.sort(key=discovery_sort_key)
     source_names=[name for name,state in providers.items() if state=="results"]
     return {
