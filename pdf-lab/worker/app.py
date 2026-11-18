@@ -304,21 +304,27 @@ def url_matcher(pattern, mode):
     return glob_to_regex(pattern)
 
 def cdx_query_candidates(pattern, mode):
-    """Create several narrower query candidates to avoid broad-index 504s."""
+    """Build a CDX query that narrows by host suffix and, where possible, file extension."""
     if mode=="regex":
         return [commoncrawl_query_pattern(pattern,mode)]
     p=normalize_glob(pattern)
-    # Literal hostname is the strongest possible CDX narrowing.
+    # A literal hostname is the strongest CDX narrowing.
     host=re.search(r"https?://([^/]+)",p)
     if host and not any(ch in host.group(1) for ch in "*?"):
         return [host.group(1)+"/*"]
-    # For a leading *.edu glob, split common useful first-level host labels into parallel CDX queries.
-    tld=re.search(r"\.([a-z]{2,})(?:/|$)",p)
+    # Keep .edu PDF discovery focused on PDF-looking URL paths. The returned URLs are
+    # still checked against the user's complete glob locally, so this is only a
+    # candidate-generation optimization, not a change to matching semantics.
+    edu=re.search(r"\\.edu(?:/|$)",p)
+    if edu:
+        if re.search(r"\\.pdf$",p):
+            return ["*.edu/*.pdf"]
+        return ["*.edu/*"]
+    # Other recognizable TLDs use a broad suffix query; local matching enforces the glob.
+    tld=re.search(r"\\.([a-z]{2,})(?:/|$)",p)
     if not tld:
         return [commoncrawl_query_pattern(pattern,mode)]
-    suffix="."+tld.group(1)
-    # Avoid one huge *.edu/* query. Query several narrower URL prefixes, still filtering full pattern locally.
-    return ["*"+suffix+"/*"] + [prefix+suffix+"/*" for prefix in ("www","lib","archive","repository","digital","scholarship","docs","files","catalog","open")]
+    return ["*."+tld.group(1)+"/*"]
 
 async def recursive_url_discovery(client, seeds, matcher, req, results, seen, errors):
     """Bounded same-host crawl from up to five discovered host roots."""
