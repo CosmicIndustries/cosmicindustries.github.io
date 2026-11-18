@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080d17"><title>PDF Lab — Cosmic Industries</title>
 <style>
 :root{color-scheme:dark;--bg:#080d17;--panel:#101a2a;--line:#25364c;--muted:#9aabc1;--text:#eaf1fb;--cyan:#66d9e8;--green:#8be0b2}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#142a42 0,transparent 42%),var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,sans-serif}a{color:var(--cyan)}header,main,footer{max-width:1050px;margin:auto;padding:22px}header{display:flex;justify-content:space-between;border-bottom:1px solid var(--line)}header a{text-decoration:none}.brand{font-weight:800;letter-spacing:.12em}.hero{padding:34px 22px 18px}.tag{font:12px ui-monospace,monospace;color:var(--green);letter-spacing:.13em}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.05;margin:.4em 0}h2{font-size:1.1rem;margin:0 0 12px}.muted,.hint{color:var(--muted)}.panel{background:linear-gradient(145deg,#111e30,#0d1624);border:1px solid var(--line);border-radius:16px;padding:20px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}label{font-size:13px;color:#c1cede}input,select,textarea{width:100%;background:#080f1b;color:var(--text);border:1px solid #31445d;border-radius:9px;padding:11px;font:inherit}textarea{min-height:76px}button{background:#173349;color:var(--text);border:1px solid #35617a;border-radius:9px;padding:10px 14px;font:600 14px inherit;cursor:pointer}button.primary{background:#155466;border-color:#287e91}button:disabled{opacity:.5;cursor:wait}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.hint{font-size:12px}.result{border-top:1px solid var(--line);padding:12px 0;overflow-wrap:anywhere}.result small{display:block;color:var(--muted)}.pill{font-size:11px;border:1px solid #3b536d;border-radius:30px;padding:2px 8px;color:#bdd0e3}.empty{padding:18px;text-align:center;color:var(--muted)}.mode{display:none}.mode.active{display:block}.status{padding:10px 0;color:var(--green);overflow-wrap:anywhere}footer{border-top:1px solid var(--line);color:var(--muted);font-size:12px}
-.workspace-main{max-width:1500px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}.main-content{min-width:0}.view-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}.view-tabs button.active{background:#155466;border-color:#287e91;color:#fff}.worker-dock{position:sticky;top:14px;align-self:start;max-height:calc(100vh - 28px);overflow:auto;background:linear-gradient(145deg,#111e30,#0b1421);border:1px solid #30465f;border-radius:14px;padding:14px}.worker-dock h2{display:flex;justify-content:space-between;align-items:center}.dock-stat{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #25364c;font-size:12px}.dock-job{padding:10px 0;border-bottom:1px solid #25364c;overflow-wrap:anywhere;font-size:12px}.dock-job progress{width:100%;height:9px;accent-color:#66d9e8}.dock-muted{color:var(--muted);font-size:11px}.view[hidden]{display:none!important}.library-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding:12px 0}.library-row .meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.library-row .row-actions{display:flex;gap:6px;flex-wrap:wrap}.library-row button{padding:7px 10px;font-size:12px}.reader-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.reader-body{height:min(72vh,850px);min-height:420px;background:#080f1b;border:1px solid var(--line);border-radius:10px;overflow:auto;margin-top:12px}.reader-body iframe{width:100%;height:100%;border:0;background:#fff}.reader-body pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:20px;margin:0;font:13px/1.65 ui-monospace,monospace;color:#eaf1fb}.format-chip{display:inline-block;border:1px solid #3b536d;border-radius:5px;padding:1px 6px;font-size:10px;text-transform:uppercase;color:#c5e4ee}.worker-light{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e6a85d;margin-right:7px}.worker-light.online{background:#65d79c}.filter-grid{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end}@media(max-width:1180px){.workspace-main{display:block;max-width:1050px}.worker-dock{position:relative;top:auto;max-height:none;margin:0 22px 20px}.workspace-main{padding:22px}.worker-dock{margin:0 0 20px}}@media(max-width:680px){.workspace-main{padding:10px}.filter-grid{grid-template-columns:1fr}.library-row{grid-template-columns:1fr}.reader-body{height:65vh;min-height:320px}}</style></head><body>
+.workspace-main{max-width:1500px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}.main-content{min-width:0}.view-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}.view-tabs button.active{background:#155466;border-color:#287e91;color:#fff}.worker-dock{position:sticky;top:14px;align-self:start;max-height:calc(100vh - 28px);overflow:auto;background:linear-gradient(145deg,#111e30,#0b1421);border:1px solid #30465f;border-radius:14px;padding:14px}.worker-dock h2{display:flex;justify-content:space-between;align-items:center}.dock-stat{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #25364c;font-size:12px}.dock-job{padding:10px 0;border-bottom:1px solid #25364c;overflow-wrap:anywhere;font-size:12px}.dock-job progress{width:100%;height:9px;accent-color:#66d9e8}.dock-muted{color:var(--muted);font-size:11px}.view[hidden]{display:none!important} .series-stack{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0;background:#0d1726}.series-stack h3{font-size:14px;margin:2px 0 8px;color:#cfe3f5}.library-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding:12px 0}.library-row .meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.library-row .row-actions{display:flex;gap:6px;flex-wrap:wrap}.library-row button{padding:7px 10px;font-size:12px}.reader-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.reader-body{height:min(72vh,850px);min-height:420px;background:#080f1b;border:1px solid var(--line);border-radius:10px;overflow:auto;margin-top:12px}.reader-body iframe{width:100%;height:100%;border:0;background:#fff}.reader-body pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:20px;margin:0;font:13px/1.65 ui-monospace,monospace;color:#eaf1fb}.format-chip{display:inline-block;border:1px solid #3b536d;border-radius:5px;padding:1px 6px;font-size:10px;text-transform:uppercase;color:#c5e4ee}.worker-light{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e6a85d;margin-right:7px}.worker-light.online{background:#65d79c}.filter-grid{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end}@media(max-width:1180px){.workspace-main{display:block;max-width:1050px}.worker-dock{position:relative;top:auto;max-height:none;margin:0 22px 20px}.workspace-main{padding:22px}.worker-dock{margin:0 0 20px}}@media(max-width:680px){.workspace-main{padding:10px}.filter-grid{grid-template-columns:1fr}.library-row{grid-template-columns:1fr}.reader-body{height:65vh;min-height:320px}}</style></head><body>
 <header><a class="brand" href="../">COSMIC INDUSTRIES</a><a href="https://github.com/CosmicIndustries/cosmicindustries.github.io">Source ↗</a></header>
 <main class="workspace-main"><div class="main-content"><section class="hero"><div class="tag">SCHOOL &amp; TECHNICAL RESEARCH / PDF-01</div><h1>Find the document. Search the evidence.</h1><p class="muted">Discover school PDFs across domains and deeply nested paths, build a local document library, then search extracted text across the collection. Designed for course materials, syllabi, catalogs, research papers, manuals, and technical references.</p></section>
 <nav class="view-tabs" aria-label="Document workspace">
@@ -16,12 +16,13 @@
 </select></div><div class="field"><label for="terms">Keywords / PDF text expression</label><input id="terms" placeholder='e.g. "flight control" AND autopilot'></div><div class="field"><label for="filename">Filename glob filter</label><input id="filename" value="*.pdf,*.pptx,*.ppt,*.docx,*.doc,*.xlsx,*.xls,*.odp,*.odt,*.ods" placeholder="*.pdf, *.pptx, *.docx, *.xlsx"></div></div>
 <div class="mode" data-mode="keywords"><div class="grid"><div class="field"><label for="engine">Search provider</label><select id="engine"><option value="google">Google</option><option value="bing">Bing</option><option value="ddg">DuckDuckGo</option></select></div><div class="field"><label for="domain">Optional domain or TLD scope</label><input id="domain" placeholder="*.edu or agency.gov"></div></div></div>
 <div class="mode active" data-mode="wildcard"><div class="field"><label for="pattern">Full URL pattern</label><input id="pattern" value="*.edu/**/*.*" spellcheck="false"><span class="hint">Glob: *.edu/**/*.* (any supported document type and directory depth) · **/manual*.pdf</span></div><div class="field"><label for="fileTypes">Document formats to discover</label><input id="fileTypes" value="pdf,pptx,ppt,docx,doc,xlsx,xls,odp,odt,ods"><span class="hint">PDF, PowerPoint, Word, Excel, and OpenDocument formats.</span></div>
-<div class="grid"><div class="field"><label for="urlMatchMode">URL matching engine</label><select id="urlMatchMode"><option value="glob">Recursive glob (*, **, ?)</option><option value="regex">Full regular expression</option></select></div><div class="field"><label for="limit">Maximum candidates</label><input id="limit" type="number" min="1" max="2000" value="200"></div><div class="field"><label for="indexes">Common Crawl indexes</label><input id="indexes" type="number" min="1" max="5" value="2"></div></div><div class="grid"><div class="field"><label><input id="recursiveDiscovery" type="checkbox" style="width:auto"> Recursively crawl discovered host roots</label><span class="hint">Bounded same-host link traversal; obeys robots.txt.</span></div><div class="field"><label for="recursiveDepth">Recursive depth (0–3)</label><input id="recursiveDepth" type="number" min="0" max="3" value="2"></div><div class="field"><label for="recursivePages">Max HTML pages</label><input id="recursivePages" type="number" min="1" max="100" value="30"></div></div></div>
-<div class="mode" data-mode="crawl"><div class="field"><label for="startUrl">Starting page URL</label><input id="startUrl" placeholder="https://example.gov/reports/"></div><div class="grid"><div class="field"><label for="depth">Link depth</label><input id="depth" type="number" min="0" max="12" value="3"></div><div class="field"><label for="pages">Max HTML pages</label><input id="pages" type="number" min="1" max="5000" value="500"></div><div class="field"><label for="files">Max documents</label><input id="files" type="number" min="1" max="2000" value="250"></div><div class="field"><label for="delay">Request delay (seconds)</label><input id="delay" type="number" min=".1" max="30" step=".1" value=".5"></div><div class="field"><label for="allow">Additional allowed domains</label><input id="allow" placeholder="archive.org, agency.gov"></div></div></div>
+<div class="field"><label for="institutionDomains">Institution domains to seed (comma-separated)</label><input id="institutionDomains" value="mit.edu,uga.edu,mga.edu,gatech.edu,gsu.edu,augusta.edu,georgiasouthern.edu,kennesaw.edu,westga.edu,valdosta.edu,asurams.edu,clayton.edu,columbusstate.edu,fortvalley.edu,gcsu.edu,gsw.edu,savannahstate.edu,ung.edu,abac.edu,atlm.edu,ccga.edu,daltonstate.edu,ega.edu,ggc.edu,highlands.edu,gordonstate.edu,sgsc.edu"><span class="hint">MIT, UGA and MGA are included. Archive-indexed .edu results add more domains automatically; edit this list to add or remove starting institutions.</span></div>
+<div class="grid"><div class="field"><label for="urlMatchMode">URL matching engine</label><select id="urlMatchMode"><option value="glob">Recursive glob (*, **, ?)</option><option value="regex">Full regular expression</option></select></div><div class="field"><label for="limit">Maximum candidates (0 = all available)</label><input id="limit" type="number" min="0" value="0"></div><div class="field"><label for="indexes">Common Crawl indexes (0 = all available)</label><input id="indexes" type="number" min="0" value="0"></div></div><div class="grid"><div class="field"><label><input id="recursiveDiscovery" type="checkbox" style="width:auto"> Recursively crawl discovered host roots</label><span class="hint">Bounded same-host link traversal; obeys robots.txt.</span></div><div class="field"><label for="recursiveDepth">Recursive depth (0–3)</label><input id="recursiveDepth" type="number" min="0" max="3" value="2"></div><div class="field"><label for="recursivePages">Max HTML pages (0 = unlimited)</label><input id="recursivePages" type="number" min="0" value="0"></div></div></div>
+<div class="mode" data-mode="crawl"><div class="field"><label for="startUrl">Starting page URL</label><input id="startUrl" placeholder="https://example.gov/reports/"></div><div class="grid"><div class="field"><label for="depth">Link depth</label><input id="depth" type="number" min="0" max="12" value="3"></div><div class="field"><label for="pages">Max HTML pages (0 = unlimited)</label><input id="pages" type="number" min="0" value="0"></div><div class="field"><label for="files">Max documents (0 = unlimited)</label><input id="files" type="number" min="0" value="0"></div><div class="field"><label for="delay">Request delay (seconds)</label><input id="delay" type="number" min=".1" max="30" step=".1" value=".5"></div><div class="field"><label for="allow">Additional allowed domains</label><input id="allow" placeholder="archive.org, agency.gov"></div></div></div>
 <div class="mode" data-mode="paths"><div class="field"><label for="pathBase">Authorized target base URL</label><input id="pathBase" placeholder="https://example.edu/"></div><div class="field"><label for="wordlist">Path wordlist (one path per line; blank uses built-in paths)</label><textarea id="wordlist" placeholder="reports/&#10;documents/&#10;technical/manual.pdf&#10;downloads/"></textarea></div><div class="grid"><div class="field"><label for="extensions">Document extensions to append</label><input id="extensions" value="pdf,pptx,ppt,docx,doc,xlsx,xls,odp,odt,ods"></div><div class="field"><label for="concurrency">Concurrent requests (1–40)</label><input id="concurrency" type="number" min="1" max="40" value="12"></div></div><p class="hint">Bounded ffuf-style wordlist probing against the specified host. Respects robots.txt.</p></div><div class="mode" data-mode="grep"><div class="grid"><div class="field"><label for="grepPattern">Regex / phrase / grep expression</label><input id="grepPattern" placeholder="wing.{0,30}loading|airfoil"></div><div class="field"><label for="grepContext">Context lines</label><input id="grepContext" type="number" min="0" max="10" value="2"></div></div><div class="grid"><div class="field"><label><input id="grepRegex" type="checkbox" checked style="width:auto"> Regular expression</label></div><div class="field"><label><input id="grepCase" type="checkbox" style="width:auto"> Case-sensitive</label></div><div class="field"><label><input id="grepWord" type="checkbox" style="width:auto"> Whole-word match</label></div></div><p class="hint">Searches text extracted from indexed PDFs. Use literal phrases or regex patterns; results include matching lines and context. For exact page-level citations, use the document download and verify the page in the PDF viewer.</p></div><div class="mode" data-mode="catalog"><p class="hint">Searches extracted text and metadata using SQLite FTS5 with Porter stemming, Unicode diacritic folding, phrase/Boolean syntax, and BM25 relevance ranking.</p></div>
 <div class="mode" data-mode="direct"><div class="field"><label for="directUrl">Direct document URL</label><input id="directUrl" placeholder="https://example.org/report.pdf"></div></div>
-<div class="grid"><div class="field"><label for="maxMb">Maximum document size (MiB; worker cap 250,000,000 bytes)</label><input id="maxMb" type="number" min="1" max="238" value="40"></div><div class="field"><label><input id="robots" type="checkbox" checked style="width:auto"> Respect robots.txt</label></div></div>
-<div class="actions"><button class="primary" id="run">Run search</button><button id="selectAll" hidden>Select all candidates</button><button id="fuzzIndexes" hidden>Fuzz indexed hosts</button><button id="import" hidden>Download &amp; index selected documents</button><button id="refresh">Refresh catalog</button></div>
+<div class="grid"><div class="field"><label for="maxMb">Maximum document size (MiB; 0 = no configured size cap)</label><input id="maxMb" type="number" min="0" value="0"></div><div class="field"><label><input id="robots" type="checkbox" checked style="width:auto"> Respect robots.txt</label></div></div>
+<div class="actions"><button class="primary" id="run">Run search</button><button id="selectAll" hidden>Select all candidates</button><button id="fuzzIndexes" hidden>Expand domains &amp; find new documents</button><button id="import" hidden>Download &amp; index selected documents</button><button id="refresh">Refresh catalog</button></div>
 <div id="status" class="status" role="status">Connecting to local PDF worker…</div><div id="results"><div class="empty">Choose a mode and run a search.</div></div>
 </section>
 <section class="panel"><div class="grid"><div><h2>Local research engine</h2><p class="hint">The local worker downloads permitted documents, extracts PDF pages, PowerPoint slides, Word paragraphs, and Excel sheets, then indexes searchable text in SQLite FTS5. Catalog search uses Porter stemming and BM25 relevance ranking; grep uses concurrent, memoized page extraction and ripgrep when installed.</p><p class="hint" id="health">Checking local worker…</p><p class="hint" id="toolInventory">Browser mode: search-provider links. Local engines activate when the worker is running.</p></div><div><h2>Research workflow &amp; boundaries</h2><p class="hint"><b>1.</b> Discover school-domain URLs with <code>*.edu/**/*.pdf</code>. <b>2.</b> Select candidates and download/index them locally. <b>3.</b> Search the catalog or run regex grep across extracted text. PDFs stay on the worker machine. Common Crawl, Arquivo.pt, and Wayback are historical, incomplete indexes—not live inventories. Their URL candidates can seed bounded host/path fuzzing. Crawling respects robots.txt and does not bypass authentication or access controls.</p><a href="worker/README.md">Worker setup guide</a></div></div></section>
@@ -31,6 +32,8 @@
  <div class="filter-grid">
   <div class="field"><label for="libraryQuery">Search library</label><input id="libraryQuery" placeholder="title, filename, aircraft systems, flight controls…"></div>
   <div class="field"><label for="libraryFormat">Format</label><select id="libraryFormat"><option value="">All formats</option><option>pdf</option><option>pptx</option><option>ppt</option><option>docx</option><option>doc</option><option>xlsx</option><option>xls</option><option>odp</option><option>odt</option><option>ods</option></select></div>
+  <div class="field"><label for="librarySort">Sort by</label><select id="librarySort"><option value="date">Newest added</option><option value="title">Title / series</option><option value="domain">Institution / domain</option><option value="year">Year → chapter → part</option><option value="size">File size</option><option value="format">Format</option></select></div>
+  <div class="field"><label><input id="libraryGroup" type="checkbox" checked style="width:auto"> Group editions, years and chapters</label></div>
   <button id="librarySearch">Search</button>
  </div>
  <div id="librarySummary" class="status">Load the local document inventory.</div>
@@ -68,7 +71,7 @@ const WORKER = (() => { const host = location.hostname; const port = location.po
 const WORKER_HINT = WORKER;
 const api=async(path,opts={})=>{if(!workerOnline)throw Error('This mode requires the local worker. Start pdf-lab/worker/run.sh and open '+WORKER_HINT+'/.');const r=await fetch(WORKER+path,{...opts,headers:{'Content-Type':'application/json',...(opts.headers||{})}});const ct=r.headers.get('content-type')||'';if(!r.ok)throw Error('Worker HTTP '+r.status+': '+(await r.text()).slice(0,180));if(!ct.includes('application/json'))throw Error('Worker returned '+ct+' instead of JSON. Open '+WORKER_HINT+'/.');return r.json()};
 const body=x=>JSON.stringify(x), patterns=()=>($('filename').value||'*.pdf').split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
-function selectedMaxBytes(){const mib=Number($('maxMb').value);if(!Number.isFinite(mib)||mib<1||mib>238)throw Error('Maximum PDF size must be between 1 and 238 MiB (worker cap: 250,000,000 bytes).');return Math.floor(mib*1048576)}
+function selectedMaxBytes(){const mib=Number($('maxMb').value);if(!Number.isFinite(mib)||mib<0)throw Error('Maximum document size must be zero (unlimited) or a positive MiB value.');return mib===0?0:Math.floor(mib*1048576)}
 
 function showStatus(s){$('status').textContent=s}
 function renderLinks(items,heading){const root=$('results');root.replaceChildren();const h=document.createElement('p');h.className='hint';h.textContent=heading+' · '+items.length+' result';root.append(h);for(const x of items){const row=document.createElement('div');row.className='result';const a=document.createElement('a');a.href=x.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=x.title;const meta=document.createElement('small');meta.textContent=x.note||'';row.append(a,meta);root.append(row)}}
@@ -92,10 +95,11 @@ $('selectAll').onclick=()=>document.querySelectorAll('#results input[type=checkb
 function renderFuzzResults(items){
  const root=$('results');root.replaceChildren();
  const archiveSeen=new Set();
- const archiveSources=candidates.filter(x=>x.archive_file_url&&String(x.mime||'').toLowerCase().includes('pdf'));
+ const supported=new Set(['pdf','pptx','ppt','docx','doc','xlsx','xls','odp','odt','ods']);
+ const archiveSources=candidates.filter(x=>x.archive_file_url&&supported.has((new URL(x.url)).pathname.split('.').pop().toLowerCase()));
  if(archiveSources.length){
   const heading=document.createElement('p');heading.className='hint';
-  heading.textContent='ARCHIVED PDF RECOVERY · '+archiveSources.length+' archived PDF candidates · live source is tried first; the preserved binary is used if the original is unavailable or not a PDF.';
+  heading.textContent='ARCHIVED DOCUMENT RECOVERY · '+archiveSources.length+' archived candidates · live source is tried first; the preserved binary is used if the original is unavailable or invalid.';
   root.append(heading);
  }
  for(const source of archiveSources){
@@ -105,7 +109,7 @@ function renderFuzzResults(items){
   const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;
   cb.dataset.archiveOriginalUrl=source.url;cb.dataset.archiveFileUrl=source.archive_file_url;cb.dataset.archiveTitle=source.title||'';cb.style.width='auto';
   const span=document.createElement('span');
-  span.textContent=(source.title||source.url)+' · '+(source.timestamp||'archive capture')+' · archived PDF; signature verified during import';
+  span.textContent=(source.title||source.url)+' · '+(source.timestamp||'archive capture')+' · '+(new URL(source.url)).pathname.split('.').pop().toUpperCase()+'; signature/container validated during import';
   const link=document.createElement('a');link.href=source.archive_url||source.archive_file_url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Open archive';
   label.append(cb,span,document.createTextNode(' · '),link);root.append(label);
  }
@@ -128,13 +132,17 @@ async function pollFuzz(jobId){
  try{
   const d=await api('/api/fuzz-indexes/'+encodeURIComponent(jobId));
   const s=d.stats||{};
-  showStatus('Indexed-host fuzzer '+d.status+' · '+(s.finished||0)+'/'+(s.planned||0)+' probes · '+(s.found||0)+' paths · '+(s.pdfs||0)+' verified PDFs · '+(s.documents||0)+' verified documents · '+(s.soft_404s||0)+' soft-404 pages filtered · '+(s.errors||0)+' errors · '+(s.robots_blocked||0)+' robots blocked');
+  showStatus('University expansion / fuzzer '+(d.phase||d.status)+' · '+(s.domains_discovered||0)+' domains · '+(s.indexed_candidates||0)+' archive-index candidates · '+(s.finished||0)+'/'+(s.planned||0)+' probes · '+(s.pdfs||0)+' verified PDFs · '+(s.documents||0)+' verified documents · '+(s.soft_404s||0)+' soft-404 filtered · '+(s.errors||0)+' errors');
   if(['queued','running'].includes(d.status)){
    setTimeout(()=>pollFuzz(jobId),900);return;
   }
   if(d.status==='completed'){
-   pathMatches=d.results||[];renderFuzzResults(pathMatches);
-   showStatus('Indexed-host fuzzing complete · '+s.hosts_checked+' hosts · '+s.seeds_used+' seeds · '+s.tested+'/'+s.planned+' requests tested · '+s.found+' HTTP paths found · '+(s.pdfs||0)+' PDFs signature-verified · '+(s.documents||0)+' total documents verified · '+(s.soft_404s||0)+' soft-404 pages filtered · '+s.errors+' errors · '+s.robots_blocked+' robots blocked. Exact indexed seed URLs were tested first; only verified PDFs are preselected.');
+   pathMatches=d.results||[];
+   const merged=new Map(candidates.map(x=>[x.url,x]));
+   for(const item of d.discovered_candidates||[])merged.set(item.url,{...(merged.get(item.url)||{}),...item});
+   candidates=[...merged.values()];
+   renderFuzzResults(pathMatches);
+   showStatus('Expansion complete · '+(d.discovered_domains||[]).length+' university domains · '+(d.discovered_candidates||[]).length+' archive-index candidates · '+s.hosts_checked+' hosts probed · '+s.tested+'/'+s.planned+' requests · '+(s.pdfs||0)+' verified PDFs · '+(s.documents||0)+' verified documents · '+(s.soft_404s||0)+' soft-404 filtered · '+s.errors+' errors. All generated probes were used.');
   }else{
    showStatus('Indexed-host fuzzer failed: '+(d.error||'unknown worker error'));
   }
@@ -147,16 +155,18 @@ async function pollFuzz(jobId){
 $('fuzzIndexes').onclick=async()=>{
  if(!candidates.length){showStatus('Run URL discovery first; index results become fuzzer seeds.');return}
  const button=$('fuzzIndexes');button.disabled=true;
- showStatus('Queueing '+candidates.length+' indexed URLs for host/path fuzzing…');
+ showStatus('Expanding .edu domains from archive indexes, then probing '+candidates.length+' existing URLs plus institutional seeds…');
  try{
   const paths=$('wordlist').value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const domains=$('institutionDomains').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
   const d=await api('/api/fuzz-indexes',{method:'POST',body:body({
-   seed_urls:candidates.map(x=>x.url),paths,
+   seed_urls:candidates.map(x=>x.url),institution_domains:domains,
+   content_query:$('terms').value.trim(),paths,
    extensions:$('extensions').value.split(',').map(x=>x.trim()).filter(Boolean),
-   concurrency:Number($('concurrency').value)||24,
-   timeout:5,max_probes:800,respect_robots:$('robots').checked
+   concurrency:Number($('concurrency').value)||12,
+   timeout:8,max_probes:0,respect_robots:$('robots').checked
   })});
-  showStatus('Fuzzer queued · '+d.stats.planned+' probes across '+d.stats.hosts_checked+' hosts…');
+  showStatus('University-domain expansion queued · '+domains.length+' institutional seeds · archive-index discovery running…');
   pollFuzz(d.id);
  }catch(e){
   button.disabled=false;
@@ -218,30 +228,54 @@ function sizeLabel(bytes){
  const n=Number(bytes||0);if(n<1024)return n+' B';if(n<1048576)return (n/1024).toFixed(1)+' KB';
  if(n<1073741824)return (n/1048576).toFixed(1)+' MB';return (n/1073741824).toFixed(2)+' GB';
 }
+function buildLibraryRow(item){
+ const row=document.createElement('div');row.className='library-row';
+ const left=document.createElement('div');
+ const title=document.createElement('strong');title.textContent=item.title||item.filename;
+ const meta=document.createElement('div');meta.className='meta';
+ const version=[item.year,item.chapter!==null&&item.chapter!==undefined?'Chapter '+item.chapter:'',item.part!==null&&item.part!==undefined?'Part '+item.part:'',item.edition?'Edition '+item.edition:''].filter(Boolean).join(' · ')||'Unversioned';
+ meta.textContent=(item.format||'unknown').toUpperCase()+' · '+version+' · '+(item.pages??'—')+' pages/slides/sheets · '+sizeLabel(item.bytes)+' · INDEXED · '+(item.discovered_at||'');
+ const source=document.createElement('div');source.className='meta';source.textContent=(item.domain||'')+' · '+(item.url||'Local document');
+ left.append(title,meta,source);
+ const actions=document.createElement('div');actions.className='row-actions';
+ const read=document.createElement('button');read.textContent='Open reader';read.onclick=()=>openReader(item.id);
+ const download=document.createElement('a');download.href=WORKER+'/api/documents/'+encodeURIComponent(item.id)+'/download';download.textContent='Download';download.className='pill';download.target='_blank';
+ actions.append(read,download);row.append(left,actions);return row;
+}
 async function loadLibrary(){
  if(!workerOnline){$('librarySummary').textContent='Local worker is offline.';return}
  $('librarySummary').textContent='Loading local documents…';
  try{
   const query=$('libraryQuery').value.trim(),format=$('libraryFormat').value;
-  const params=new URLSearchParams({limit:'500'});
+  const params=new URLSearchParams({limit:'0',sort:$('librarySort').value});
   if(query)params.set('q',query);if(format)params.set('format',format);
   const items=await api('/api/documents?'+params.toString());
   const root=$('libraryList');root.replaceChildren();
   const totalBytes=items.reduce((n,x)=>n+Number(x.bytes||0),0);
   $('librarySummary').textContent=items.length+' indexed documents in this view · '+sizeLabel(totalBytes)+' represented · local searchable text available.';
   if(!items.length){root.innerHTML='<div class="empty">No indexed documents match this filter.</div>';return}
-  for(const item of items){
-   const row=document.createElement('div');row.className='library-row';
-   const left=document.createElement('div');
-   const title=document.createElement('strong');title.textContent=item.title||item.filename;
-   const meta=document.createElement('div');meta.className='meta';
-   meta.textContent=(item.format||'unknown').toUpperCase()+' · '+(item.pages||'—')+' pages/slides/sheets · '+sizeLabel(item.bytes)+' · '+(item.indexed?'INDEXED':'DOWNLOADED')+' · '+(item.discovered_at||'');
-   const source=document.createElement('div');source.className='meta';source.textContent=item.url||'Local document';
-   left.append(title,meta,source);
-   const actions=document.createElement('div');actions.className='row-actions';
-   const read=document.createElement('button');read.textContent='Open reader';read.onclick=()=>openReader(item.id);
-   const download=document.createElement('a');download.href=WORKER+'/api/documents/'+encodeURIComponent(item.id)+'/download';download.textContent='Download';download.className='pill';download.target='_blank';
-   actions.append(read,download);row.append(left,actions);root.append(row);
+  const grouped=$('libraryGroup').checked;
+  const series=new Map();
+  if(grouped){
+   for(const item of items){
+    const key=item.series_key||((item.domain||'')+'::'+(item.series_title||item.title||item.filename));
+    if(!series.has(key))series.set(key,[]);
+    series.get(key).push(item);
+   }
+  }else{
+   items.forEach((item,i)=>series.set('document-'+i,[item]));
+  }
+  for(const stack of series.values()){
+   stack.sort((a,b)=>(a.year||0)-(b.year||0)||(a.chapter||0)-(b.chapter||0)||(a.part||0)-(b.part||0)||(a.edition||'').localeCompare(b.edition||''));
+   if(grouped&&stack.length>1){
+    const group=document.createElement('section');group.className='series-stack';
+    const heading=document.createElement('h3');heading.textContent=(stack[0].series_title||stack[0].title||stack[0].filename)+' · '+stack.length+' editions / chapters';
+    group.append(heading);
+    for(const item of stack)group.append(buildLibraryRow(item));
+    root.append(group);
+   }else{
+    for(const item of stack)root.append(buildLibraryRow(item));
+   }
   }
  }catch(e){$('librarySummary').textContent='Library error: '+e.message}
 }
@@ -249,6 +283,8 @@ $('libraryRefresh').onclick=loadLibrary;
 $('librarySearch').onclick=loadLibrary;
 $('libraryQuery').addEventListener('keydown',e=>{if(e.key==='Enter')loadLibrary()});
 $('libraryFormat').onchange=loadLibrary;
+$('librarySort').onchange=loadLibrary;
+$('libraryGroup').onchange=loadLibrary;
 async function openReader(id){
  currentReaderId=id;showView('readerView');
  $('readerTitle').textContent='Loading document…';
