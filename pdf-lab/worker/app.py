@@ -526,8 +526,8 @@ async def arquivo_discovery(client, pattern, mode, matcher, max_results, errors)
         ]
         # Narrow archived captures to PDF-looking URLs before applying the exact
         # user glob locally. This keeps broad TLD scans useful under the API cap.
-        if re.search(r"\\.pdf(?:$|[?#])",pattern,re.I):
-            params.append(("filter",r"~url:.*\\.pdf([?#].*)?$"))
+        if re.search(r"\.pdf(?:$|[?#])",pattern,re.I):
+            params.append(("filter",r"~url:.*\.pdf([?#].*)?$"))
         last_error=None
         for attempt in range(2):
             try:
