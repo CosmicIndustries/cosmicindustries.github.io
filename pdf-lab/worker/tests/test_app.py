@@ -21,6 +21,12 @@ class PDFLabCoreTests(unittest.TestCase):
     def tearDown(self):
         self.conn.close()
 
+    def test_pdf_signature_detects_real_pdf_header(self):
+        self.assertTrue(worker.is_pdf_signature(b"%PDF-1.7\nbinary"))
+        self.assertTrue(worker.is_pdf_signature(b"%PDF-1.4" + b"x" * 1016))
+        self.assertFalse(worker.is_pdf_signature(b"<!doctype html><html>not a pdf</html>"))
+        self.assertFalse(worker.is_pdf_signature(b""))
+
     def test_recursive_edu_glob_matches_arbitrary_depth_and_query(self):
         matcher = worker.glob_to_regex("*.edu/**/*.pdf")
         self.assertTrue(matcher.search("https://example.edu/course.pdf"))
