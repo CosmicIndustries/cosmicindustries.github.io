@@ -421,6 +421,51 @@ def parse_wayback_cdx_payload(payload):
     return []
 
 
+def arquivo_query_patterns(pattern, mode):
+    """Build a broad but bounded Arquivo.pt CDX query; exact matching stays local."""
+    p=pattern.lower()
+    literal=re.search(r"https?://([^/]+)",p)
+    if literal and not any(ch in literal.group(1) for ch in "*?[]"):
+        return [literal.group(1)+"/*"]
+    tld=None
+    if mode=="regex":
+        tld=re.search(r"\\\.([a-z]{2,})",p) or re.search(r"\.([a-z]{2,})(?:/|$)",p)
+    else:
+        tld=re.search(r"\.([a-z]{2,})(?:/|$)",p)
+    if not tld:
+        raise ValueError("Arquivo.pt discovery needs a recognizable TLD (such as .edu/.gov) or literal hostname.")
+    # CDX interprets *.tld as a domain match, including hosts below that TLD.
+    return ["*."+tld.group(1)]
+
+
+def parse_arquivo_cdx_payload(payload):
+    """Parse Arquivo.pt's output=json format (NDJSON, one object per line)."""
+    if isinstance(payload, (dict, list)):
+        if isinstance(payload, dict):
+            return [payload]
+        return [item for item in payload if isinstance(item, dict)]
+    text_payload=str(payload or "").strip()
+    if not text_payload:
+        return []
+    try:
+        decoded=json.loads(text_payload)
+        if isinstance(decoded, dict):
+            return [decoded]
+        if isinstance(decoded, list):
+            return [item for item in decoded if isinstance(item, dict)]
+    except (json.JSONDecodeError, TypeError):
+        pass
+    rows=[]
+    for line in text_payload.splitlines():
+        try:
+            item=json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(item,dict):
+            rows.append(item)
+    return rows
+
+
 def discovery_sort_key(item):
     is_pdf=(str(item.get("mime") or "").lower()=="application/pdf" or
             urlparse(item["url"]).path.lower().endswith(".pdf"))
@@ -428,7 +473,7 @@ def discovery_sort_key(item):
     # Common Crawl uses YYYYMMDD; Wayback uses YYYYMMDDhhmmss.
     # Right-pad to a common precision, then sort newest first.
     stamp_number=int(stamp.ljust(14,"0")) if stamp.isdigit() else 0
-    source_priority=0 if item.get("collection")=="commoncrawl" else 1
+    source_priority={"commoncrawl":0,"arquivo-cdx":1,"wayback-cdx":2}.get(item.get("collection"),3)
     return (0 if is_pdf else 1, -stamp_number, source_priority, item["url"].casefold())
 
 
@@ -467,6 +512,67 @@ async def wayback_discovery(client, pattern, mode, matcher, max_results, errors)
     return found,pages_fetched
 
 
+async def arquivo_discovery(client, pattern, mode, matcher, max_results, errors):
+    """Supplement URL discovery with Arquivo.pt's independent CDX archive."""
+    endpoint="https://arquivo.pt/wayback/cdx"
+    queries=arquivo_query_patterns(pattern,mode)
+    found=[]; seen=set(); requests_made=0
+    for qpattern in queries:
+        params=[
+            ("url",qpattern),("output","json"),
+            ("fields","url,timestamp,mime,status"),
+            ("limit",str(min(max(200,max_results*20),2000))),
+            ("filter","=status:200"),
+        ]
+        # Narrow archived captures to PDF-looking URLs before applying the exact
+        # user glob locally. This keeps broad TLD scans useful under the API cap.
+        if re.search(r"\\.pdf(?:$|[?#])",pattern,re.I):
+            params.append(("filter",r"~url:.*\\.pdf([?#].*)?$"))
+        last_error=None
+        for attempt in range(2):
+            try:
+                response=await client.get(
+                    endpoint,params=params,
+                    timeout=httpx.Timeout(20.0,connect=8.0),
+                )
+                if response.status_code==429:
+                    retry_after=response.headers.get("Retry-After","2")
+                    try: delay=min(max(float(retry_after),1.0),15.0)
+                    except ValueError: delay=2.0
+                    if attempt==0:
+                        await asyncio.sleep(delay)
+                        continue
+                response.raise_for_status()
+                requests_made+=1
+                for item in parse_arquivo_cdx_payload(response.text):
+                    url=item.get("url") or item.get("original") or ""
+                    if not url or url in seen or not re.match(r"^https?://",url,re.I):
+                        continue
+                    if not matcher.search(url):
+                        continue
+                    seen.add(url)
+                    found.append({
+                        "url":url,"timestamp":item.get("timestamp"),
+                        "mime":item.get("mime") or item.get("mimetype"),
+                        "status":item.get("status") or item.get("statuscode"),
+                        "collection":"arquivo-cdx",
+                    })
+                    if len(found)>=max_results:
+                        break
+                break
+            except (httpx.TimeoutException,httpx.TransportError,httpx.HTTPStatusError,ValueError) as exc:
+                last_error=exc
+                if attempt==0 and isinstance(exc,(httpx.TimeoutException,httpx.TransportError)):
+                    await asyncio.sleep(1.0)
+                    continue
+                break
+        if last_error:
+            errors.append("Arquivo.pt CDX "+qpattern+": "+type(last_error).__name__+": "+str(last_error)[:160])
+        if len(found)>=max_results:
+            break
+    return found,requests_made
+
+
 @app.post("/api/discover")
 async def discover_wildcard(req: WildcardDiscoveryRequest):
     pattern=req.url_pattern.strip()
@@ -477,7 +583,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         raise HTTPException(400,detail=str(exc))
     results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0
     pages_crawled=0; page_limit_reached=False
-    providers={"commoncrawl":"not-run","wayback":"not-run"}
+    providers={"commoncrawl":"not-run","arquivo":"not-run","wayback":"not-run"}
     timeout=httpx.Timeout(22.0,connect=6.0)
     async with httpx.AsyncClient(timeout=timeout,headers={"User-Agent":UA},limits=httpx.Limits(max_connections=12,max_keepalive_connections=6)) as client:
         collections=[]
@@ -552,8 +658,23 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
 
         if results:
             providers["commoncrawl"]="results" if providers["commoncrawl"]=="available" else providers["commoncrawl"]
-        # Use Wayback as an independent fallback when Common Crawl is unavailable,
-        # failed, or did not find enough candidates.
+        # Arquivo.pt is an independent CDX source and is queried before Wayback.
+        # It is a supplement, not a complete mirror of the global web.
+        if len(results)<req.max_results:
+            try:
+                arquivo_results,arquivo_requests=await arquivo_discovery(
+                    client,pattern,req.match_mode,matcher,req.max_results-len(results),errors
+                )
+                pages_fetched+=arquivo_requests
+                for item in arquivo_results:
+                    if item["url"] not in seen:
+                        seen.add(item["url"]); results.append(item)
+                providers["arquivo"]="results" if arquivo_results else ("empty" if arquivo_requests else "unavailable")
+            except Exception as exc:
+                providers["arquivo"]="unavailable"
+                errors.append("Arquivo.pt CDX: "+type(exc).__name__+": "+str(exc)[:160])
+
+        # Internet Archive Wayback remains the final independent fallback.
         if len(results)<req.max_results:
             try:
                 wayback_results,wayback_pages=await wayback_discovery(
