@@ -1311,13 +1311,26 @@ class PathDiscoveryRequest(BaseModel):
     timeout: float = Field(default=8, ge=2, le=30)
     respect_robots: bool = True
 
+INSTITUTION_DOMAIN_SEEDS = [
+    "mit.edu","uga.edu","mga.edu","gatech.edu","gsu.edu","augusta.edu",
+    "georgiasouthern.edu","kennesaw.edu","westga.edu","valdosta.edu",
+    "asurams.edu","clayton.edu","columbusstate.edu","fortvalley.edu",
+    "gcsu.edu","gsw.edu","savannahstate.edu","ung.edu","abac.edu",
+    "atlm.edu","ccga.edu","daltonstate.edu","ega.edu","ggc.edu",
+    "highlands.edu","gordonstate.edu","sgsc.edu"
+]
+
+
 class IndexedFuzzRequest(BaseModel):
-    seed_urls: list[str] = Field(default_factory=list, max_length=2000)
-    paths: list[str] = Field(default_factory=list, max_length=1000)
-    extensions: list[str] = Field(default_factory=lambda:["pdf"])
-    concurrency: int = Field(default=24, ge=1, le=40)
-    timeout: float = Field(default=5, ge=2, le=30)
-    max_probes: int = Field(default=800, ge=1, le=8000)
+    seed_urls: list[str] = Field(default_factory=list)
+    institution_domains: list[str] = Field(default_factory=lambda:list(INSTITUTION_DOMAIN_SEEDS))
+    content_query: str = ""
+    paths: list[str] = Field(default_factory=list)
+    extensions: list[str] = Field(default_factory=lambda:list(SUPPORTED_FORMATS))
+    concurrency: int = Field(default=12, ge=1, le=40)
+    timeout: float = Field(default=8, ge=2, le=60)
+    # Zero means use every generated index-seed/path combination.
+    max_probes: int = Field(default=0, ge=0)
     respect_robots: bool = True
 
 DEFAULT_PATHS = [
@@ -1529,8 +1542,15 @@ def build_index_fuzz_plan(req: IndexedFuzzRequest):
         raise HTTPException(400,"Supply URL candidates from an index search first.")
     origins={}
     invalid=0
-    for seed in req.seed_urls:
-        seed=seed.strip()
+    combined_seeds=list(req.seed_urls)
+    for domain in req.institution_domains:
+        host=(domain or "").strip().lower().rstrip(".")
+        host=re.sub(r"^https?://","",host).split("/")[0].split(":")[0]
+        if not re.fullmatch(r"[a-z0-9.-]+\.[a-z]{2,}",host):
+            invalid+=1
+            continue
+        combined_seeds.append("https://"+host+"/")
+    for seed in dict.fromkeys(x.strip() for x in combined_seeds if x and x.strip()):
         if not valid_http(seed):
             invalid+=1
             continue
@@ -1553,20 +1573,23 @@ def build_index_fuzz_plan(req: IndexedFuzzRequest):
         # meaningless paths such as "documents/.pdf".
         if not p.endswith("/") and not Path(p).suffix:
             clean_paths.extend(p+"."+ext for ext in extensions)
-    clean_paths=list(dict.fromkeys(clean_paths))[:1500]
+    clean_paths=list(dict.fromkeys(clean_paths))
 
     probe_jobs=[]; seen=set()
     origin_items=list(origins.items())
-    base_budget,extra_budget=divmod(req.max_probes,len(origin_items))
+    if req.max_probes:
+        base_budget,extra_budget=divmod(req.max_probes,len(origin_items))
+    else:
+        base_budget,extra_budget=(None,0)
     for origin_index,(origin,seeds) in enumerate(origin_items):
-        host_budget=base_budget+(1 if origin_index<extra_budget else 0)
-        if host_budget<1:
+        host_budget=(base_budget+(1 if origin_index<extra_budget else 0)) if req.max_probes else None
+        if host_budget is not None and host_budget<1:
             continue
         host_added=0
         # Test the exact archived/indexed candidates first; they are stronger
         # evidence than synthetic wordlist guesses and were previously omitted.
         for seed in seeds:
-            if seed not in seen and host_added<host_budget:
+            if seed not in seen and (host_budget is None or host_added<host_budget):
                 seen.add(seed)
                 probe_jobs.append((seed,origin,seed))
                 host_added+=1
@@ -1587,9 +1610,9 @@ def build_index_fuzz_plan(req: IndexedFuzzRequest):
                     seen.add(url)
                     probe_jobs.append((url,origin,seeds[0]))
                     host_added+=1
-                if host_added>=host_budget:
+                if host_budget is not None and host_added>=host_budget:
                     break
-            if host_added>=host_budget:
+            if host_budget is not None and host_added>=host_budget:
                 break
 
     return {
