@@ -323,12 +323,12 @@ def cdx_query_candidates(pattern, mode):
     # candidate-generation optimization, not a change to matching semantics.
     edu=re.search(r"\.edu(?:/|$)",p)
     if edu:
-        suffix="*.edu/*.pdf" if re.search(r"\.pdf$",p) else "*.edu/*"
         # Partition the broad .edu wildcard by the first hostname character.
-        # This reduces single-query CDX load while covering ordinary DNS hostnames.
+        # CDX's * wildcard spans the remainder of the URL, including nested paths.
+        # The local matcher below still enforces the user's full ** glob.
         buckets=list("0123456789abcdefghijklmnopqrstuvwxyz")
-        tail="/".join([])  # keep this function's candidate generation deterministic
-        return [ch+"*.edu/"+("*" if not re.search(r"\.pdf$",p) else "*.pdf") for ch in buckets]
+        extension="*.pdf" if re.search(r"\.pdf$",p) else "*"
+        return [ch+"*.edu/"+extension for ch in buckets]
     # Other recognizable TLDs use a broad suffix query; local matching enforces the glob.
     tld=re.search(r"\.([a-z]{2,})(?:/|$)",p)
     if not tld:
@@ -380,7 +380,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         info=await client.get("https://index.commoncrawl.org/collinfo.json")
         info.raise_for_status()
         collections=info.json()[:req.indexes]
-        results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0
+        results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0; page_limit_reached=False
         async def cdx_get(endpoint, params):
             # Common Crawl asks clients to be serial and polite. Retry transient gateway
             # failures with backoff; never fan out concurrent queries to the public index.
@@ -415,6 +415,8 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                     # Bound work per pattern/index. User's max_results is the output cap;
                     # page traversal lets us move past the first block instead of silently
                     # stopping at the first 300 records.
+                    if total_pages>50:
+                        page_limit_reached=True
                     for page_no in range(min(total_pages,50)):
                         if len(results)>=req.max_results: break
                         params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey",
@@ -444,7 +446,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         pages_crawled=0
         if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
             pages_crawled=await recursive_url_discovery(client,[x["url"] for x in results],matcher,req,results,seen,errors)
-    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,"queries_succeeded":queried,"pages_fetched":pages_fetched,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"partial":bool(errors),"source":"Paginated Common Crawl CDX URL index + bounded live recursive crawl" if req.recursive else "Paginated Common Crawl CDX URL index; captures may be historical"}
+    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,"queries_succeeded":queried,"pages_fetched":pages_fetched,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"partial":bool(errors) or page_limit_reached,"page_limit_reached":page_limit_reached,"source":"Paginated Common Crawl CDX URL index + bounded live recursive crawl" if req.recursive else "Paginated Common Crawl CDX URL index; captures may be historical"}
 @app.post("/api/import-urls")
 async def import_discovered_urls(req: ImportURLsRequest):
     results=[]; errors=[]
