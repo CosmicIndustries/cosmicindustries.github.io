@@ -413,9 +413,14 @@ async def discover_paths(req: PathDiscoveryRequest):
                 if not valid_http(url) or urlparse(url).hostname!=host: return
                 if req.respect_robots and not await can_fetch(client,url,True): return
                 try:
-                    r=await client.get(url,headers={"Range":"bytes=0-0"})
-                    if r.status_code in (200,206,301,302,307,308,401,403):
-                        found.append({"url":url,"status":r.status_code,"content_type":r.headers.get("content-type",""),"bytes":r.headers.get("content-length"),"interesting":r.status_code in (401,403)})
+                    r=await client.head(url)
+                    if r.status_code in (405,501):
+                        async with client.stream("GET",url,headers={"Range":"bytes=0-0"}) as streamed:
+                            status=streamed.status_code; headers=streamed.headers
+                    else:
+                        status=r.status_code; headers=r.headers
+                    if status in (200,206,301,302,307,308,401,403):
+                        found.append({"url":url,"status":status,"content_type":headers.get("content-type",""),"bytes":headers.get("content-length"),"interesting":status in (401,403)})
                 except Exception as e: errors.append({"path":path,"error":str(e)[:120]})
         await asyncio.gather(*(probe(p) for p in candidates))
     found.sort(key=lambda x:(0 if x["url"].lower().endswith(".pdf") else 1,x["status"],x["url"]))
