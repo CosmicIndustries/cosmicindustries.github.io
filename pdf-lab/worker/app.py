@@ -320,7 +320,7 @@ def _extract_ooxml(data, ext):
                 paragraphs.extend(_xml_paragraph_text(archive.read(part)))
             lines.extend(paragraphs)
             page_records=[{"page":1,"line":i+1,"text":p[:500]} for i,p in enumerate(paragraphs)]
-            return "\n".join(lines),1,page_records
+            return "\n".join(lines),None,page_records
         elif ext=="xlsx":
             shared=[]
             if "xl/sharedStrings.xml" in names:
