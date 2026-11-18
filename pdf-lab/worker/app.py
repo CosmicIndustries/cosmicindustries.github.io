@@ -1081,7 +1081,7 @@ async def import_discovered_urls(req: ImportURLsRequest):
     extract_sem=asyncio.Semaphore(4)
     async with httpx.AsyncClient(follow_redirects=False,timeout=25,
             headers={"User-Agent":UA},limits=httpx.Limits(max_connections=8,max_keepalive_connections=6)) as client:
-        async def download_pdf(target_url):
+        async def download_document(target_url, expected_filename):
             if not valid_http(target_url):
                 raise ValueError("URL is not a public http(s) target")
             async with sem:
@@ -1094,32 +1094,26 @@ async def import_discovered_urls(req: ImportURLsRequest):
                         raise ValueError("HTTP "+str(response.status_code))
                     if not valid_http(str(response.url)):
                         raise ValueError("Unsafe redirect target")
-                    ctype=response.headers.get("content-type","").lower()
                     length=int(response.headers.get("content-length","0") or 0)
                     if length>req.max_bytes:
-                        raise ValueError("PDF exceeds size limit")
+                        raise ValueError("Document exceeds size limit")
                     chunks=[]; total=0
                     async for chunk in response.aiter_bytes():
                         total+=len(chunk)
                         if total>req.max_bytes:
-                            raise ValueError("PDF exceeds size limit")
+                            raise ValueError("Document exceeds size limit")
                         chunks.append(chunk)
                     data=b"".join(chunks)
-                    if not is_pdf_signature(data):
-                        mime=ctype.split(";",1)[0].strip() or "unknown MIME type"
-                        raise ValueError(
-                            f"Response is not a PDF: Content-Type={mime}; "
-                            "missing %PDF- file signature (a .pdf URL suffix is not proof)."
-                        )
+                    validate_document_signature(data,expected_filename)
                     return data
 
-        async def import_one(url, archive_file_url=None, title=""):
+        async def import_one_core(url, archive_file_url=None, title=""):
             attempts=[]
             data=None
             download_url=None
             for target in import_source_targets(url,archive_file_url):
                 try:
-                    data=await download_pdf(target)
+                    data=await download_document(target,name)
                     download_url=target
                     break
                 except Exception as exc:
@@ -1139,20 +1133,42 @@ async def import_discovered_urls(req: ImportURLsRequest):
                 return None,{"url":url,"error":"Excluded: filename did not match the selected glob(s).","excluded":True}
             try:
                 async with extract_sem:
-                    body,np,pages=await asyncio.to_thread(extract_pdf,data)
+                    body,np,pages=await asyncio.to_thread(extract_document,data,name)
             except Exception as exc:
                 return None,{"url":url,"error":"Verified PDF could not be parsed: "+str(exc)[:160]}
             if not query_matches(body,req.content_query):
                 return None,{"url":url,"error":"Excluded: extracted PDF text did not match the content expression.","excluded":True}
 
             document_title=clean_archive_text(title,400) or name
-            docid,new=store_pdf(download_url,name,data,document_title,body,np)
+            docid,new=store_document(download_url,name,data,document_title,body,np)
             return {
                 "id":docid,"filename":name,"title":document_title,
                 "url":url,"download_url":download_url,
                 "retrieved_from_archive":download_url!=url,
-                "pages":np,"bytes":len(data),"new":new,
+                "format":document_format(name),"pages":np,"bytes":len(data),"new":new,
             },None
+
+        job_id=str(uuid.uuid4())
+        planned=len(req.urls[:500])+len(req.archive_sources[:500])
+        import_jobs[job_id]={
+            "id":job_id,"type":"import","status":"running","created_at":now(),
+            "stats":{"planned":planned,"started":0,"finished":0,"stored":0,"errors":0,"excluded":0},
+        }
+
+        async def import_one(url,archive_file_url=None,title=""):
+            stats=import_jobs[job_id]["stats"]
+            stats["started"]+=1
+            try:
+                item,error=await import_one_core(url,archive_file_url,title)
+                if item:
+                    stats["stored"]+=1
+                elif error and error.get("excluded"):
+                    stats["excluded"]+=1
+                elif error:
+                    stats["errors"]+=1
+                return item,error
+            finally:
+                stats["finished"]+=1
 
         tasks=[]
         tasks.extend(import_one(url) for url in req.urls[:500])
@@ -1165,7 +1181,10 @@ async def import_discovered_urls(req: ImportURLsRequest):
     outcomes=[error for item,error in pairs if error]
     errors=[item for item in outcomes if not item.get("excluded")]
     excluded=[item for item in outcomes if item.get("excluded")]
-    return {"imported":len(results),"results":results,"errors":errors,"excluded":excluded}
+    import_jobs[job_id]["status"]="completed"
+    import_jobs[job_id]["finished_at"]=now()
+    import_jobs[job_id]["stats"]["imported"]=len(results)
+    return {"job_id":job_id,"imported":len(results),"results":results,"errors":errors,"excluded":excluded}
 
 
 
@@ -1682,22 +1701,107 @@ def get_job(jobid:str):
     return jobs[jobid]
 
 @app.get("/api/documents")
-def list_documents(q:str="",limit:int=200):
+def list_documents(q:str="",limit:int=200,format:str=""):
     c=connect()
+    capped=min(max(limit,1),500)
     if q.strip():
         try:
-            rows=c.execute("SELECT d.id,d.filename,d.title,d.url,d.bytes,d.pages,d.sha256,d.discovered_at FROM document_fts f JOIN documents d ON d.id=f.id WHERE document_fts MATCH ? ORDER BY rank LIMIT ?",(q, min(max(limit,1),500))).fetchall()
+            rows=c.execute(
+                "SELECT d.id,d.filename,d.title,d.url,d.bytes,d.pages,d.sha256,d.discovered_at "
+                "FROM document_fts_linguistic f JOIN documents d ON d.id=f.id "
+                "WHERE document_fts_linguistic MATCH ? ORDER BY rank LIMIT ?",
+                (q,capped*3)
+            ).fetchall()
         except sqlite3.OperationalError:
-            rows=c.execute("SELECT id,filename,title,url,bytes,pages,sha256,discovered_at FROM documents WHERE filename LIKE ? OR title LIKE ? OR text LIKE ? ORDER BY discovered_at DESC LIMIT ?",(f"%{q}%",f"%{q}%",f"%{q}%",min(max(limit,1),500))).fetchall()
+            rows=c.execute(
+                "SELECT id,filename,title,url,bytes,pages,sha256,discovered_at FROM documents "
+                "WHERE filename LIKE ? OR title LIKE ? OR text LIKE ? ORDER BY discovered_at DESC LIMIT ?",
+                (f"%{q}%",f"%{q}%",f"%{q}%",capped*3)
+            ).fetchall()
     else:
-        rows=c.execute("SELECT id,filename,title,url,bytes,pages,sha256,discovered_at FROM documents ORDER BY discovered_at DESC LIMIT ?",(min(max(limit,1),500),)).fetchall()
-    c.close(); return [dict(x) for x in rows]
+        rows=c.execute(
+            "SELECT id,filename,title,url,bytes,pages,sha256,discovered_at FROM documents ORDER BY discovered_at DESC LIMIT ?",
+            (capped*3,)
+        ).fetchall()
+    c.close()
+    output=[]
+    for row in rows:
+        item=dict(row)
+        item["format"]=Path(item["filename"]).suffix.lower().lstrip(".") or "unknown"
+        item["mime"]=mimetypes.guess_type(item["filename"])[0] or "application/octet-stream"
+        item["indexed"]=True
+        if format and item["format"]!=format.lower().lstrip("."):
+            continue
+        output.append(item)
+        if len(output)>=capped:break
+    return output
+
+
+def document_row(docid):
+    c=connect()
+    row=c.execute("SELECT id,path,filename,title,url,bytes,pages,sha256,discovered_at,text FROM documents WHERE id=?",(docid,)).fetchone()
+    c.close()
+    if not row or not Path(row["path"]).is_file():
+        raise HTTPException(404,"Document not found")
+    return dict(row)
+
+
+@app.get("/api/documents/{docid}/content")
+def document_content(docid:str):
+    row=document_row(docid)
+    ext=Path(row["filename"]).suffix.lower().lstrip(".")
+    return {
+        "id":row["id"],"filename":row["filename"],"title":row["title"],
+        "url":row["url"],"bytes":row["bytes"],"pages":row["pages"],
+        "sha256":row["sha256"],"discovered_at":row["discovered_at"],
+        "format":ext,"mime":mimetypes.guess_type(row["filename"])[0] or "application/octet-stream",
+        "text":(row["text"] or "")[:2_000_000],
+        "truncated":len(row["text"] or "")>2_000_000,
+    }
+
 
 @app.get("/api/documents/{docid}/download")
 def download_document(docid:str):
-    c=connect(); row=c.execute("SELECT path,filename FROM documents WHERE id=?",(docid,)).fetchone(); c.close()
-    if not row or not Path(row["path"]).is_file(): raise HTTPException(404,"Document not found")
-    return FileResponse(row["path"],media_type="application/pdf",filename=row["filename"])
+    row=document_row(docid)
+    mime=mimetypes.guess_type(row["filename"])[0] or "application/octet-stream"
+    return FileResponse(row["path"],media_type=mime,filename=row["filename"])
+
+
+@app.get("/api/documents/{docid}/view")
+def view_document(docid:str):
+    row=document_row(docid)
+    mime=mimetypes.guess_type(row["filename"])[0] or "application/octet-stream"
+    return FileResponse(
+        row["path"],media_type=mime,
+        headers={"Content-Disposition":f'inline; filename="{row["filename"]}"'}
+    )
+
+
+@app.get("/api/worker/status")
+def worker_status():
+    c=connect()
+    rows=c.execute("SELECT filename,bytes,discovered_at FROM documents ORDER BY discovered_at DESC LIMIT 5000").fetchall()
+    c.close()
+    formats={}
+    storage_bytes=0
+    for row in rows:
+        ext=Path(row["filename"]).suffix.lower().lstrip(".") or "unknown"
+        formats[ext]=formats.get(ext,0)+1
+        storage_bytes+=int(row["bytes"] or 0)
+    combined=[]
+    for kind,source in (("crawl",jobs),("fuzzer",fuzz_jobs),("import",import_jobs)):
+        for item in source.values():
+            combined.append({**item,"type":kind})
+    combined.sort(key=lambda x:x.get("created_at",""),reverse=True)
+    active=[x for x in combined if x.get("status") in ("queued","running")]
+    return {
+        "ok":True,"service":"Cosmic PDF Lab Worker",
+        "documents":len(rows),"storage_bytes":storage_bytes,
+        "formats":formats,"active_jobs":active[:10],"recent_jobs":combined[:8],
+        "data_dir":str(ROOT),
+        "tools":{"libreoffice":bool(shutil.which("libreoffice") or shutil.which("soffice")),
+                 "ripgrep":bool(shutil.which("rg"))},
+    }
 
 
 @app.post("/api/search")
