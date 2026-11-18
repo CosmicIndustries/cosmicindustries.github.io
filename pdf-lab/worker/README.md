@@ -38,7 +38,7 @@ The worker reports installed tool availability at GET /api/tools. The path fuzze
 
 ## Global wildcard discovery
 
-The interface queries Common Crawl URL indexes, searches Arquivo.pt's full-text PDF index when a keyword/phrase is supplied, then supplements with Arquivo.pt CDX and Internet Archive Wayback CDX when earlier providers are unavailable or return too few candidates, so a search does not need a seed website. Examples:
+The interface queries Arquivo.pt's full-text PDF index first when a keyword/phrase is supplied, then supplements with Common Crawl, Arquivo.pt CDX, and Internet Archive Wayback CDX when the result limit is not met. Without a keyword query, it starts with Common Crawl. URL-only index candidates are explicitly marked as keyword-unverified; the import stage still applies the full local content expression. Examples:
 
 - `*.edu/**/*.pdf`
 - `*.gov/**/budget*.pdf`
