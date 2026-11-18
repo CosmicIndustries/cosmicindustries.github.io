@@ -21,6 +21,12 @@ class PDFLabCoreTests(unittest.TestCase):
     def tearDown(self):
         self.conn.close()
 
+    def test_pdf_candidate_includes_generic_binary_responses(self):
+        self.assertTrue(worker.is_pdf_candidate("https://example.edu/scan.pdf", "text/html"))
+        self.assertTrue(worker.is_pdf_candidate("https://example.edu/download?id=9", "application/pdf"))
+        self.assertTrue(worker.is_pdf_candidate("https://example.edu/download?id=9", "application/octet-stream"))
+        self.assertFalse(worker.is_pdf_candidate("https://example.edu/course", "text/html"))
+
     def test_pdf_signature_detects_real_pdf_header(self):
         self.assertTrue(worker.is_pdf_signature(b"%PDF-1.7\nbinary"))
         self.assertTrue(worker.is_pdf_signature(b"%PDF-1.4" + b"x" * 1016))
