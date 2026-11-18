@@ -2,6 +2,7 @@
 """Local-first, bounded PDF crawler and searchable document catalog."""
 from __future__ import annotations
 import asyncio, hashlib, json, os, re, sqlite3, time, uuid, shutil, subprocess, traceback
+from functools import lru_cache
 from collections import deque
 from datetime import datetime, timezone
 from pathlib import Path
@@ -33,6 +34,8 @@ app.add_middleware(CORSMiddleware, allow_origins=["https://cosmicindustries.gith
 jobs: dict[str, dict] = {}
 job_tasks: dict[str, asyncio.Task] = {}
 robots_cache: dict[str, RobotFileParser] = {}
+robots_locks: dict[str, asyncio.Lock] = {}
+host_validation_cache: dict[str, tuple[float, bool]] = {}
 
 def connect():
     c=sqlite3.connect(DB); c.row_factory=sqlite3.Row
@@ -41,6 +44,17 @@ def connect():
       filename TEXT NOT NULL, title TEXT, path TEXT NOT NULL, bytes INTEGER NOT NULL,
       pages INTEGER, text TEXT NOT NULL, discovered_at TEXT NOT NULL)""")
     c.execute("CREATE VIRTUAL TABLE IF NOT EXISTS document_fts USING fts5(id UNINDEXED, filename, title, url, body)")
+    # Porter stemming and Unicode diacritic folding improve recall for variants such
+    # as fly/flying/flights while keeping the original text unchanged.
+    c.execute("""CREATE VIRTUAL TABLE IF NOT EXISTS document_fts_linguistic
+                 USING fts5(id UNINDEXED, filename, title, url, body,
+                 tokenize='porter unicode61 remove_diacritics 2')""")
+    c.execute("CREATE TABLE IF NOT EXISTS pdf_lab_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+    migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='linguistic_fts_v1'").fetchone()
+    if not migrated:
+        c.execute("""INSERT INTO document_fts_linguistic(id,filename,title,url,body)
+                     SELECT id,filename,title,url,text FROM documents""")
+        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('linguistic_fts_v1','done')")
     c.commit(); return c
 
 def now(): return datetime.now(timezone.utc).isoformat()
@@ -67,17 +81,22 @@ def valid_http(url):
     p=urlparse(url)
     if p.scheme not in ("http","https") or not p.hostname: return False
     if p.username or p.password: return False
-    # Refuse localhost/private literal IP targets to reduce accidental SSRF.
     import ipaddress, socket
+    host=p.hostname.lower().rstrip(".")
+    cached=host_validation_cache.get(host)
+    if cached and time.monotonic()-cached[0] < 60:
+        return cached[1]
     try:
-        ip=ipaddress.ip_address(p.hostname)
-        if not ip.is_global: return False
+        ip=ipaddress.ip_address(host)
+        safe=ip.is_global
     except ValueError:
         try:
-            for info in socket.getaddrinfo(p.hostname, None):
-                if not ipaddress.ip_address(info[4][0]).is_global: return False
-        except socket.gaierror: return False
-    return True
+            addresses=socket.getaddrinfo(host,None)
+            safe=bool(addresses) and all(ipaddress.ip_address(info[4][0]).is_global for info in addresses)
+        except (socket.gaierror, ValueError):
+            safe=False
+    host_validation_cache[host]=(time.monotonic(),safe)
+    return safe
 
 def domain_allowed(host, root_host, allow, same):
     host=(host or "").lower().rstrip(".")
@@ -93,14 +112,20 @@ async def can_fetch(client, url, respect):
     p=urlparse(url); origin=f"{p.scheme}://{p.netloc}"
     rp=robots_cache.get(origin)
     if rp is None:
-        rp=RobotFileParser(); rp.set_url(origin+"/robots.txt")
-        try:
-            r=await client.get(origin+"/robots.txt", timeout=8, headers={"User-Agent":UA})
-            if r.status_code==200: rp.parse(r.text.splitlines())
-            elif r.status_code in (401,403): rp.parse(["User-agent: *","Disallow: /"])
-            else: rp.parse(["User-agent: *","Allow: /"])
-        except Exception: rp.parse(["User-agent: *","Disallow: /"])
-        robots_cache[origin]=rp
+        lock=robots_locks.setdefault(origin,asyncio.Lock())
+        async with lock:
+            rp=robots_cache.get(origin)
+            if rp is None:
+                rp=RobotFileParser(); rp.set_url(origin+"/robots.txt")
+                try:
+                    r=await client.get(origin+"/robots.txt", timeout=8, headers={"User-Agent":UA})
+                    if r.status_code==200: rp.parse(r.text.splitlines())
+                    elif r.status_code in (401,403): rp.parse(["User-agent: *","Disallow: /"])
+                    else: rp.parse(["User-agent: *","Allow: /"])
+                except Exception:
+                    # Fail closed on robots retrieval errors.
+                    rp.parse(["User-agent: *","Disallow: /"])
+                robots_cache[origin]=rp
     return rp.can_fetch(UA,url)
 
 def filename_matches(name, patterns):
@@ -163,6 +188,7 @@ def store_pdf(url, filename, data, title, text, pages):
     c.execute("INSERT INTO documents VALUES(?,?,?,?,?,?,?,?,?,?)",
       (docid,digest,url,filename,title,str(path),len(data),pages,text,now()))
     c.execute("INSERT INTO document_fts VALUES(?,?,?,?,?)",(docid,filename,title or "",url,text))
+    c.execute("INSERT INTO document_fts_linguistic VALUES(?,?,?,?,?)",(docid,filename,title or "",url,text))
     c.commit(); c.close()
     return docid,True
 
@@ -371,63 +397,116 @@ async def recursive_url_discovery(client, seeds, matcher, req, results, seen, er
             errors.append("recursive "+url+": "+str(e)[:140])
     return pages
 
+def wayback_query_patterns(pattern, mode):
+    """Map supported URL globs/regexes to a bounded Wayback CDX domain/prefix query."""
+    p=pattern.lower()
+    literal=re.search(r"https?://([^/]+)",p)
+    if literal and not any(ch in literal.group(1) for ch in "*?[]"):
+        return [literal.group(1)+"/*"]
+    tld=re.search(r"\.([a-z]{2,})(?:/|$)",p)
+    if not tld:
+        raise ValueError("Wayback fallback needs a recognizable TLD or literal hostname.")
+    return ["*."+tld.group(1)+"/*"]
+
+
+async def wayback_discovery(client, pattern, mode, matcher, max_results, errors):
+    """Retrieve archived URL candidates from Internet Archive CDX; exact-match locally."""
+    endpoint="https://web.archive.org/cdx/search/cdx"
+    queries=wayback_query_patterns(pattern,mode)
+    found=[]; seen=set(); pages_fetched=0
+    for qpattern in queries:
+        try:
+            params=[
+                ("url",qpattern),("output","json"),("fl","timestamp,original,mimetype,statuscode"),
+                ("filter","statuscode:200"),("collapse","urlkey"),("limit",str(min(max_results*3,2000))),
+            ]
+            if re.search(r"\.pdf$",pattern,re.I):
+                params.append(("filter",r"original:.*\.pdf([?#].*)?$"))
+            response=await client.get(endpoint,params=params,timeout=httpx.Timeout(18.0,connect=6.0))
+            response.raise_for_status()
+            pages_fetched+=1
+            payload=response.json()
+            records=[]
+            if isinstance(payload,list) and payload:
+                header=payload[0] if isinstance(payload[0],list) else None
+                if header:
+                    for values in payload[1:]:
+                        if isinstance(values,list):
+                            records.append(dict(zip(header,values)))
+                else:
+                    records=[x for x in payload if isinstance(x,dict)]
+            elif isinstance(payload,dict):
+                records=[payload]
+            for item in records:
+                url=item.get("original") or item.get("url") or ""
+                if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
+                if not matcher.search(url): continue
+                seen.add(url)
+                found.append({
+                    "url":url,"timestamp":item.get("timestamp"),
+                    "mime":item.get("mimetype") or item.get("mime"),
+                    "status":item.get("statuscode") or item.get("status"),
+                    "collection":"wayback-cdx",
+                })
+                if len(found)>=max_results: break
+        except Exception as exc:
+            errors.append("Wayback CDX "+qpattern+": "+type(exc).__name__+": "+str(exc)[:160])
+    return found,pages_fetched
+
+
 @app.post("/api/discover")
 async def discover_wildcard(req: WildcardDiscoveryRequest):
     pattern=req.url_pattern.strip()
     matcher=url_matcher(pattern,req.match_mode)
     query_patterns=cdx_query_candidates(pattern,req.match_mode)
-    async with httpx.AsyncClient(timeout=httpx.Timeout(60.0,connect=12.0),headers={"User-Agent":UA}) as client:
+    results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0
+    pages_crawled=0; page_limit_reached=False
+    providers={"commoncrawl":"not-run","wayback":"not-run"}
+    timeout=httpx.Timeout(22.0,connect=6.0)
+    async with httpx.AsyncClient(timeout=timeout,headers={"User-Agent":UA},limits=httpx.Limits(max_connections=12,max_keepalive_connections=6)) as client:
+        collections=[]
         try:
-            info=await client.get("https://index.commoncrawl.org/collinfo.json")
+            info=await client.get("https://index.commoncrawl.org/collinfo.json",timeout=httpx.Timeout(12.0,connect=5.0))
             info.raise_for_status()
             collection_data=info.json()
             if not isinstance(collection_data,list):
                 raise ValueError("Common Crawl collection list was not a JSON array")
             collections=collection_data[:req.indexes]
-            if not collections:
-                raise ValueError("Common Crawl returned no available indexes")
+            providers["commoncrawl"]="available"
         except Exception as exc:
-            traceback.print_exc()
-            raise HTTPException(502,detail=f"Common Crawl index discovery failed ({type(exc).__name__}): {str(exc)[:220]}")
-        results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0; page_limit_reached=False
+            providers["commoncrawl"]="unavailable"
+            errors.append("Common Crawl collection list: "+type(exc).__name__+": "+str(exc)[:180])
+
         async def cdx_get(endpoint, params):
-            # Common Crawl asks clients to be serial and polite. Retry transient gateway
-            # failures with backoff; never fan out concurrent queries to the public index.
             last_error=None
-            for attempt in range(3):
+            for attempt in range(2):
                 try:
-                    response=await client.get(endpoint,params=params,timeout=60.0)
+                    response=await client.get(endpoint,params=params,timeout=timeout)
                     if response.status_code in (429,500,502,503,504):
                         last_error=RuntimeError("HTTP "+str(response.status_code))
-                        if attempt<2: await asyncio.sleep(2 ** (attempt+1))
+                        if attempt==0: await asyncio.sleep(1.0)
                         continue
                     response.raise_for_status()
                     return response
                 except (httpx.TimeoutException,httpx.TransportError) as exc:
                     last_error=exc
-                    if attempt<2: await asyncio.sleep(2 ** (attempt+1))
-            raise RuntimeError("Common Crawl query failed after retries: "+str(last_error)[:140])
+                    if attempt==0: await asyncio.sleep(1.0)
+            raise RuntimeError("CDX request failed: "+str(last_error)[:140])
+
         for collection in collections:
             endpoint=collection.get("cdx-api")
             if not endpoint: continue
             for query_index,cdx_pattern in enumerate(query_patterns):
                 if len(results)>=req.max_results: break
                 try:
-                    # Ask the ZipNum index how many pages exist, then retrieve pages
-                    # serially. pageSize is compressed index blocks per page, not URL rows.
                     meta=await cdx_get(endpoint,{"url":cdx_pattern,"showNumPages":"true","pageSize":"1","filter":"status:200"})
                     try:
                         page_info=meta.json()
                         total_pages=max(1,int(page_info.get("pages",1)))
                     except Exception:
                         total_pages=1
-                    # Bound work per pattern/index. User's max_results is the output cap;
-                    # page traversal lets us move past the first block instead of silently
-                    # stopping at the first 300 records.
                     page_cap=min(total_pages,50)
-                    # One-second spacing also applies between the metadata request
-                    # and the first data page.
-                    await asyncio.sleep(1.0)
+                    await asyncio.sleep(0.5)
                     for page_no in range(page_cap):
                         if len(results)>=req.max_results: break
                         params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey",
@@ -443,23 +522,55 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                             if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
                             if not matcher.search(url): continue
                             seen.add(url)
-                            results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
+                            results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),
+                                            "status":item.get("status"),"collection":collection.get("id")})
                             if len(results)>=req.max_results: break
-                        # Respect the public index service's request-rate guidance.
                         if page_no+1<page_cap and len(results)<req.max_results:
-                            await asyncio.sleep(1.0)
-                    if total_pages>50 and len(results)<req.max_results:
-                        page_limit_reached=True
-                except Exception as e:
-                    errors.append(collection.get("id","index")+" "+cdx_pattern+": "+str(e)[:180])
-                # The public CDX service requests serial, rate-limited use.
+                            await asyncio.sleep(0.5)
+                    if total_pages>50 and len(results)<req.max_results: page_limit_reached=True
+                except Exception as exc:
+                    errors.append("Common Crawl "+str(collection.get("id","index"))+" "+cdx_pattern+": "+type(exc).__name__+": "+str(exc)[:160])
                 if query_index+1<len(query_patterns) and len(results)<req.max_results:
-                    await asyncio.sleep(1.0)
+                    await asyncio.sleep(0.5)
             if len(results)>=req.max_results: break
-        pages_crawled=0
+
+        if results:
+            providers["commoncrawl"]="results" if providers["commoncrawl"]=="available" else providers["commoncrawl"]
+        # Use Wayback as an independent fallback when Common Crawl is unavailable,
+        # failed, or did not find enough candidates.
+        if len(results)<req.max_results:
+            wayback_results,wayback_pages=await wayback_discovery(
+                client,pattern,req.match_mode,matcher,req.max_results-len(results),errors
+            )
+            pages_fetched+=wayback_pages
+            for item in wayback_results:
+                if item["url"] not in seen:
+                    seen.add(item["url"]); results.append(item)
+            providers["wayback"]="results" if wayback_results else ("empty" if wayback_pages else "unavailable")
+
         if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
+            before=len(results)
             pages_crawled=await recursive_url_discovery(client,[x["url"] for x in results],matcher,req,results,seen,errors)
-    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,"queries_succeeded":queried,"pages_fetched":pages_fetched,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"partial":bool(errors) or page_limit_reached,"page_limit_reached":page_limit_reached,"source":"Paginated Common Crawl CDX URL index + bounded live recursive crawl" if req.recursive else "Paginated Common Crawl CDX URL index; captures may be historical"}
+            if len(results)>before: providers["live-recursive"]="results"
+            else: providers["live-recursive"]="empty"
+
+    # Stable, relevance-aware ordering: direct PDF MIME/extension first, then newest capture.
+    def result_key(item):
+        is_pdf=(str(item.get("mime") or "").lower()=="application/pdf" or
+                urlparse(item["url"]).path.lower().endswith(".pdf"))
+        stamp=str(item.get("timestamp") or "")
+        return (0 if is_pdf else 1, 0 if item.get("collection")=="commoncrawl" else 1, tuple(-ord(ch) for ch in stamp), item["url"].casefold())
+    results.sort(key=result_key)
+    source_names=[name for name,state in providers.items() if state=="results"]
+    return {
+        "pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,
+        "queries_succeeded":queried,"pages_fetched":pages_fetched,"results":results,"count":len(results),
+        "indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,
+        "providers":providers,"degraded":bool(errors),"partial":bool(errors) or page_limit_reached,
+        "page_limit_reached":page_limit_reached,
+        "source":" + ".join(source_names) if source_names else "No external index returned results; local tools remain available",
+    }
+
 @app.post("/api/import-urls")
 async def import_discovered_urls(req: ImportURLsRequest):
     results=[]; errors=[]
@@ -511,6 +622,15 @@ class PathDiscoveryRequest(BaseModel):
     timeout: float = Field(default=8, ge=2, le=30)
     respect_robots: bool = True
 
+class IndexedFuzzRequest(BaseModel):
+    seed_urls: list[str] = Field(default_factory=list, max_length=500)
+    paths: list[str] = Field(default_factory=list, max_length=1000)
+    extensions: list[str] = Field(default_factory=lambda:["pdf"])
+    concurrency: int = Field(default=24, ge=1, le=40)
+    timeout: float = Field(default=8, ge=2, le=30)
+    max_probes: int = Field(default=5000, ge=1, le=8000)
+    respect_robots: bool = True
+
 DEFAULT_PATHS = [
  "","files/","docs/","documents/","downloads/","publications/","reports/","research/",
  "resources/","manuals/","technical/","technical-reports/","archive/","archives/",
@@ -526,9 +646,76 @@ def tool_inventory():
     return {"tools":[{"name":name,"available":shutil.which(name) is not None,"path":shutil.which(name)} for name in DISCOVERY_TOOLS],
             "native_engines":["Common Crawl CDX","bounded async path probe","HTML link crawler","PDF text regex grep","SQLite FTS5"]}
 
-@app.post("/api/grep")
-def intelligent_grep(req: GrepRequest):
+
+@lru_cache(maxsize=32)
+def cached_pdf_page_lines(path,mtime_ns,size):
+    reader=PdfReader(path,strict=False)
+    records=[]
+    for page_no,page in enumerate(reader.pages,1):
+        page_text=page.extract_text() or ""
+        for line_no,line in enumerate(page_text.splitlines(),1):
+            if line.strip():
+                records.append((page_no,line_no,line[:4000]))
+    return tuple(records)
+
+
+def grep_one_document(row,req,rx,rg):
     import fnmatch
+    if not fnmatch.fnmatch(row["filename"].lower(),req.filename_pattern.lower()): return None
+    try:
+        stat=Path(row["path"]).stat()
+        records=cached_pdf_page_lines(row["path"],stat.st_mtime_ns,stat.st_size)
+    except Exception:
+        return None
+    if not records: return None
+    hit_indexes=[]; engine="Python regex fallback"
+    if rg:
+        payload="".join(f"{page}\t{line}\t{text}\n" for page,line,text in records)
+        cmd=[rg,"--json","--line-number","--color","never","--text"]
+        if not req.regex: cmd.append("--fixed-strings")
+        if not req.case_sensitive: cmd.append("--ignore-case")
+        if req.whole_word: cmd.append("--word-regexp")
+        cmd.extend(["-e",req.pattern,"-"])
+        try:
+            proc=subprocess.run(cmd,input=payload,text=True,capture_output=True,timeout=20,check=False)
+            if proc.returncode not in (0,1):
+                raise RuntimeError(proc.stderr.strip() or f"rg exited {proc.returncode}")
+            for raw in proc.stdout.splitlines():
+                try:
+                    event=json.loads(raw)
+                    if event.get("type")!="match": continue
+                    n=event.get("data",{}).get("line_number")
+                    if n and 1<=n<=len(records): hit_indexes.append(n-1)
+                except (ValueError,TypeError):
+                    continue
+            engine="ripgrep"
+        except (OSError,subprocess.SubprocessError,RuntimeError):
+            hit_indexes=[i for i,x in enumerate(records) if rx.search(x[2])]
+    else:
+        hit_indexes=[i for i,x in enumerate(records) if rx.search(x[2])]
+    if not hit_indexes: return None
+
+    snippets=[]; used=set(); matched_pages=set()
+    for idx in hit_indexes:
+        page_no,line_no,_=records[idx]
+        matched_pages.add(page_no)
+        lo=max(0,idx-req.context_lines); hi=min(len(records),idx+req.context_lines+1)
+        # Do not let snippets cross PDF page boundaries.
+        while lo<idx and records[lo][0]!=page_no: lo+=1
+        while hi>idx+1 and records[hi-1][0]!=page_no: hi-=1
+        if any(k in used for k in range(lo,hi)): continue
+        used.update(range(lo,hi))
+        snippets.append({"page":page_no,"line":line_no,
+            "text":"\n".join(f"{records[k][1]}: {records[k][2][:500]}" for k in range(lo,hi))})
+        if len(snippets)>=12: break
+    return {
+        "id":row["id"],"filename":row["filename"],"title":row["title"],"url":row["url"],
+        "hit_count":len(hit_indexes),"pages":sorted(matched_pages),"snippets":snippets,"engine":engine,
+    }
+
+
+@app.post("/api/grep")
+async def intelligent_grep(req: GrepRequest):
     if not req.pattern.strip(): raise HTTPException(400,"Enter a grep expression.")
     try:
         flags=0 if req.case_sensitive else re.IGNORECASE
@@ -537,69 +724,20 @@ def intelligent_grep(req: GrepRequest):
         rx=re.compile(expression,flags)
     except re.error as e: raise HTTPException(400,"Invalid regular expression: "+str(e))
     c=connect()
-    rows=c.execute("SELECT id,filename,title,url,path FROM documents ORDER BY discovered_at DESC").fetchall()
+    rows=[dict(x) for x in c.execute("SELECT id,filename,title,url,path FROM documents ORDER BY discovered_at DESC").fetchall()]
     c.close()
     rg=shutil.which("rg")
-    results=[]
-    for row in rows:
-        if not fnmatch.fnmatch(row["filename"].lower(),req.filename_pattern.lower()): continue
-        try:
-            reader=PdfReader(row["path"],strict=False)
-            records=[]
-            for page_no,page in enumerate(reader.pages,1):
-                page_text=page.extract_text() or ""
-                for line_no,line in enumerate(page_text.splitlines(),1):
-                    records.append({"page":page_no,"line":line_no,"text":line[:4000]})
-        except Exception:
-            continue
-        if not records: continue
-        hit_indexes=[]
-        if rg:
-            # Feed page-tagged extracted text to ripgrep over stdin. This keeps rg's
-            # regex engine while preserving an exact PDF page/line mapping.
-            payload="".join(f"{x['page']}\t{x['line']}\t{x['text']}\n" for x in records)
-            cmd=[rg,"--json","--line-number","--color","never"]
-            if not req.regex: cmd.append("--fixed-strings")
-            if not req.case_sensitive: cmd.append("--ignore-case")
-            if req.whole_word: cmd.append("--word-regexp")
-            cmd.extend(["-e",req.pattern,"-"])
-            try:
-                proc=subprocess.run(cmd,input=payload,text=True,capture_output=True,timeout=20,check=False)
-                if proc.returncode not in (0,1):
-                    raise RuntimeError(proc.stderr.strip() or f"rg exited {proc.returncode}")
-                for raw in proc.stdout.splitlines():
-                    try:
-                        event=json.loads(raw)
-                        if event.get("type")!="match": continue
-                        n=event.get("data",{}).get("line_number")
-                        if n and 1<=n<=len(records): hit_indexes.append(n-1)
-                    except (ValueError,TypeError):
-                        continue
-                engine="ripgrep" 
-            except (OSError,subprocess.SubprocessError,RuntimeError):
-                hit_indexes=[i for i,x in enumerate(records) if rx.search(x["text"])]
-                engine="Python regex fallback"
-        else:
-            hit_indexes=[i for i,x in enumerate(records) if rx.search(x["text"])]
-            engine="Python regex fallback (ripgrep not installed)"
-        if not hit_indexes: continue
-        snippets=[]; used=set(); matched_pages=[]
-        for idx in hit_indexes:
-            hit=records[idx]
-            if hit["page"] not in matched_pages: matched_pages.append(hit["page"])
-            lo=max(0,idx-req.context_lines); hi=min(len(records),idx+req.context_lines+1)
-            # Do not let context bleed across PDF page boundaries.
-            lo=max(lo,next((k for k in range(idx,-1,-1) if records[k]["page"]!=hit["page"]),-1)+1)
-            hi=min(hi,next((k for k in range(idx+1,len(records)) if records[k]["page"]!=hit["page"]),len(records)))
-            if any(k in used for k in range(lo,hi)): continue
-            used.update(range(lo,hi))
-            snippets.append({"page":hit["page"],"line":hit["line"],
-                "text":"\n".join(f"{records[k]['line']}: {records[k]['text'][:500]}" for k in range(lo,hi))})
-            if len(snippets)>=12: break
-        results.append({"id":row["id"],"filename":row["filename"],"title":row["title"],"url":row["url"],
-            "hit_count":len(hit_indexes),"pages":matched_pages,"snippets":snippets,"engine":engine})
-        if len(results)>=req.limit: break
-    return {"count":len(results),"results":results,"engine":"ripgrep with page-aware PDF extraction" if rg else "Python regex fallback; install ripgrep for faster search"}
+    sem=asyncio.Semaphore(4)
+    async def search_one(row):
+        async with sem:
+            return await asyncio.to_thread(grep_one_document,row,req,rx,rg)
+    searched=await asyncio.gather(*(search_one(row) for row in rows))
+    results=[x for x in searched if x]
+    # Deterministic relevance order: more hits first, then earlier hit pages, then title.
+    results.sort(key=lambda x:(-x["hit_count"],x["pages"][0] if x["pages"] else 10**9,x["filename"].casefold()))
+    results=results[:req.limit]
+    return {"count":len(results),"results":results,
+            "engine":"concurrent ripgrep with memoized page-aware PDF extraction" if rg else "concurrent Python regex with memoized page-aware PDF extraction"}
 
 @app.post("/api/discover-paths")
 async def discover_paths(req: PathDiscoveryRequest):
@@ -637,6 +775,112 @@ async def discover_paths(req: PathDiscoveryRequest):
     found.sort(key=lambda x:(0 if x["url"].lower().endswith(".pdf") else 1,x["status"],x["url"]))
     return {"base_url":base,"tested":len(candidates),"count":len(found),"results":found,"errors":errors[:30],
             "engine":"bounded native ffuf-style wordlist probe","available_external_tools":tool_inventory()["tools"]}
+
+
+@app.post("/api/fuzz-indexes")
+async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
+    """Feed index-discovered URLs into a bounded, concurrent same-origin path fuzzer."""
+    if not req.seed_urls:
+        raise HTTPException(400,"Supply URL candidates from an index search first.")
+    origins={}
+    invalid=0
+    for seed in req.seed_urls:
+        seed=seed.strip()
+        if not valid_http(seed):
+            invalid+=1; continue
+        parsed=urlparse(seed)
+        origin=f"{parsed.scheme}://{parsed.netloc}"
+        origins.setdefault(origin,[]).append(seed)
+    if not origins:
+        raise HTTPException(400,"No valid public HTTP(S) index URLs were supplied.")
+
+    word_paths=req.paths or DEFAULT_PATHS
+    extensions=[x.lower().lstrip(".") for x in req.extensions if re.fullmatch(r"[A-Za-z0-9]{1,8}",x.lstrip("."))]
+    clean_paths=[]
+    for raw in word_paths:
+        p=raw.strip().replace("\\","/").lstrip("/")
+        if not p or "://" in p or any(part==".." for part in p.split("/")) or p.startswith("?"):
+            continue
+        clean_paths.append(p)
+        if not Path(p).suffix:
+            clean_paths.extend(p+"."+ext for ext in extensions)
+    clean_paths=list(dict.fromkeys(clean_paths))[:1500]
+
+    jobs=[]; seen=set()
+    # Index URLs contribute both the host and their existing directory hierarchy.
+    for origin,seeds in origins.items():
+        directories={"/"}
+        for seed in seeds:
+            parts=[x for x in urlparse(seed).path.split("/") if x]
+            # Treat the final segment as a filename when it has a suffix.
+            if parts and "." in parts[-1]: parts=parts[:-1]
+            prefix=[]
+            for part in parts:
+                prefix.append(part)
+                directories.add("/"+"/".join(prefix)+"/")
+        # Search known directories before the domain root, then common root paths.
+        ordered_dirs=sorted(directories,key=lambda x:(0 if x!="/" else 1,x.count("/"),x))
+        for directory in ordered_dirs:
+            for path in clean_paths:
+                url=origin+directory+path
+                if url not in seen:
+                    seen.add(url); jobs.append((url,origin,seeds[0]))
+                if len(jobs)>=req.max_probes: break
+            if len(jobs)>=req.max_probes: break
+        if len(jobs)>=req.max_probes: break
+
+    sem=asyncio.Semaphore(req.concurrency)
+    found=[]; errors=[]; checked=0
+    async with httpx.AsyncClient(follow_redirects=False,timeout=req.timeout,
+            headers={"User-Agent":UA},limits=httpx.Limits(max_connections=req.concurrency,max_keepalive_connections=req.concurrency)) as client:
+        async def probe(item):
+            nonlocal checked
+            url,origin,seed=item
+            async with sem:
+                if not valid_http(url) or urlparse(url).netloc.lower()!=urlparse(origin).netloc.lower():
+                    return
+                if not await can_fetch(client,url,req.respect_robots):
+                    return
+                try:
+                    response=await client.head(url)
+                    if response.status_code in (405,501):
+                        async with client.stream("GET",url,headers={"Range":"bytes=0-0"}) as streamed:
+                            status=streamed.status_code; headers=streamed.headers
+                    else:
+                        status=response.status_code; headers=response.headers
+                    checked+=1
+                    if status in (200,206,301,302,307,308,401,403):
+                        found.append({
+                            "url":url,"status":status,"content_type":headers.get("content-type",""),
+                            "bytes":headers.get("content-length"),"interesting":status in (401,403),
+                            "seed_url":seed,"host":urlparse(origin).hostname,
+                            "is_pdf":("pdf" in headers.get("content-type","").lower() or urlparse(url).path.lower().endswith(".pdf")),
+                        })
+                except Exception as exc:
+                    errors.append({"url":url,"error":str(exc)[:120]})
+        # Fixed-size worker set avoids creating thousands of pending asyncio tasks.
+        queue=asyncio.Queue()
+        for item in jobs: queue.put_nowait(item)
+        async def worker():
+            while True:
+                try: item=queue.get_nowait()
+                except asyncio.QueueEmpty: return
+                try: await probe(item)
+                finally: queue.task_done()
+        await asyncio.gather(*(worker() for _ in range(min(req.concurrency,len(jobs)))))
+    found.sort(key=lambda x:(
+        0 if x["is_pdf"] else 1,
+        0 if x["status"] in (200,206) else 1,
+        0 if x["interesting"] else 1,
+        x["url"].casefold(),
+    ))
+    return {
+        "hosts_checked":len(origins),"seeds_used":sum(len(v) for v in origins.values()),
+        "invalid_seeds":invalid,"planned":len(jobs),"tested":checked,"count":len(found),
+        "truncated":len(jobs)>=req.max_probes,"results":found,"errors":errors[:40],
+        "engine":"bounded async indexed-host path fuzzer","concurrency":req.concurrency,
+    }
+
 
 @app.get("/api/health")
 def health():
@@ -676,14 +920,45 @@ def download_document(docid:str):
     if not row or not Path(row["path"]).is_file(): raise HTTPException(404,"Document not found")
     return FileResponse(row["path"],media_type="application/pdf",filename=row["filename"])
 
+
 @app.post("/api/search")
 def search_docs(req:SearchRequest):
     c=connect()
-    rows=c.execute("SELECT id,filename,title,url,text FROM documents ORDER BY discovered_at DESC").fetchall()
-    c.close(); results=[]
-    for row in rows:
-        if query_matches(row["text"],req.query):
-            lines=[x.strip() for x in row["text"].splitlines() if x.strip() and query_matches(x,req.query)]
-            results.append({"id":row["id"],"filename":row["filename"],"title":row["title"],"url":row["url"],"snippets":lines[:8]})
-            if len(results)>=req.limit: break
-    return results
+    query=req.query.strip()
+    try:
+        if not query:
+            rows=c.execute("""SELECT id,filename,title,url,bytes,pages,discovered_at
+                              FROM documents ORDER BY discovered_at DESC LIMIT ?""",(req.limit,)).fetchall()
+            out=[{**dict(row),"score":0.0,"snippets":[]} for row in rows]
+        else:
+            rows=c.execute("""
+                SELECT d.id,d.filename,d.title,d.url,d.bytes,d.pages,d.discovered_at,
+                       bm25(document_fts_linguistic,0.0,5.0,2.0,0.25,1.0) AS rank,
+                       snippet(document_fts_linguistic,4,'[',']',' … ',18) AS excerpt
+                FROM document_fts_linguistic
+                JOIN documents d ON d.id=document_fts_linguistic.id
+                WHERE document_fts_linguistic MATCH ?
+                ORDER BY rank ASC, d.filename COLLATE NOCASE ASC
+                LIMIT ?
+            """,(query,req.limit)).fetchall()
+            out=[{**{k:row[k] for k in ("id","filename","title","url","bytes","pages","discovered_at")},
+                  "score":float(-row["rank"]),"snippets":[row["excerpt"]] if row["excerpt"] else []} for row in rows]
+    except sqlite3.OperationalError:
+        # Retain tolerant literal/boolean matching if a user enters non-FTS syntax.
+        c.close()
+        c=connect()
+        rows=c.execute("SELECT id,filename,title,url,bytes,pages,discovered_at,text FROM documents ORDER BY discovered_at DESC").fetchall()
+        tokens=[t for t in re.findall(r"[\w'-]+",query.casefold()) if t not in {"and","or","not"}]
+        fallback=[]
+        for row in rows:
+            body=(row["text"] or "").casefold()
+            if query_matches(body,query):
+                score=sum(body.count(t) for t in tokens)
+                fallback.append((score,row))
+        fallback.sort(key=lambda item:(-item[0],item[1]["filename"].casefold()))
+        out=[{**{k:row[k] for k in ("id","filename","title","url","bytes","pages","discovered_at")},
+              "score":float(score),"snippets":[line[:500] for line in (row["text"] or "").splitlines() if query_matches(line,query)][:8]}
+             for score,row in fallback[:req.limit]]
+    c.close()
+    return out
+
