@@ -281,7 +281,7 @@ def _xml_paragraph_text(xml_bytes):
     root=ET.fromstring(xml_bytes)
     output=[]
     for paragraph in root.iter():
-        if paragraph.tag.rsplit("}",1)[-1] not in ("p","si","is"):
+        if paragraph.tag.rsplit("}",1)[-1] not in ("p","h","si","is"):
             continue
         parts=[node.text or "" for node in paragraph.iter()
                if node.tag.rsplit("}",1)[-1] in ("t","tab")]
@@ -308,8 +308,8 @@ def _extract_ooxml(data, ext):
                 raise ValueError("Presentation contains no readable slides.")
             for number,name in enumerate(slide_names,1):
                 paragraphs=_xml_paragraph_text(archive.read(name))
-                text="\\n".join(paragraphs)
-                lines.append(f"[Slide {number}]\\n{text}")
+                text="\n".join(paragraphs)
+                lines.append(f"[Slide {number}]\n{text}")
                 page_records.append({"page":number,"line":1,"text":text[:500]})
         elif ext=="docx":
             if "word/document.xml" not in names:
@@ -345,8 +345,8 @@ def _extract_ooxml(data, ext):
                                           if x.tag.rsplit("}",1)[-1]=="t")
                         if value: values.append(value)
                     if values: rows.append(" | ".join(values))
-                text="\\n".join(rows)
-                lines.append(f"[Sheet {number}]\\n{text}")
+                text="\n".join(rows)
+                lines.append(f"[Sheet {number}]\n{text}")
                 page_records.append({"page":number,"line":1,"text":text[:500]})
         else:
             if "content.xml" not in names:
@@ -1796,7 +1796,13 @@ def worker_status():
     combined=[]
     for kind,source in (("crawl",jobs),("fuzzer",fuzz_jobs),("import",import_jobs)):
         for item in source.values():
-            combined.append({**item,"type":kind})
+            combined.append({
+                "id":item.get("id"),"type":kind,"status":item.get("status"),
+                "created_at":item.get("created_at"),"started_at":item.get("started_at"),
+                "finished_at":item.get("finished_at"),"stats":item.get("stats",{}),
+                "config":item.get("config",{}) if kind=="crawl" else {},
+                "error":item.get("error"),
+            })
     combined.sort(key=lambda x:x.get("created_at",""),reverse=True)
     active=[x for x in combined if x.get("status") in ("queued","running")]
     return {
