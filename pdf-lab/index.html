@@ -18,6 +18,13 @@
 <div class="field"><label for="domain">Optional domain scope</label><input id="domain" placeholder="example.gov (leave blank for web-wide search)"></div>
 <div class="field"><label for="engine">Search provider</label><select id="engine"><option value="google">Google</option><option value="bing">Bing</option><option value="ddg">DuckDuckGo</option></select></div>
 </div><div class="actions"><button class="primary" id="searchPdf">Search PDF documents</button><button id="searchAny">Search broader document references</button></div><p class="hint">Opens a search-engine query in a new tab. Try variants such as annual report, technical manual, dataset, assessment, or presentation.</p></section>
+<section class="panel"><div class="split"><h2>02 / Global URL wildcard discovery</h2><span class="pill">COMMON CRAWL INDEX</span></div>
+<p class="hint">Search indexed captures across unrelated domains. This does not require a starting website. Common Crawl is historical and coverage is not exhaustive.</p>
+<div class="field"><label for="globalPattern">Full URL wildcard</label><input id="globalPattern" value="*.edu/**/*.pdf" spellcheck="false"><span class="hint">Examples: *.edu/**/*.pdf · *.gov/**/budget*.pdf · *.org/**/*manual*.pdf</span></div>
+<div class="grid"><div class="field"><label for="globalLimit">Maximum URL results</label><input id="globalLimit" type="number" min="1" max="2000" value="200"></div><div class="field"><label for="globalIndexes">Recent Common Crawl indexes to query</label><input id="globalIndexes" type="number" min="1" max="5" value="2"></div></div>
+<div class="actions"><button class="primary" id="discoverGlobal">Discover matching URLs</button><button id="selectAllGlobal">Select all results</button><button id="importGlobal">Fetch, inspect &amp; store selected PDFs</button></div>
+<div id="globalStatus" class="hint" role="status"></div><div id="globalResults"></div>
+</section>
 <section class="panel"><div class="split"><h2>02 / Recursive crawler &amp; content search</h2><span class="pill">LOCAL WORKER REQUIRED</span></div>
 <div class="field"><label for="apiBase">Worker API address</label><input id="apiBase" value="http://127.0.0.1:8787" spellcheck="false"></div>
 <div class="field"><label for="startUrl">Starting URL</label><input id="startUrl" type="url" placeholder="https://example.gov/reports/"></div>
@@ -73,6 +80,12 @@ async function render(){const items=await all(),f=$('filter').value.toLowerCase(
 function format(n){if(!n)return '0 B';const u=['B','KB','MB','GB'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return n.toFixed(1)+' '+u[i]}
 
 // Local worker integration. The worker stores files on the machine running it.
+
+let globalMatches=[];
+$('discoverGlobal').onclick=async()=>{const pattern=$('globalPattern').value.trim();if(!pattern){$('globalStatus').textContent='Enter a URL wildcard pattern.';return} $('globalStatus').textContent='Querying public URL indexes…';$('globalResults').replaceChildren();try{const data=await api('/api/discover',{method:'POST',body:JSON.stringify({url_pattern:pattern,max_results:Number($('globalLimit').value),indexes:Number($('globalIndexes').value)})});globalMatches=data.results||[];$('globalStatus').textContent='Found '+data.count+' URL matches using index pattern '+data.cdx_pattern+'. Historical captures may no longer be live.';for(let i=0;i<globalMatches.length;i++){const item=globalMatches[i],row=document.createElement('label');row.className='result';const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;cb.dataset.index=String(i);cb.style.width='auto';const txt=document.createElement('span');txt.textContent=item.url+' · '+(item.collection||'Common Crawl');row.append(cb,txt);$('globalResults').append(row)}}catch(e){$('globalStatus').textContent='Discovery failed: '+e.message}};
+$('selectAllGlobal').onclick=()=>{$('globalResults').querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=true)};
+$('importGlobal').onclick=async()=>{const selected=[...$('globalResults').querySelectorAll('input[type=checkbox]:checked')].map(x=>globalMatches[Number(x.dataset.index)]?.url).filter(Boolean);if(!selected.length){$('globalStatus').textContent='Select at least one discovered URL.';return} $('globalStatus').textContent='Fetching and inspecting '+selected.length+' PDFs…';try{const data=await api('/api/import-urls',{method:'POST',body:JSON.stringify({urls:selected,filename_patterns:$('patterns').value.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean),content_query:$('contentQuery').value.trim(),respect_robots:$('respectRobots').checked,max_bytes:Number($('maxBytes').value)*1024*1024})});$('globalStatus').textContent='Stored '+data.imported+' matching PDFs. '+data.errors.length+' URL errors or exclusions.';const root=$('globalResults');for(const item of data.results){const p=document.createElement('p');p.className='hint';p.textContent=(item.new?'STORED · ':'ALREADY STORED · ')+item.filename+' · '+item.pages+' pages';root.append(p)}$('refreshDocs').onclick()}catch(e){$('globalStatus').textContent='Import failed: '+e.message}};
+
 const apiBase=()=>($('apiBase').value.trim().replace(/\/$/,'')||'http://127.0.0.1:8787');
 $('apiBase').value=localStorage.getItem('pdfLabApi')||'http://127.0.0.1:8787';
 $('apiBase').onchange=()=>localStorage.setItem('pdfLabApi',apiBase());
