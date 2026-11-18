@@ -58,12 +58,20 @@ def derive_document_metadata(url, filename, title, text=""):
     title_text=str(title or "").strip()
     filename_text=Path(filename).stem
     raw=(title_text+" "+filename_text).strip() if title_text else filename_text
+    # Version identifiers are often printed on the cover/title page but absent
+    # from archive metadata and filenames. Scan only the opening text, where
+    # edition/year/chapter identifiers are most likely to be authoritative.
+    version_text=raw+" "+re.sub(r"\s+"," ",(text or "")[:3500])
     series_source=title_text or filename_text
     year_match=re.search(r"(?<!\d)(?:19|20)\d{2}(?!\d)",raw)
+    if not year_match:
+        year_match=re.search(r"(?<!\d)(?:19|20)\d{2}(?!\d)",version_text)
     year=int(year_match.group(0)) if year_match else None
 
     def find_unit(label):
         match=re.search(rf"\b(?:{label})\s*[-_.:#]?\s*(\d{{1,3}}|[ivxlcdm]+)\b",raw,re.I)
+        if not match:
+            match=re.search(rf"\b(?:{label})\s*[-_.:#]?\s*(\d{{1,3}}|[ivxlcdm]+)\b",version_text,re.I)
         if not match:return None
         value=match.group(1)
         return int(value) if value.isdigit() else _roman_value(value)
@@ -74,6 +82,11 @@ def derive_document_metadata(url, filename, title, text=""):
         r"\b(?:(\d+(?:st|nd|rd|th)?)\s+edition|edition\s*(\d+)|rev(?:ision)?\s*([A-Z0-9.]+)|v(?:ersion)?\s*([0-9]+(?:\.[0-9]+)*))\b",
         raw,re.I
     )
+    if not edition_match:
+        edition_match=re.search(
+            r"\b(?:(\d+(?:st|nd|rd|th)?)\s+edition|edition\s*(\d+)|rev(?:ision)?\s*([A-Z0-9.]+)|v(?:ersion)?\s*([0-9]+(?:\.[0-9]+)*))\b",
+            version_text,re.I
+        )
     edition=next((x for x in edition_match.groups() if x),None) if edition_match else None
 
     series=re.sub(r"(?<!\d)(?:19|20)\d{2}(?!\d)"," ",series_source)
@@ -211,7 +224,7 @@ def connect():
             if not still_used:
                 try:Path(duplicate_path).unlink(missing_ok=True)
                 except OSError:pass
-    metadata_v3=c.execute("SELECT value FROM pdf_lab_meta WHERE key='document_metadata_v3'").fetchone()
+    metadata_v3=c.execute("SELECT value FROM pdf_lab_meta WHERE key='document_metadata_v4'").fetchone()
     if not metadata_v3:
         duplicate_paths=[]
         rows=c.execute(
@@ -246,7 +259,7 @@ def connect():
                  metadata["year"],metadata["chapter"],metadata["part"],metadata["edition"],
                  metadata["version_label"],duplicate_key)
             )
-        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('document_metadata_v3','done')")
+        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('document_metadata_v4','done')")
         c.commit()
         for duplicate_path in duplicate_paths:
             still_used=c.execute("SELECT 1 FROM documents WHERE path=? LIMIT 1",(duplicate_path,)).fetchone()
