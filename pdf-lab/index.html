@@ -45,7 +45,55 @@ default:throw Error('Unknown search mode.');
 async function poll(id){try{const j=await api('/api/jobs/'+id);showStatus('Crawl '+j.status+' · '+j.stats.pages_visited+' pages · '+j.stats.pdfs_found+' PDFs · '+j.stats.matches+' matches · '+(j.log||[]).slice(-2).join(' / '));render(j.results||[]);if(['queued','running'].includes(j.status))setTimeout(()=>poll(id),1300)}catch(e){showStatus('Crawl status error: '+e.message)}}
 $('run').onclick=runSearch;
 $('selectAll').onclick=()=>document.querySelectorAll('#results input[type=checkbox]').forEach(x=>x.checked=true);
-$('fuzzIndexes').onclick=async()=>{if(!candidates.length){showStatus('Run URL discovery first; index results become fuzzer seeds.');return}const button=$('fuzzIndexes');button.disabled=true;showStatus('Feeding '+candidates.length+' indexed URLs into the host/path fuzzer…');try{const paths=$('wordlist').value.split(/\n+/).map(x=>x.trim()).filter(Boolean);const d=await api('/api/fuzz-indexes',{method:'POST',body:body({seed_urls:candidates.map(x=>x.url),paths,extensions:$('extensions').value.split(',').map(x=>x.trim()).filter(Boolean),concurrency:Number($('concurrency').value)||24,timeout:8,max_probes:5000,respect_robots:$('robots').checked})});pathMatches=d.results||[];const root=$('results');root.replaceChildren();pathMatches.forEach((x,i)=>{const label=document.createElement('label');label.className='result';const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!x.is_pdf;cb.dataset.pathIndex=i;cb.style.width='auto';const span=document.createElement('span');span.textContent=x.status+' · '+x.url+' · '+(x.content_type||'unknown type')+' · seed: '+x.seed_url;label.append(cb,span);root.append(label)});showStatus('Indexed-host fuzzing complete · '+d.hosts_checked+' hosts · '+d.seeds_used+' seeds · '+d.tested+'/'+d.planned+' probes · '+d.count+' paths found'+(d.truncated?' · probe cap reached':'')+(d.errors?.length?' · '+d.errors.slice(0,3).map(x=>x.error).join(' | '):'')+'. PDF results are preselected for import.')}catch(e){showStatus('Indexed-host fuzzing failed: '+e.message)}finally{button.disabled=false}};
+function renderFuzzResults(items){
+ const root=$('results');root.replaceChildren();
+ if(!items.length){root.innerHTML='<div class="empty">The host/path fuzzer completed without finding additional paths. Try another wordlist or use fewer seed hosts.</div>';return}
+ for(const [i,x] of items.entries()){
+  const label=document.createElement('label');label.className='result';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!x.is_pdf;cb.dataset.pathIndex=i;cb.style.width='auto';
+  const span=document.createElement('span');span.textContent=x.status+' · '+x.url+' · '+(x.content_type||'unknown type')+' · seed: '+x.seed_url;
+  label.append(cb,span);root.append(label);
+ }
+}
+async function pollFuzz(jobId){
+ try{
+  const d=await api('/api/fuzz-indexes/'+encodeURIComponent(jobId));
+  const s=d.stats||{};
+  showStatus('Indexed-host fuzzer '+d.status+' · '+(s.finished||0)+'/'+(s.planned||0)+' probes · '+(s.found||0)+' paths found · '+(s.errors||0)+' errors · '+(s.robots_blocked||0)+' robots blocked');
+  if(['queued','running'].includes(d.status)){
+   setTimeout(()=>pollFuzz(jobId),900);return;
+  }
+  if(d.status==='completed'){
+   pathMatches=d.results||[];renderFuzzResults(pathMatches);
+   showStatus('Indexed-host fuzzing complete · '+s.hosts_checked+' hosts · '+s.seeds_used+' seeds · '+s.tested+'/'+s.planned+' requests tested · '+s.found+' paths found · '+s.errors+' errors · '+s.robots_blocked+' robots blocked. PDF results are preselected for import.');
+  }else{
+   showStatus('Indexed-host fuzzer failed: '+(d.error||'unknown worker error'));
+  }
+  $('fuzzIndexes').disabled=false;
+ }catch(e){
+  $('fuzzIndexes').disabled=false;
+  showStatus('Fuzzer progress check failed: '+e.message);
+ }
+}
+$('fuzzIndexes').onclick=async()=>{
+ if(!candidates.length){showStatus('Run URL discovery first; index results become fuzzer seeds.');return}
+ const button=$('fuzzIndexes');button.disabled=true;
+ showStatus('Queueing '+candidates.length+' indexed URLs for host/path fuzzing…');
+ try{
+  const paths=$('wordlist').value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const d=await api('/api/fuzz-indexes',{method:'POST',body:body({
+   seed_urls:candidates.map(x=>x.url),paths,
+   extensions:$('extensions').value.split(',').map(x=>x.trim()).filter(Boolean),
+   concurrency:Number($('concurrency').value)||24,
+   timeout:5,max_probes:800,respect_robots:$('robots').checked
+  })});
+  showStatus('Fuzzer queued · '+d.stats.planned+' probes across '+d.stats.hosts_checked+' hosts…');
+  pollFuzz(d.id);
+ }catch(e){
+  button.disabled=false;
+  showStatus('Indexed-host fuzzing failed: '+e.message);
+ }
+};
 $('import').onclick=async()=>{const urls=[...document.querySelectorAll('#results input[type=checkbox]:checked')].map(x=>x.dataset.pathIndex!==undefined?pathMatches[Number(x.dataset.pathIndex)]?.url:candidates[Number(x.dataset.i)]?.url).filter(Boolean);if(!urls.length){showStatus('Select at least one candidate.');return}showStatus('Fetching '+urls.length+' PDFs…');try{const d=await api('/api/import-urls',{method:'POST',body:body({urls,filename_patterns:patterns(),content_query:$('terms').value.trim(),max_bytes:selectedMaxBytes(),respect_robots:$('robots').checked})});render(d.results||[]);showStatus('Stored '+d.imported+' PDFs; '+d.errors.length+' errors or exclusions.')}catch(e){showStatus('Import failed: '+e.message)}};
 $('refresh').onclick=async()=>{try{const d=await api('/api/documents?limit=500');render(d);showStatus('Catalog loaded · '+d.length+' documents.')}catch(e){showStatus('Catalog unavailable: '+e.message)}};
 fetch(WORKER+'/api/health').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(h=>{workerOnline=true;$('health').textContent='Local worker connected · '+h.documents+' PDFs indexed · '+h.data_dir;return fetch(WORKER+'/api/tools')}).then(r=>r.json()).then(d=>{$('toolInventory').textContent='Local tools detected: '+d.tools.filter(x=>x.available).map(x=>x.name).join(', ')+(d.tools.some(x=>x.available)?'':'none of the optional binaries')+' · native grep/crawler/path engines available'}).catch(()=>$('health').textContent='Local worker offline · browser search modes are available; start the worker at '+WORKER_HINT+'/ for full PDF processing.');setMode();
