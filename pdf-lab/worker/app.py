@@ -211,6 +211,48 @@ def connect():
             if not still_used:
                 try:Path(duplicate_path).unlink(missing_ok=True)
                 except OSError:pass
+    metadata_v3=c.execute("SELECT value FROM pdf_lab_meta WHERE key='document_metadata_v3'").fetchone()
+    if not metadata_v3:
+        duplicate_paths=[]
+        rows=c.execute(
+            "SELECT id,url,filename,title,text,path FROM documents ORDER BY discovered_at ASC"
+        ).fetchall()
+        c.execute("DELETE FROM document_metadata")
+        for row in rows:
+            source_url=canonical_document_url(row["url"])
+            if source_url!=row["url"]:
+                c.execute("UPDATE documents SET url=? WHERE id=?",(source_url,row["id"]))
+                c.execute("UPDATE document_fts SET url=? WHERE id=?",(source_url,row["id"]))
+                c.execute("UPDATE document_fts_linguistic SET url=? WHERE id=?",(source_url,row["id"]))
+            metadata=derive_document_metadata(source_url,row["filename"],row["title"],row["text"])
+            duplicate_key=document_duplicate_key(row["text"],metadata)
+            duplicate=None
+            if duplicate_key:
+                duplicate=c.execute(
+                    "SELECT doc_id FROM document_metadata WHERE duplicate_key=?",
+                    (duplicate_key,)
+                ).fetchone()
+            if duplicate:
+                c.execute("DELETE FROM document_fts WHERE id=?",(row["id"],))
+                c.execute("DELETE FROM document_fts_linguistic WHERE id=?",(row["id"],))
+                c.execute("DELETE FROM documents WHERE id=?",(row["id"],))
+                duplicate_paths.append(row["path"])
+                continue
+            c.execute(
+                "INSERT INTO document_metadata"
+                "(doc_id,domain,series_key,series_title,year,chapter,part,edition,version_label,duplicate_key) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (row["id"],metadata["domain"],metadata["series_key"],metadata["series_title"],
+                 metadata["year"],metadata["chapter"],metadata["part"],metadata["edition"],
+                 metadata["version_label"],duplicate_key)
+            )
+        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('document_metadata_v3','done')")
+        c.commit()
+        for duplicate_path in duplicate_paths:
+            still_used=c.execute("SELECT 1 FROM documents WHERE path=? LIMIT 1",(duplicate_path,)).fetchone()
+            if not still_used:
+                try:Path(duplicate_path).unlink(missing_ok=True)
+                except OSError:pass
     migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='linguistic_fts_v1'").fetchone()
     if not migrated:
         c.execute("""INSERT INTO document_fts_linguistic(id,filename,title,url,body)
