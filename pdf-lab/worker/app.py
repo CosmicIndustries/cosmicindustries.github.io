@@ -245,12 +245,12 @@ class ImportURLsRequest(BaseModel):
     respect_robots: bool = True
 
 def normalize_glob(pattern):
-    return pattern.strip().replace(r"\\*", "*").replace(r"\\?", "?").lower()
+    return pattern.strip().replace(r"\*", "*").replace(r"\?", "?").lower()
 
 def commoncrawl_query_pattern(pattern):
     # CDX is efficient for domain wildcards; the complete glob is applied locally afterward.
     p=normalize_glob(pattern)
-    m=re.search(r"\\.([a-z]{2,})(?:[./*]|$)",p)
+    m=re.search(r"\.([a-z]{2,})(?:[./*]|$)",p)
     if m:
         return "*."+m.group(1)+"/*"
     host=re.search(r"https?://([^/]+)",p)
