@@ -53,7 +53,7 @@ class PDFLabCoreTests(unittest.TestCase):
                 "</w:body></w:document>",
             )
         text, pages, records = worker.extract_document(payload.getvalue(), "systems.docx")
-        self.assertEqual(pages, 1)
+        self.assertIsNone(pages)
         self.assertIn("Aircraft systems", text)
         self.assertIn("Maintenance procedures", text)
         self.assertEqual(len(records), 2)
