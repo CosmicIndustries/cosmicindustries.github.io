@@ -63,6 +63,16 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertIsNone(worker.arquivo_text_query("aviation OR helicopter"))
         self.assertIsNone(worker.arquivo_text_query("aviation NOT obsolete"))
 
+    def test_archive_html_fragments_are_cleaned(self):
+        self.assertEqual(
+            worker.clean_archive_text(
+                'For <em>aviation</em> &amp; flight <span class="ellipsis">systems</span>'
+            ),
+            "For aviation & flight systems",
+        )
+        self.assertEqual(worker.clean_archive_text("<b></b>"), None)
+        self.assertEqual(worker.clean_archive_text(None), None)
+
     def test_arquivo_json_lines_are_normalized(self):
         payload = (
             '{"url":"https://example.edu/report.pdf","timestamp":"20261118010101",'
