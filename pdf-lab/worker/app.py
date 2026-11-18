@@ -134,23 +134,41 @@ def connect():
       doc_id TEXT PRIMARY KEY, domain TEXT, series_key TEXT, series_title TEXT,
       year INTEGER, chapter INTEGER, part INTEGER, edition TEXT,
       version_label TEXT, duplicate_key TEXT UNIQUE)""")
-    metadata_migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='document_metadata_v1'").fetchone()
+    metadata_migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='document_metadata_v2'").fetchone()
     if not metadata_migrated:
-        for row in c.execute("SELECT id,url,filename,title,text FROM documents").fetchall():
+        duplicate_paths=[]
+        for row in c.execute("SELECT id,url,filename,title,text,path FROM documents ORDER BY discovered_at ASC").fetchall():
             metadata=derive_document_metadata(row["url"],row["filename"],row["title"],row["text"])
             duplicate_key=document_duplicate_key(row["text"],metadata)
-            try:
-                c.execute(
-                    "INSERT OR IGNORE INTO document_metadata"
-                    "(doc_id,domain,series_key,series_title,year,chapter,part,edition,version_label,duplicate_key) "
-                    "VALUES(?,?,?,?,?,?,?,?,?,?)",
-                    (row["id"],metadata["domain"],metadata["series_key"],metadata["series_title"],
-                     metadata["year"],metadata["chapter"],metadata["part"],metadata["edition"],
-                     metadata["version_label"],duplicate_key)
-                )
-            except sqlite3.IntegrityError:
-                pass
-        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('document_metadata_v1','done')")
+            duplicate=None
+            if duplicate_key:
+                duplicate=c.execute(
+                    "SELECT doc_id FROM document_metadata WHERE duplicate_key=?",
+                    (duplicate_key,)
+                ).fetchone()
+            if duplicate:
+                # Remove only exact extracted-content/version duplicates. Different
+                # years, chapters, parts or editions have different duplicate keys.
+                c.execute("DELETE FROM document_fts WHERE id=?",(row["id"],))
+                c.execute("DELETE FROM document_fts_linguistic WHERE id=?",(row["id"],))
+                c.execute("DELETE FROM documents WHERE id=?",(row["id"],))
+                duplicate_paths.append(row["path"])
+                continue
+            c.execute(
+                "INSERT OR IGNORE INTO document_metadata"
+                "(doc_id,domain,series_key,series_title,year,chapter,part,edition,version_label,duplicate_key) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (row["id"],metadata["domain"],metadata["series_key"],metadata["series_title"],
+                 metadata["year"],metadata["chapter"],metadata["part"],metadata["edition"],
+                 metadata["version_label"],duplicate_key)
+            )
+        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('document_metadata_v2','done')")
+        c.commit()
+        for duplicate_path in duplicate_paths:
+            still_used=c.execute("SELECT 1 FROM documents WHERE path=? LIMIT 1",(duplicate_path,)).fetchone()
+            if not still_used:
+                try:Path(duplicate_path).unlink(missing_ok=True)
+                except OSError:pass
     migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='linguistic_fts_v1'").fetchone()
     if not migrated:
         c.execute("""INSERT INTO document_fts_linguistic(id,filename,title,url,body)
