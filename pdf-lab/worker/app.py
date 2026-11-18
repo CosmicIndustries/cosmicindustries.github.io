@@ -582,6 +582,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
 @app.post("/api/import-urls")
 async def import_discovered_urls(req: ImportURLsRequest):
     sem=asyncio.Semaphore(6)
+    extract_sem=asyncio.Semaphore(4)
     async with httpx.AsyncClient(follow_redirects=False,timeout=25,
             headers={"User-Agent":UA},limits=httpx.Limits(max_connections=8,max_keepalive_connections=6)) as client:
         async def import_one(url):
@@ -610,7 +611,8 @@ async def import_discovered_urls(req: ImportURLsRequest):
                 if not name.lower().endswith(".pdf"): name+=".pdf"
                 if not filename_matches(name,req.filename_patterns):
                     return None, None
-                body,np,pages=await asyncio.to_thread(extract_pdf,data)
+                async with extract_sem:
+                    body,np,pages=await asyncio.to_thread(extract_pdf,data)
                 if not query_matches(body,req.content_query):
                     return None, None
                 # This synchronous DB/file commit is short and runs on the event loop,
@@ -643,7 +645,7 @@ class PathDiscoveryRequest(BaseModel):
     respect_robots: bool = True
 
 class IndexedFuzzRequest(BaseModel):
-    seed_urls: list[str] = Field(default_factory=list, max_length=500)
+    seed_urls: list[str] = Field(default_factory=list, max_length=2000)
     paths: list[str] = Field(default_factory=list, max_length=1000)
     extensions: list[str] = Field(default_factory=lambda:["pdf"])
     concurrency: int = Field(default=24, ge=1, le=40)
@@ -833,6 +835,7 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
     base_budget,extra_budget=divmod(req.max_probes,len(origin_items))
     for origin_index,(origin,seeds) in enumerate(origin_items):
         host_budget=base_budget+(1 if origin_index<extra_budget else 0)
+        if host_budget<1: continue
         host_added=0
         directories={"/"}
         for seed in seeds:
