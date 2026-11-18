@@ -28,6 +28,15 @@ Then open **http://127.0.0.1:8787/**. The worker serves the interface and API fr
 
 The crawler follows ordinary HTML links and direct PDF URLs. It does not bypass authentication, paywalls, CAPTCHAs, robots exclusions, or access controls. It refuses localhost and non-public IP targets to reduce SSRF risk. JavaScript-only portals may require a rendered crawler such as WebGrep/Katana; this worker intentionally stays lightweight and auditable.
 
+## Intelligent grep and path discovery
+
+The unified search switch includes two additional engines:
+
+- Intelligent grep (POST /api/grep): regular expressions or literal phrases across extracted PDF text; optional case sensitivity, whole-word matching, filename glob, hit counts, and configurable context lines. Results include line-numbered snippets.
+- Directory / wordlist discovery (POST /api/discover-paths): bounded, concurrent, same-host path probing with a built-in starter wordlist or user-supplied paths. It uses HEAD requests first and a one-byte range fallback, reports interesting HTTP statuses and PDF candidates, and respects robots.txt when enabled. This is an ffuf-style native probe, not a wrapper that silently assumes ffuf is installed.
+
+The worker reports installed tool availability at GET /api/tools. It detects ffuf, feroxbuster, dirsearch, gobuster, dirb, katana, hakrawler, gau, waybackurls, rg, and pdftotext. Detection is informational at this stage: the current path-probe engine is native Python and does not execute those third-party binaries. This avoids silently launching aggressive scans or relying on tools that may not be installed. Use them only against systems you own or are explicitly authorized to test.
+
 ## Global wildcard discovery
 
 The interface also queries recent Common Crawl URL indexes, so a search does not need a seed website. Examples:
