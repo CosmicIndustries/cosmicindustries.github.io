@@ -323,9 +323,12 @@ def cdx_query_candidates(pattern, mode):
     # candidate-generation optimization, not a change to matching semantics.
     edu=re.search(r"\.edu(?:/|$)",p)
     if edu:
-        if re.search(r"\.pdf$",p):
-            return ["*.edu/*.pdf"]
-        return ["*.edu/*"]
+        suffix="*.edu/*.pdf" if re.search(r"\.pdf$",p) else "*.edu/*"
+        # Partition the broad .edu wildcard by the first hostname character.
+        # This reduces single-query CDX load while covering ordinary DNS hostnames.
+        buckets=list("0123456789abcdefghijklmnopqrstuvwxyz")
+        tail="/".join([])  # keep this function's candidate generation deterministic
+        return [ch+"*.edu/"+("*" if not re.search(r"\.pdf$",p) else "*.pdf") for ch in buckets]
     # Other recognizable TLDs use a broad suffix query; local matching enforces the glob.
     tld=re.search(r"\.([a-z]{2,})(?:/|$)",p)
     if not tld:
@@ -398,7 +401,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         for collection in collections:
             endpoint=collection.get("cdx-api")
             if not endpoint: continue
-            for cdx_pattern in query_patterns:
+            for query_index,cdx_pattern in enumerate(query_patterns):
                 if len(results)>=req.max_results: break
                 try:
                     # Ask the ZipNum index how many pages exist, then retrieve pages
@@ -434,6 +437,9 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                             await asyncio.sleep(1.0)
                 except Exception as e:
                     errors.append(collection.get("id","index")+" "+cdx_pattern+": "+str(e)[:180])
+                # The public CDX service requests serial, rate-limited use.
+                if query_index+1<len(query_patterns) and len(results)<req.max_results:
+                    await asyncio.sleep(1.0)
             if len(results)>=req.max_results: break
         pages_crawled=0
         if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
