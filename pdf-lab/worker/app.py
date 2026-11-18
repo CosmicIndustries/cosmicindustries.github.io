@@ -315,13 +315,13 @@ def cdx_query_candidates(pattern, mode):
     # Keep .edu PDF discovery focused on PDF-looking URL paths. The returned URLs are
     # still checked against the user's complete glob locally, so this is only a
     # candidate-generation optimization, not a change to matching semantics.
-    edu=re.search(r"\\.edu(?:/|$)",p)
+    edu=re.search(r"\.edu(?:/|$)",p)
     if edu:
-        if re.search(r"\\.pdf$",p):
+        if re.search(r"\.pdf$",p):
             return ["*.edu/*.pdf"]
         return ["*.edu/*"]
     # Other recognizable TLDs use a broad suffix query; local matching enforces the glob.
-    tld=re.search(r"\\.([a-z]{2,})(?:/|$)",p)
+    tld=re.search(r"\.([a-z]{2,})(?:/|$)",p)
     if not tld:
         return [commoncrawl_query_pattern(pattern,mode)]
     return ["*."+tld.group(1)+"/*"]
