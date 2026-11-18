@@ -415,9 +415,11 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                     # Bound work per pattern/index. User's max_results is the output cap;
                     # page traversal lets us move past the first block instead of silently
                     # stopping at the first 300 records.
-                    if total_pages>50:
-                        page_limit_reached=True
-                    for page_no in range(min(total_pages,50)):
+                    page_cap=min(total_pages,50)
+                    # One-second spacing also applies between the metadata request
+                    # and the first data page.
+                    await asyncio.sleep(1.0)
+                    for page_no in range(page_cap):
                         if len(results)>=req.max_results: break
                         params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey",
                                 "pageSize":"1","page":str(page_no),"limit":str(min(req.max_results,2000)),
@@ -435,8 +437,10 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                             results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
                             if len(results)>=req.max_results: break
                         # Respect the public index service's request-rate guidance.
-                        if page_no+1<min(total_pages,50) and len(results)<req.max_results:
+                        if page_no+1<page_cap and len(results)<req.max_results:
                             await asyncio.sleep(1.0)
+                    if total_pages>50 and len(results)<req.max_results:
+                        page_limit_reached=True
                 except Exception as e:
                     errors.append(collection.get("id","index")+" "+cdx_pattern+": "+str(e)[:180])
                 # The public CDX service requests serial, rate-limited use.
