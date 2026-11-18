@@ -241,8 +241,13 @@ async def crawl(jobid, cfg: CrawlRequest):
 
 class WildcardDiscoveryRequest(BaseModel):
     url_pattern: str
+    match_mode: str = Field(default="glob", pattern="^(glob|regex)$")
     max_results: int = Field(default=200, ge=1, le=2000)
     indexes: int = Field(default=2, ge=1, le=5)
+    recursive: bool = False
+    recursive_depth: int = Field(default=2, ge=0, le=3)
+    max_pages: int = Field(default=30, ge=1, le=100)
+    respect_robots: bool = True
 
 class ImportURLsRequest(BaseModel):
     urls: list[str] = Field(default_factory=list, max_length=500)
@@ -254,20 +259,78 @@ class ImportURLsRequest(BaseModel):
 def normalize_glob(pattern):
     return pattern.strip().replace(r"\*", "*").replace(r"\?", "?").lower()
 
+def glob_to_regex(pattern):
+    """Translate URL glob: * stays within a path segment; ** crosses separators."""
+    p=normalize_glob(pattern); out=[]; i=0
+    while i<len(p):
+        ch=p[i]
+        if ch=="*":
+            if i+1<len(p) and p[i+1]=="*":
+                i+=2
+                if i<len(p) and p[i]=="/":
+                    out.append("(?:.*/)?"); i+=1
+                else: out.append(".*")
+                continue
+            out.append("[^/]*")
+        elif ch=="?": out.append("[^/]")
+        else: out.append(re.escape(ch))
+        i+=1
+    return re.compile("^"+"".join(out)+"$",re.I)
+
 def commoncrawl_query_pattern(pattern):
-    # CDX is efficient for domain wildcards; the complete glob is applied locally afterward.
-    p=normalize_glob(pattern)
+    p=pattern.lower()
     m=re.search(r"\.([a-z]{2,})(?:[./*]|$)",p)
-    if m:
-        return "*."+m.group(1)+"/*"
+    if m: return "*."+m.group(1)+"/*"
     host=re.search(r"https?://([^/]+)",p)
-    if host and "*" not in host.group(1):
-        return host.group(1)+"/*"
-    raise ValueError("For global discovery, include a recognizable domain suffix such as *.edu/**/*.pdf or *.gov/**/report*.pdf.")
+    if host and "*" not in host.group(1): return host.group(1)+"/*"
+    raise ValueError("Global discovery needs a recognizable suffix (.edu/.gov/.org) or literal host.")
+
+def url_matcher(pattern, mode):
+    if mode=="regex":
+        try: return re.compile(pattern,re.I)
+        except re.error as e: raise HTTPException(400,"Invalid URL regular expression: "+str(e))
+    return glob_to_regex(pattern)
+
+async def recursive_url_discovery(client, seeds, matcher, req, results, seen, errors):
+    """Bounded same-host crawl from up to five discovered host roots."""
+    roots=[]
+    for seed in seeds:
+        p=urlparse(seed); root=f"{p.scheme}://{p.netloc}/"
+        if root not in roots: roots.append(root)
+        if len(roots)>=5: break
+    queue=deque((root,0) for root in roots); visited=set(); pages=0
+    while queue and pages<req.max_pages and len(results)<req.max_results:
+        url,depth=queue.popleft()
+        if url in visited or depth>req.recursive_depth: continue
+        visited.add(url)
+        if not valid_http(url): continue
+        try:
+            if not await can_fetch(client,url,req.respect_robots): continue
+            async with client.stream("GET",url,timeout=15) as response:
+                if response.status_code!=200 or "text/html" not in response.headers.get("content-type","").lower(): continue
+                if not valid_http(str(response.url)): continue
+                data=await response.aread()
+            if len(data)>2_000_000: continue
+            pages+=1
+            soup=BeautifulSoup(data,"html.parser")
+            for link in soup.select("a[href]"):
+                target=urldefrag(urljoin(url,link.get("href","")))[0]
+                if not valid_http(target) or urlparse(target).netloc.lower()!=urlparse(url).netloc.lower(): continue
+                if matcher.search(target):
+                    if target not in seen:
+                        seen.add(target); results.append({"url":target,"timestamp":None,"mime":None,"status":"live-crawl","collection":"recursive-live"})
+                        if len(results)>=req.max_results: break
+                elif depth<req.recursive_depth and "?" not in target:
+                    if target not in visited and not urlparse(target).path.lower().endswith((".jpg",".png",".gif",".zip",".mp4")):
+                        queue.append((target,depth+1))
+        except Exception as e:
+            errors.append("recursive "+url+": "+str(e)[:140])
+    return pages
 
 @app.post("/api/discover")
 async def discover_wildcard(req: WildcardDiscoveryRequest):
-    pattern=normalize_glob(req.url_pattern)
+    pattern=req.url_pattern.strip()
+    matcher=url_matcher(pattern,req.match_mode)
     cdx_pattern=commoncrawl_query_pattern(pattern)
     async with httpx.AsyncClient(timeout=30,headers={"User-Agent":UA}) as client:
         info=await client.get("https://index.commoncrawl.org/collinfo.json")
@@ -278,22 +341,24 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             endpoint=collection.get("cdx-api")
             if not endpoint: continue
             try:
-                r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results*3,6000))})
+                r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results*10,10000))})
                 if r.status_code==404: continue
                 r.raise_for_status()
                 for line in r.text.splitlines():
                     try: item=json.loads(line)
                     except Exception: continue
                     url=item.get("url","")
-                    if not url or url in seen: continue
-                    if not re.match(r"^https?://",url,re.I): continue
-                    if not __import__("fnmatch").fnmatchcase(url.lower(),pattern): continue
+                    if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
+                    if not matcher.search(url): continue
                     seen.add(url)
                     results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
                     if len(results)>=req.max_results: break
                 if len(results)>=req.max_results: break
             except Exception as e: errors.append(collection.get("id","index")+": "+str(e)[:180])
-    return {"pattern":pattern,"cdx_pattern":cdx_pattern,"results":results,"count":len(results),"indexes_checked":len(collections),"errors":errors,"source":"Common Crawl URL index; captures may be historical"}
+        pages_crawled=0
+        if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
+            pages_crawled=await recursive_url_discovery(client,[x["url"] for x in results],matcher,req,results,seen,errors)
+    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_pattern":cdx_pattern,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"source":"Common Crawl URL index + bounded live recursive crawl" if req.recursive else "Common Crawl URL index; captures may be historical"}
 
 @app.post("/api/import-urls")
 async def import_discovered_urls(req: ImportURLsRequest):
