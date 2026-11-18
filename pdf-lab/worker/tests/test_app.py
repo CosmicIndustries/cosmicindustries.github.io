@@ -42,6 +42,26 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertEqual(rows[0]["original"], "https://example.edu/report.pdf")
         self.assertEqual(rows[0]["statuscode"], "200")
 
+    def test_arquivo_tld_query_targets_domain_suffix(self):
+        self.assertEqual(worker.arquivo_query_patterns("*.edu/**/*.pdf", "glob"), ["*.edu"])
+        self.assertEqual(worker.arquivo_query_patterns("*.gov/**/manual.pdf", "glob"), ["*.gov"])
+        self.assertEqual(
+            worker.arquivo_query_patterns("https://library.example.edu/**/*.pdf", "glob"),
+            ["library.example.edu/*"],
+        )
+
+    def test_arquivo_json_lines_are_normalized(self):
+        payload = (
+            '{"url":"https://example.edu/report.pdf","timestamp":"20261118010101",'
+            '"mime":"application/pdf","status":"200"}\\n'
+            '{"url":"https://example.edu/handbook.pdf","timestamp":"20251118010101",'
+            '"mime":"application/pdf","status":"200"}'
+        )
+        rows = worker.parse_arquivo_cdx_payload(payload)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["url"], "https://example.edu/report.pdf")
+        self.assertEqual(rows[1]["mime"], "application/pdf")
+
     def test_discovery_sort_prefers_pdf_then_newest_capture(self):
         items = [
             {"url": "https://example.edu/old.pdf", "mime": "application/pdf",
