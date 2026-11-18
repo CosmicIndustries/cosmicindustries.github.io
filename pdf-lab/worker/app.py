@@ -328,6 +328,100 @@ async def import_discovered_urls(req: ImportURLsRequest):
             except Exception as e: errors.append({"url":url,"error":str(e)[:200]})
     return {"imported":len(results),"results":results,"errors":errors}
 
+
+class GrepRequest(BaseModel):
+    pattern: str
+    regex: bool = True
+    case_sensitive: bool = False
+    whole_word: bool = False
+    context_lines: int = Field(default=2, ge=0, le=10)
+    limit: int = Field(default=200, ge=1, le=1000)
+    filename_pattern: str = "*.pdf"
+
+class PathDiscoveryRequest(BaseModel):
+    base_url: str
+    paths: list[str] = Field(default_factory=list, max_length=3000)
+    extensions: list[str] = Field(default_factory=lambda:["pdf"])
+    concurrency: int = Field(default=12, ge=1, le=40)
+    timeout: float = Field(default=8, ge=2, le=30)
+    respect_robots: bool = True
+
+DEFAULT_PATHS = [
+ "","files/","docs/","documents/","downloads/","publications/","reports/","research/",
+ "resources/","manuals/","technical/","technical-reports/","archive/","archives/",
+ "data/","datasets/","library/","media/","uploads/","assets/","content/",
+ "annual-report.pdf","report.pdf","technical-report.pdf","manual.pdf","index.pdf",
+ "documents/","files/","wp-content/uploads/","sites/default/files/"
+]
+DISCOVERY_TOOLS = ["ffuf","feroxbuster","dirsearch","gobuster","dirb","katana","hakrawler","gau","waybackurls","rg","ripgrep","pdftotext"]
+
+@app.get("/api/tools")
+def tool_inventory():
+    import shutil
+    return {"tools":[{"name":name,"available":shutil.which(name) is not None,"path":shutil.which(name)} for name in DISCOVERY_TOOLS],
+            "native_engines":["Common Crawl CDX","bounded async path probe","HTML link crawler","PDF text regex grep","SQLite FTS5"]}
+
+@app.post("/api/grep")
+def intelligent_grep(req: GrepRequest):
+    import fnmatch
+    if not req.pattern.strip(): raise HTTPException(400,"Enter a grep expression.")
+    try:
+        flags=0 if req.case_sensitive else re.IGNORECASE
+        expression=req.pattern if req.regex else re.escape(req.pattern)
+        if req.whole_word: expression=r"\\b(?:"+expression+r")\\b"
+        rx=re.compile(expression,flags)
+    except re.error as e: raise HTTPException(400,"Invalid regular expression: "+str(e))
+    c=connect()
+    rows=c.execute("SELECT id,filename,title,url,text FROM documents ORDER BY discovered_at DESC").fetchall()
+    c.close(); results=[]
+    for row in rows:
+        if not fnmatch.fnmatch(row["filename"].lower(),req.filename_pattern.lower()): continue
+        lines=(row["text"] or "").splitlines()
+        hits=[i for i,line in enumerate(lines) if rx.search(line)]
+        if not hits: continue
+        snippets=[]; used=set()
+        for i in hits:
+            lo=max(0,i-req.context_lines); hi=min(len(lines),i+req.context_lines+1)
+            if any(k in used for k in range(lo,hi)): continue
+            used.update(range(lo,hi))
+            snippets.append({"line":i+1,"text":"\\n".join(f"{k+1}: {lines[k][:500]}" for k in range(lo,hi))})
+            if len(snippets)>=12: break
+        results.append({"id":row["id"],"filename":row["filename"],"title":row["title"],"url":row["url"],"hit_count":len(hits),"snippets":snippets})
+        if len(results)>=req.limit: break
+    return {"count":len(results),"results":results,"engine":"Python regex grep over extracted PDF text"}
+
+@app.post("/api/discover-paths")
+async def discover_paths(req: PathDiscoveryRequest):
+    base=req.base_url.strip().rstrip("/")+"/"
+    if not valid_http(base): raise HTTPException(400,"Base URL must be a public http(s) address.")
+    host=urlparse(base).hostname
+    paths=list(dict.fromkeys((req.paths or DEFAULT_PATHS)[:3000]))
+    extensions=[x.lower().lstrip(".") for x in req.extensions if re.fullmatch(r"[A-Za-z0-9]{1,8}",x.lstrip("."))]
+    candidates=[]
+    for p in paths:
+        p=p.strip().lstrip("/")
+        if not p: continue
+        candidates.append(p)
+        if not Path(p).suffix:
+            candidates.extend(p+("."+ext) for ext in extensions)
+    candidates=list(dict.fromkeys(candidates))[:5000]
+    sem=asyncio.Semaphore(req.concurrency); found=[]; errors=[]
+    async with httpx.AsyncClient(follow_redirects=False,timeout=req.timeout,headers={"User-Agent":UA}) as client:
+        async def probe(path):
+            async with sem:
+                url=urljoin(base,path)
+                if not valid_http(url) or urlparse(url).hostname!=host: return
+                if req.respect_robots and not await can_fetch(client,url,True): return
+                try:
+                    r=await client.get(url,headers={"Range":"bytes=0-0"})
+                    if r.status_code in (200,206,301,302,307,308,401,403):
+                        found.append({"url":url,"status":r.status_code,"content_type":r.headers.get("content-type",""),"bytes":r.headers.get("content-length"),"interesting":r.status_code in (401,403)})
+                except Exception as e: errors.append({"path":path,"error":str(e)[:120]})
+        await asyncio.gather(*(probe(p) for p in candidates))
+    found.sort(key=lambda x:(0 if x["url"].lower().endswith(".pdf") else 1,x["status"],x["url"]))
+    return {"base_url":base,"tested":len(candidates),"count":len(found),"results":found,"errors":errors[:30],
+            "engine":"bounded native ffuf-style wordlist probe","available_external_tools":tool_inventory()["tools"]}
+
 @app.get("/api/health")
 def health():
     c=connect(); count=c.execute("SELECT COUNT(*) n FROM documents").fetchone()["n"]; c.close()
