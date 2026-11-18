@@ -55,7 +55,10 @@ def _roman_value(value):
 def derive_document_metadata(url, filename, title, text=""):
     """Extract a document series and explicit year/chapter/part/edition markers."""
     host=(urlparse(url).hostname or "").lower().removeprefix("www.")
-    raw=str(title or "").strip() or Path(filename).stem
+    title_text=str(title or "").strip()
+    filename_text=Path(filename).stem
+    raw=(title_text+" "+filename_text).strip() if title_text else filename_text
+    series_source=title_text or filename_text
     year_match=re.search(r"(?<!\d)(?:19|20)\d{2}(?!\d)",raw)
     year=int(year_match.group(0)) if year_match else None
 
@@ -73,7 +76,7 @@ def derive_document_metadata(url, filename, title, text=""):
     )
     edition=next((x for x in edition_match.groups() if x),None) if edition_match else None
 
-    series=re.sub(r"(?<!\d)(?:19|20)\d{2}(?!\d)"," ",raw)
+    series=re.sub(r"(?<!\d)(?:19|20)\d{2}(?!\d)"," ",series_source)
     series=re.sub(
         r"\b(?:chapter|chap|ch|part|pt|unit|module|lesson|volume|vol)\s*[-_.:#]?\s*(?:\d{1,3}|[ivxlcdm]+)\b",
         " ",series,flags=re.I
@@ -146,13 +149,16 @@ def connect():
                     "SELECT doc_id FROM document_metadata WHERE duplicate_key=?",
                     (duplicate_key,)
                 ).fetchone()
-            if duplicate:
+            if duplicate and duplicate["doc_id"]!=row["id"]:
                 # Remove only exact extracted-content/version duplicates. Different
                 # years, chapters, parts or editions have different duplicate keys.
                 c.execute("DELETE FROM document_fts WHERE id=?",(row["id"],))
                 c.execute("DELETE FROM document_fts_linguistic WHERE id=?",(row["id"],))
                 c.execute("DELETE FROM documents WHERE id=?",(row["id"],))
                 duplicate_paths.append(row["path"])
+                continue
+            if duplicate and duplicate["doc_id"]==row["id"]:
+                # A previous schema version already registered this same canonical row.
                 continue
             c.execute(
                 "INSERT OR IGNORE INTO document_metadata"
