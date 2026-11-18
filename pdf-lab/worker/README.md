@@ -30,31 +30,35 @@ The crawler follows ordinary HTML links and direct PDF URLs. It does not bypass 
 
 ## Intelligent grep and path discovery
 
-The unified search switch includes two additional engines:
+Intelligent grep (POST /api/grep) searches extracted PDF pages with ripgrep when installed, otherwise Python regex. It supports literals, regex, case sensitivity, whole-word matching, filename globs, hit counts, page numbers, and line-numbered context. Page extraction is memoized and document searches run through a bounded worker pool.
 
-- Intelligent grep (POST /api/grep): regular expressions or literal phrases across extracted PDF text; optional case sensitivity, whole-word matching, filename glob, hit counts, and configurable context lines. Results include line-numbered snippets.
-- Directory / wordlist discovery (POST /api/discover-paths): bounded, concurrent, same-host path probing with a built-in starter wordlist or user-supplied paths. It uses HEAD requests first and a one-byte range fallback, reports interesting HTTP statuses and PDF candidates, and respects robots.txt when enabled. This is an ffuf-style native probe, not a wrapper that silently assumes ffuf is installed.
+Directory / wordlist discovery (POST /api/discover-paths) provides bounded, concurrent, same-host path probing. The **Fuzz indexed hosts** action (POST /api/fuzz-indexes) takes URLs returned by global indexes, deduplicates their hosts, derives known directory prefixes from those URLs, and feeds both the directories and configured wordlist into a bounded async probe pool. Results are relevance-sorted with PDF candidates first and can be sent directly to PDF import. Both probes use HEAD with a one-byte Range fallback and respect robots.txt when enabled.
 
-The worker reports installed tool availability at GET /api/tools. It detects ffuf, feroxbuster, dirsearch, gobuster, dirb, katana, hakrawler, gau, waybackurls, rg, and pdftotext. Detection is informational at this stage: the current path-probe engine is native Python and does not execute those third-party binaries. This avoids silently launching aggressive scans or relying on tools that may not be installed. Use them only against systems you own or are explicitly authorized to test.
+The worker reports installed tool availability at GET /api/tools. The path fuzzer is a bounded native Python implementation; ripgrep is executed for PDF text grep when available. Other detected binaries are informational and are not silently launched. Probe only public systems you own or are explicitly authorized to assess.
 
 ## Global wildcard discovery
 
-The interface also queries recent Common Crawl URL indexes, so a search does not need a seed website. Examples:
+The interface queries Common Crawl URL indexes and falls back to the independent Internet Archive Wayback CDX index when Common Crawl is unavailable or returns too few candidates, so a search does not need a seed website. Examples:
 
 - `*.edu/**/*.pdf`
 - `*.gov/**/budget*.pdf`
 - `*.org/**/*manual*.pdf`
 
-The URL matcher supports recursive globs (`*`, `**`, `?`) or full Python regular expressions against complete URLs. A single `*` stays within one path segment; `**` crosses path separators, and `**/` can match zero or more directories. Common Crawl queries use narrower host/TLD prefixes in bounded batches to reduce CDX 504 errors. Exact glob/regex matching is then applied locally. If individual indexes time out, the API returns surviving results plus an explicit partial-result warning rather than treating upstream failures as proof of no matches. Optional bounded live recursion follows same-host HTML links from up to five discovered host roots, with configurable depth/page caps and robots.txt enforcement. The index is historical and not exhaustive; discovered URLs may be stale or unavailable. Use the result selector to fetch, inspect, and store matching PDFs. The same filename and content filters apply.
+The URL matcher supports recursive globs (`*`, `**`, `?`) or full Python regular expressions against complete URLs, including optional URL query strings after a matched PDF path. A single `*` stays within one path segment; `**` crosses path separators, and `**/` can match zero or more directories. Common Crawl queries use bounded host/TLD shards. Wayback CDX acts as a fallback provider when Common Crawl connectivity or coverage is insufficient. Exact glob/regex matching is enforced locally. Provider failures are returned as source-level diagnostics while the endpoint still returns HTTP 200 and any results from other sources. Optional bounded live recursion follows same-host HTML links from up to five discovered host roots. Once URL candidates appear, **Fuzz indexed hosts** feeds their origins and known directory ancestors to the path fuzzer. Both indexes are historical and incomplete; discovered URLs may be stale or unavailable. Use the result selector to fetch, inspect, and store matching PDFs.
 
 Global discovery currently expects a recognizable public suffix such as `.edu`, `.gov`, or `.org`, or a literal host. It does not enumerate the entire live DNS namespace.
 
 ## API
 
-- `POST /api/discover` search Common Crawl URL indexes with a full-URL glob or regex, optionally adding bounded recursive live-link discovery\n- `POST /api/import-urls` fetch, inspect, and store selected discovered PDFs\n- `POST /api/jobs` create recursive site crawl
+- `POST /api/discover` search Common Crawl and Wayback CDX indexes with a full-URL glob or regex, optionally adding bounded recursive live-link discovery
+- `POST /api/fuzz-indexes` use index-discovered URLs as seeds for concurrent same-host directory/path probing
+- `POST /api/discover-paths` probe a supplied host with a bounded path wordlist
+- `POST /api/import-urls` concurrently fetch, extract, filter, and store selected discovered PDFs
+- `POST /api/jobs` create recursive site crawl
 - `GET /api/jobs/{id}` job status, counters, matches, and log
 - `GET /api/documents?q=...` list/search indexed documents
-- `POST /api/search` full-text boolean search
+- `POST /api/search` linguistically normalized full-text search using FTS5 Porter stemming, Unicode diacritic folding, and BM25 relevance ranking
+- `POST /api/grep` concurrent ripgrep/Python regex with memoized page-aware PDF extraction
 - `GET /api/documents/{id}/download` retrieve a locally stored PDF
 
 ## Data and privacy
