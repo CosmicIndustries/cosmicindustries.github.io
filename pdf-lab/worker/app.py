@@ -282,7 +282,7 @@ def commoncrawl_query_pattern(pattern, mode="glob"):
     p=pattern.lower()
     if mode=="regex":
         # Recover a literal hostname/TLD from common anchored or unanchored URL regexes.
-        host=re.search(r"https?://(?:\\[\\^/\\]\\+|[^/]+)?(\\.[a-z]{2,})",p)
+        host=re.search(r"https?://.*?(\\.[a-z]{2,})(?:/|$)",p)
         if host: return "*"+host.group(1)+"/*"
         literal=re.search(r"https?://([a-z0-9.-]+)",p)
         if literal: return literal.group(1)+"/*"
@@ -313,12 +313,12 @@ def cdx_query_candidates(pattern, mode):
     if host and not any(ch in host.group(1) for ch in "*?"):
         return [host.group(1)+"/*"]
     # For a leading *.edu glob, split common useful first-level host labels into parallel CDX queries.
-    tld=re.search(r"\\.([a-z]{2,})(?:/|$)",p)
+    tld=re.search(r"\.([a-z]{2,})(?:/|$)",p)
     if not tld:
         return [commoncrawl_query_pattern(pattern,mode)]
     suffix="."+tld.group(1)
     # Avoid one huge *.edu/* query. Query several narrower URL prefixes, still filtering full pattern locally.
-    return [prefix+suffix+"/*" for prefix in ("www","lib","archive","repository","digital","scholarship","docs","files","catalog","open")]
+    return ["*"+suffix+"/*"] + [prefix+suffix+"/*" for prefix in ("www","lib","archive","repository","digital","scholarship","docs","files","catalog","open")]
 
 async def recursive_url_discovery(client, seeds, matcher, req, results, seen, errors):
     """Bounded same-host crawl from up to five discovered host roots."""
@@ -372,7 +372,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             for cdx_pattern in query_patterns:
                 if len(results)>=req.max_results: break
                 try:
-                    r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results,1000))},timeout=18.0)
+                    r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results,300))},timeout=18.0)
                     if r.status_code==404: continue
                     r.raise_for_status()
                     queried.append(collection.get("id","index")+":"+cdx_pattern)
