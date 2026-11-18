@@ -368,7 +368,7 @@ def intelligent_grep(req: GrepRequest):
     try:
         flags=0 if req.case_sensitive else re.IGNORECASE
         expression=req.pattern if req.regex else re.escape(req.pattern)
-        if req.whole_word: expression=r"\\b(?:"+expression+r")\\b"
+        if req.whole_word: expression=r"\b(?:"+expression+r")\b"
         rx=re.compile(expression,flags)
     except re.error as e: raise HTTPException(400,"Invalid regular expression: "+str(e))
     c=connect()
