@@ -79,4 +79,4 @@ Files are downloaded only to the machine running this worker. The static GitHub 
 
 ### PDF size limits
 
-The import and crawl worker cap each PDF at 250,000,000 bytes. The interface exposes a compatible maximum of 238 MiB (binary MiB), preventing UI values from exceeding the backend byte cap.
+The import and crawl worker cap each PDF at 250,000,000 bytes. The interface exposes a compatible maximum of 238 MiB (binary MiB), preventing UI values from exceeding the backend byte cap. Import verifies the `%PDF-` file signature within the first 1,024 bytes; a `.pdf` filename or `application/pdf` MIME header alone is not accepted as proof. Indexed-host fuzzing performs a small ranged GET for PDF-looking paths, and only signature-verified PDFs are preselected for import. Import responses separate download/validation errors from filename/content-filter exclusions and display representative reasons in the UI.
