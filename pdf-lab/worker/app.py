@@ -1108,6 +1108,14 @@ async def import_discovered_urls(req: ImportURLsRequest):
                     return data
 
         async def import_one_core(url, archive_file_url=None, title=""):
+            # Determine the document extension before fetching so the binary
+            # validator knows which file signature/container structure to require.
+            name=unquote(Path(urlparse(url).path).name) or "document"
+            if not document_format(name):
+                if archive_file_url:
+                    name+=".pdf"
+                else:
+                    return None,{"url":url,"error":"URL has no supported document extension; use a direct .pdf/.pptx/.docx/.xlsx/etc. URL."}
             attempts=[]
             data=None
             download_url=None
@@ -1125,17 +1133,14 @@ async def import_discovered_urls(req: ImportURLsRequest):
                     reason=attempts[0]["error"] if attempts else "No import source was supplied"
                 return None,{"url":url,"error":reason,"attempts":attempts}
 
-            # Use the original source's filename, not the archive's id_ endpoint path.
-            name=unquote(Path(urlparse(url).path).name) or "document.pdf"
-            if not name.lower().endswith(".pdf"):
-                name+=".pdf"
+            # Keep the original source filename, not the archive replay endpoint name.
             if not filename_matches(name,req.filename_patterns):
                 return None,{"url":url,"error":"Excluded: filename did not match the selected glob(s).","excluded":True}
             try:
                 async with extract_sem:
                     body,np,pages=await asyncio.to_thread(extract_document,data,name)
             except Exception as exc:
-                return None,{"url":url,"error":"Verified PDF could not be parsed: "+str(exc)[:160]}
+                return None,{"url":url,"error":"Verified document could not be extracted: "+str(exc)[:160]}
             if not query_matches(body,req.content_query):
                 return None,{"url":url,"error":"Excluded: extracted PDF text did not match the content expression.","excluded":True}
 
@@ -1222,7 +1227,7 @@ DEFAULT_PATHS = [
  "annual-report.pdf","report.pdf","technical-report.pdf","manual.pdf","index.pdf",
  "documents/","files/","wp-content/uploads/","sites/default/files/"
 ]
-DISCOVERY_TOOLS = ["ffuf","feroxbuster","dirsearch","gobuster","dirb","katana","hakrawler","gau","waybackurls","rg","ripgrep","pdftotext"]
+DISCOVERY_TOOLS = ["ffuf","feroxbuster","dirsearch","gobuster","dirb","katana","hakrawler","gau","waybackurls","rg","ripgrep","pdftotext","libreoffice","soffice"]
 
 @app.get("/api/tools")
 def tool_inventory():
@@ -1773,21 +1778,21 @@ def view_document(docid:str):
     mime=mimetypes.guess_type(row["filename"])[0] or "application/octet-stream"
     return FileResponse(
         row["path"],media_type=mime,
-        headers={"Content-Disposition":f'inline; filename="{row["filename"]}"'}
+        headers={"Content-Disposition":"inline"}
     )
 
 
 @app.get("/api/worker/status")
 def worker_status():
     c=connect()
-    rows=c.execute("SELECT filename,bytes,discovered_at FROM documents ORDER BY discovered_at DESC LIMIT 5000").fetchall()
+    count=int(c.execute("SELECT COUNT(*) FROM documents").fetchone()[0])
+    storage_bytes=int(c.execute("SELECT COALESCE(SUM(bytes),0) FROM documents").fetchone()[0])
+    rows=c.execute("SELECT filename,COUNT(*) AS n FROM documents GROUP BY filename").fetchall()
     c.close()
     formats={}
-    storage_bytes=0
     for row in rows:
         ext=Path(row["filename"]).suffix.lower().lstrip(".") or "unknown"
-        formats[ext]=formats.get(ext,0)+1
-        storage_bytes+=int(row["bytes"] or 0)
+        formats[ext]=formats.get(ext,0)+int(row["n"])
     combined=[]
     for kind,source in (("crawl",jobs),("fuzzer",fuzz_jobs),("import",import_jobs)):
         for item in source.values():
@@ -1796,7 +1801,7 @@ def worker_status():
     active=[x for x in combined if x.get("status") in ("queued","running")]
     return {
         "ok":True,"service":"Cosmic PDF Lab Worker",
-        "documents":len(rows),"storage_bytes":storage_bytes,
+        "documents":count,"storage_bytes":storage_bytes,
         "formats":formats,"active_jobs":active[:10],"recent_jobs":combined[:8],
         "data_dir":str(ROOT),
         "tools":{"libreoffice":bool(shutil.which("libreoffice") or shutil.which("soffice")),
