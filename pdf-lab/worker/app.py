@@ -212,7 +212,8 @@ def is_document_candidate(url, content_type):
 def is_pdf_candidate(url, content_type):
     """Backward-compatible PDF candidate helper."""
     mime=(content_type or "").split(";",1)[0].strip().lower()
-    return document_format(url)=="pdf" or "pdf" in mime
+    return (document_format(url)=="pdf" or "pdf" in mime
+            or mime in {"application/octet-stream","binary/octet-stream"})
 
 
 def document_signature_probe(data, filename, content_type=""):
@@ -319,6 +320,7 @@ def _extract_ooxml(data, ext):
                 paragraphs.extend(_xml_paragraph_text(archive.read(part)))
             lines.extend(paragraphs)
             page_records=[{"page":1,"line":i+1,"text":p[:500]} for i,p in enumerate(paragraphs)]
+            return "\n".join(lines),1,page_records
         elif ext=="xlsx":
             shared=[]
             if "xl/sharedStrings.xml" in names:
