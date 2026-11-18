@@ -28,9 +28,21 @@ Then open the PDF Lab page and set **Worker API** to `http://127.0.0.1:8787`. Ke
 
 The crawler follows ordinary HTML links and direct PDF URLs. It does not bypass authentication, paywalls, CAPTCHAs, robots exclusions, or access controls. It refuses localhost and non-public IP targets to reduce SSRF risk. JavaScript-only portals may require a rendered crawler such as WebGrep/Katana; this worker intentionally stays lightweight and auditable.
 
+## Global wildcard discovery
+
+The interface also queries recent Common Crawl URL indexes, so a search does not need a seed website. Examples:
+
+- `*.edu/**/*.pdf`
+- `*.gov/**/budget*.pdf`
+- `*.org/**/*manual*.pdf`
+
+The URL glob is applied to the complete discovered URL. Escaped stars are normalized. The Common Crawl query is narrowed using the domain suffix (for example, `*.edu/*`) and then filtered locally against the full glob. The index is historical and not exhaustive; discovered URLs may be stale or unavailable. Use the result selector to fetch, inspect, and store matching PDFs. The same filename and content filters apply.
+
+Global discovery currently expects a recognizable public suffix such as `.edu`, `.gov`, or `.org`, or a literal host. It does not enumerate the entire live DNS namespace.
+
 ## API
 
-- `POST /api/jobs` create crawl
+- `POST /api/discover` search Common Crawl URL indexes with a full-URL wildcard\n- `POST /api/import-urls` fetch, inspect, and store selected discovered PDFs\n- `POST /api/jobs` create recursive site crawl
 - `GET /api/jobs/{id}` job status, counters, matches, and log
 - `GET /api/documents?q=...` list/search indexed documents
 - `POST /api/search` full-text boolean search
