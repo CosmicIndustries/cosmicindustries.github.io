@@ -32,7 +32,7 @@ The crawler follows ordinary HTML links and direct PDF URLs. It does not bypass 
 
 Intelligent grep (POST /api/grep) searches extracted PDF pages with ripgrep when installed, otherwise Python regex. It supports literals, regex, case sensitivity, whole-word matching, filename globs, hit counts, page numbers, and line-numbered context. Page extraction is memoized and document searches run through a bounded worker pool.
 
-Directory / wordlist discovery (POST /api/discover-paths) provides bounded, concurrent, same-host path probing. The **Fuzz indexed hosts** action (POST /api/fuzz-indexes) takes URLs returned by global indexes, deduplicates their hosts, derives known directory prefixes from those URLs, and feeds both the directories and configured wordlist into a bounded async probe pool. Results are relevance-sorted with PDF candidates first and can be sent directly to PDF import. Both probes use HEAD with a one-byte Range fallback and respect robots.txt when enabled. Path work uses fixed-size worker pools rather than one task per wordlist entry. Indexed-host fuzzing has a global concurrency cap, a two-request per-host cap, a per-host request interval, and shares its probe budget across all discovered hosts.
+Directory / wordlist discovery (POST /api/discover-paths) provides bounded, concurrent, same-host path probing. The **Fuzz indexed hosts** action (POST /api/fuzz-indexes) queues a background job and returns a job ID immediately. Poll GET /api/fuzz-indexes/{job_id} for live progress and partial results. It deduplicates discovered hosts, derives known directory prefixes from seed URLs, and feeds those directories plus the configured wordlist into a bounded async probe pool. Results are relevance-sorted with PDF candidates first and can be sent directly to PDF import. Both probes use HEAD with a one-byte Range fallback and respect robots.txt when enabled. Path work uses fixed-size worker pools rather than one task per wordlist entry. Indexed-host fuzzing has a global concurrency cap, a two-request per-host cap, a per-host request interval, and shares its probe budget across all discovered hosts. The interface uses an 800-probe starter budget and shows tested/found/error/robots-blocked counters while the job runs; increase the API request budget for deliberate deeper scans.
 
 The worker reports installed tool availability at GET /api/tools. The path fuzzer is a bounded native Python implementation; ripgrep is executed for PDF text grep when available. Other detected binaries are informational and are not silently launched. Probe only public systems you own or are explicitly authorized to assess.
 
@@ -51,7 +51,7 @@ Global discovery currently expects a recognizable public suffix such as `.edu`, 
 ## API
 
 - `POST /api/discover` search Common Crawl, Arquivo.pt, and Wayback CDX indexes with a full-URL glob or regex, optionally adding bounded recursive live-link discovery
-- `POST /api/fuzz-indexes` use index-discovered URLs as seeds for concurrent same-host directory/path probing
+- `POST /api/fuzz-indexes` queue a bounded indexed-host fuzzer job; `GET /api/fuzz-indexes/{job_id}` returns live progress and results
 - `POST /api/discover-paths` probe a supplied host with a bounded path wordlist
 - `POST /api/import-urls` concurrently fetch, extract, filter, and store selected discovered PDFs
 - `POST /api/jobs` create recursive site crawl
