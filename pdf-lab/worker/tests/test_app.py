@@ -4,6 +4,7 @@ import os
 import tempfile
 import unittest
 import uuid
+from unittest.mock import patch
 from pathlib import Path
 
 # Keep tests isolated from a developer's real PDF library.
@@ -84,6 +85,30 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0]["url"], "https://example.edu/report.pdf")
         self.assertEqual(rows[1]["mime"], "application/pdf")
+
+    def test_index_fuzz_plan_distributes_budget_across_hosts(self):
+        req = worker.IndexedFuzzRequest(
+            seed_urls=[
+                "https://one.example.edu/docs/handbook.pdf",
+                "https://two.example.edu/library/course.pdf",
+            ],
+            paths=["docs/", "manual"],
+            extensions=["pdf"],
+            max_probes=10,
+        )
+        with patch.object(worker, "valid_http", return_value=True):
+            plan = worker.build_index_fuzz_plan(req)
+        urls = [item[0] for item in plan["probe_jobs"]]
+        self.assertEqual(len(plan["origins"]), 2)
+        self.assertLessEqual(len(urls), 10)
+        self.assertTrue(any(url == "https://one.example.edu/docs/docs/" for url in urls))
+        self.assertTrue(any(url == "https://one.example.edu/docs/manual.pdf" for url in urls))
+        self.assertFalse(any("/docs/.pdf" in url for url in urls))
+
+    def test_index_fuzz_job_plan_rejects_empty_seed_list(self):
+        req = worker.IndexedFuzzRequest(seed_urls=[])
+        with self.assertRaises(worker.HTTPException):
+            worker.build_index_fuzz_plan(req)
 
     def test_discovery_sort_prioritizes_verified_keyword_hits(self):
         items = [
