@@ -1,6 +1,6 @@
 # PDF Lab local worker
 
-The GitHub Pages interface is static. This companion worker performs the network crawl, extracts PDF text, applies filename wildcards and content expressions, and stores matched PDFs in a local SQLite-backed library.
+The GitHub Pages interface is static. This companion worker performs network discovery/crawling, extracts PDF and supported Office/OpenDocument text, applies filename wildcards and content expressions, and stores matched documents in a local SQLite-backed library.
 
 ## Start (Linux/macOS)
 
@@ -27,6 +27,20 @@ Then open **http://127.0.0.1:8787/**. The worker serves the interface and API fr
 - **Limits**: page count, PDF count, max bytes per PDF, and request delay.
 
 The crawler follows ordinary HTML links and direct PDF URLs. It does not bypass authentication, paywalls, CAPTCHAs, robots exclusions, or access controls. It refuses localhost and non-public IP targets to reduce SSRF risk. JavaScript-only portals may require a rendered crawler such as WebGrep/Katana; this worker intentionally stays lightweight and auditable.
+
+## Supported document formats and reader
+
+The library accepts and indexes:
+
+- **PDF** (.pdf) — pypdf text extraction and the browser's built-in inline PDF reader.
+- **PowerPoint** (.pptx, .ppt) — slide text extraction; modern PPTX is parsed directly from its OOXML package.
+- **Word** (.docx, .doc) — paragraph/header/footer text extraction for DOCX.
+- **Excel** (.xlsx, .xls) — worksheet cell text extraction for XLSX.
+- **OpenDocument** (.odp, .odt, .ods) — presentation, text and spreadsheet text extraction.
+
+The modern PPTX/DOCX/XLSX and ODP/ODT/ODS readers use Python's standard ZIP/XML libraries, so they do not require heavyweight Office packages. Legacy binary PPT/DOC/XLS conversion uses LibreOffice in headless mode when installed; otherwise the worker reports that legacy format as unsupported and continues importing other files. The worker panel reports LibreOffice availability.
+
+The **Library & Indexes** view lists local stored documents, format, size, page/slide/sheet count, source URL and indexing status. **Reader** opens PDFs in an inline browser viewer and presents extracted slide/sheet/paragraph text for Office/OpenDocument files. Search and grep operate on extracted text across all indexed formats.
 
 ## Intelligent grep and path discovery
 
@@ -55,10 +69,13 @@ Global discovery currently expects a recognizable public suffix such as `.edu`, 
 - `POST /api/discover` search Common Crawl, Arquivo.pt, and Wayback CDX indexes with a full-URL glob or regex, optionally adding bounded recursive live-link discovery
 - `POST /api/fuzz-indexes` queue a bounded indexed-host fuzzer job; `GET /api/fuzz-indexes/{job_id}` returns live progress and results
 - `POST /api/discover-paths` probe a supplied host with a bounded path wordlist
-- `POST /api/import-urls` concurrently fetch, extract, filter, and store selected discovered PDFs
+- `POST /api/import-urls` concurrently fetch, extract, filter, and store selected PDF/Office/OpenDocument files
 - `POST /api/jobs` create recursive site crawl
 - `GET /api/jobs/{id}` job status, counters, matches, and log
-- `GET /api/documents?q=...` list/search indexed documents
+- `GET /api/documents?q=...&format=...` list/search indexed documents by query and file format
+- `GET /api/documents/{id}/content` return extracted text and reader metadata
+- `GET /api/documents/{id}/view` serve a stored PDF inline for the lightweight reader
+- `GET /api/worker/status` report worker health, storage, format counts, and active/recent job progress
 - `POST /api/search` linguistically normalized full-text search using FTS5 Porter stemming, Unicode diacritic folding, and BM25 relevance ranking
 - `POST /api/grep` concurrent ripgrep/Python regex with memoized page-aware PDF extraction
 - `GET /api/documents/{id}/download` retrieve a locally stored PDF
