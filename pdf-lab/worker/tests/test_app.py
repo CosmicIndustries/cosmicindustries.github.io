@@ -206,6 +206,120 @@ class PDFLabCoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing %PDF-"):
             worker.extract_pdf(b"<!DOCTYPE html><html>not a PDF</html>")
 
+    def test_institution_seeds_include_mit_uga_and_middle_georgia(self):
+        self.assertIn("mit.edu", worker.INSTITUTION_DOMAIN_SEEDS)
+        self.assertIn("uga.edu", worker.INSTITUTION_DOMAIN_SEEDS)
+        self.assertIn("mga.edu", worker.INSTITUTION_DOMAIN_SEEDS)
+
+    def test_fuzzer_can_start_from_domains_without_existing_url_seeds(self):
+        req = worker.IndexedFuzzRequest(
+            seed_urls=[],
+            institution_domains=["mit.edu", "mga.edu"],
+            paths=["manual.pdf"],
+            extensions=["pdf"],
+            max_probes=0,
+        )
+        with patch.object(worker, "valid_http", return_value=True):
+            plan = worker.build_index_fuzz_plan(req)
+        self.assertEqual(len(plan["origins"]), 2)
+        self.assertIn("https://mit.edu/", plan["origins"])
+        self.assertIn("https://mga.edu/", plan["origins"])
+        self.assertTrue(any(x[0] == "https://mit.edu/manual.pdf" for x in plan["probe_jobs"]))
+        self.assertTrue(any(x[0] == "https://mga.edu/manual.pdf" for x in plan["probe_jobs"]))
+
+    def test_unlimited_probe_budget_keeps_all_generated_paths(self):
+        req = worker.IndexedFuzzRequest(
+            seed_urls=["https://example.edu/files/known.pdf"],
+            institution_domains=[],
+            paths=["manual.pdf", "syllabus.pdf", "catalog.pdf"],
+            extensions=["pdf"],
+            max_probes=0,
+        )
+        with patch.object(worker, "valid_http", return_value=True):
+            plan = worker.build_index_fuzz_plan(req)
+        urls = [item[0] for item in plan["probe_jobs"]]
+        self.assertIn("https://example.edu/manual.pdf", urls)
+        self.assertIn("https://example.edu/syllabus.pdf", urls)
+        self.assertIn("https://example.edu/catalog.pdf", urls)
+
+    def test_version_metadata_splits_years_and_chapters(self):
+        body = "A sufficiently long extracted aircraft systems chapter " * 8
+        first = worker.derive_document_metadata(
+            "https://mit.edu/flight/manual-2022-chapter-1.pdf",
+            "manual-2022-chapter-1.pdf",
+            "Flight Training Manual 2022 Chapter 1",
+            body,
+        )
+        next_year = worker.derive_document_metadata(
+            "https://mit.edu/flight/manual-2023-chapter-1.pdf",
+            "manual-2023-chapter-1.pdf",
+            "Flight Training Manual 2023 Chapter 1",
+            body,
+        )
+        next_chapter = worker.derive_document_metadata(
+            "https://mit.edu/flight/manual-2022-chapter-2.pdf",
+            "manual-2022-chapter-2.pdf",
+            "Flight Training Manual 2022 Chapter 2",
+            body,
+        )
+        self.assertEqual(first["year"], 2022)
+        self.assertEqual(first["chapter"], 1)
+        self.assertEqual(next_year["year"], 2023)
+        self.assertEqual(next_chapter["chapter"], 2)
+        self.assertEqual(first["series_title"], next_year["series_title"])
+        self.assertNotEqual(
+            worker.document_duplicate_key(body, first),
+            worker.document_duplicate_key(body, next_year),
+        )
+        self.assertNotEqual(
+            worker.document_duplicate_key(body, first),
+            worker.document_duplicate_key(body, next_chapter),
+        )
+
+    def test_store_document_skips_same_version_text_duplicate(self):
+        body = "Aircraft operating limitations and procedures. " * 12
+        data_a = b"document bytes with different metadata A"
+        data_b = b"document bytes with different metadata B"
+        first_id, first_new = worker.store_document(
+            "https://mit.edu/course/flight-manual-2022-chapter-1.pdf",
+            "flight-manual-2022-chapter-1.pdf", data_a,
+            "Flight Manual 2022 Chapter 1", body, 1,
+        )
+        second_id, second_new = worker.store_document(
+            "https://www.mit.edu/archive/flight-manual-2022-chapter-1.pdf",
+            "flight-manual-2022-chapter-1.pdf", data_b,
+            "Flight Manual 2022 Chapter 1", body, 1,
+        )
+        other_id, other_new = worker.store_document(
+            "https://mit.edu/course/flight-manual-2023-chapter-1.pdf",
+            "flight-manual-2023-chapter-1.pdf", data_b+b"new-year",
+            "Flight Manual 2023 Chapter 1", body, 1,
+        )
+        self.assertTrue(first_new)
+        self.assertFalse(second_new)
+        self.assertEqual(first_id, second_id)
+        self.assertTrue(other_new)
+        self.assertNotEqual(first_id, other_id)
+
+    def test_zero_means_unlimited_for_discovery_and_file_size(self):
+        wildcard = worker.WildcardDiscoveryRequest(
+            url_pattern="*.edu/**/*.pdf", max_results=0, indexes=0
+        )
+        imported = worker.ImportURLsRequest(max_bytes=0)
+        crawl = worker.CrawlRequest(start_url="https://example.edu/", max_bytes=0, max_files=0, max_pages=0)
+        self.assertEqual(wildcard.max_results, 0)
+        self.assertEqual(wildcard.indexes, 0)
+        self.assertEqual(imported.max_bytes, 0)
+        self.assertEqual(crawl.max_bytes, 0)
+        self.assertEqual(crawl.max_files, 0)
+        self.assertEqual(crawl.max_pages, 0)
+
+    def test_document_url_normalization_removes_fragment_and_host_case(self):
+        self.assertEqual(
+            worker.normalize_document_url("HTTPS://WWW.MIT.EDU/manual.pdf#page=4"),
+            "https://www.mit.edu/manual.pdf",
+        )
+
     def test_index_fuzz_plan_distributes_budget_across_hosts(self):
         req = worker.IndexedFuzzRequest(
             seed_urls=[
@@ -214,6 +328,7 @@ class PDFLabCoreTests(unittest.TestCase):
             ],
             paths=["docs/", "manual"],
             extensions=["pdf"],
+            institution_domains=[],
             max_probes=10,
         )
         with patch.object(worker, "valid_http", return_value=True):
@@ -228,14 +343,14 @@ class PDFLabCoreTests(unittest.TestCase):
     def test_index_fuzz_plan_includes_original_seed_urls(self):
         seed = "https://example.edu/docs/aviation-handbook.pdf"
         req = worker.IndexedFuzzRequest(
-            seed_urls=[seed], paths=["manual"], extensions=["pdf"], max_probes=5
+            seed_urls=[seed], institution_domains=[], paths=["manual"], extensions=["pdf"], max_probes=5
         )
         with patch.object(worker, "valid_http", return_value=True):
             plan = worker.build_index_fuzz_plan(req)
         self.assertIn((seed, "https://example.edu", seed), plan["probe_jobs"])
 
     def test_index_fuzz_job_plan_rejects_empty_seed_list(self):
-        req = worker.IndexedFuzzRequest(seed_urls=[])
+        req = worker.IndexedFuzzRequest(seed_urls=[], institution_domains=[])
         with self.assertRaises(worker.HTTPException):
             worker.build_index_fuzz_plan(req)
 
