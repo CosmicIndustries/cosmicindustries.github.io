@@ -175,6 +175,16 @@ def is_pdf_signature(data):
     return b"%PDF-" in (data or b"")[:1024]
 
 
+def is_pdf_candidate(url, content_type):
+    """Identify responses worth a lightweight PDF-signature probe."""
+    mime=(content_type or "").split(";",1)[0].strip().lower()
+    return (
+        urlparse(url).path.lower().endswith(".pdf")
+        or "pdf" in mime
+        or mime in {"application/octet-stream","binary/octet-stream"}
+    )
+
+
 def extract_pdf(data):
     import io
     reader=PdfReader(io.BytesIO(data), strict=False)
@@ -852,8 +862,6 @@ async def import_discovered_urls(req: ImportURLsRequest):
                         if response.status_code!=200: raise ValueError("HTTP "+str(response.status_code))
                         if not valid_http(str(response.url)): raise ValueError("Unsafe redirect target")
                         ctype=response.headers.get("content-type","").lower()
-                        if "pdf" not in ctype and not urlparse(url).path.lower().endswith(".pdf"):
-                            raise ValueError("Not identified as a PDF")
                         length=int(response.headers.get("content-length","0") or 0)
                         if length>req.max_bytes: raise ValueError("PDF exceeds size limit")
                         chunks=[]; total=0
@@ -1191,10 +1199,7 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
                     response=await client.head(url)
                     status=response.status_code
                     headers=response.headers
-                    candidate_pdf=(
-                        urlparse(url).path.lower().endswith(".pdf")
-                        or "pdf" in headers.get("content-type","").lower()
-                    )
+                    candidate_pdf=is_pdf_candidate(url,headers.get("content-type",""))
                     pdf_verified=False
                     # HEAD metadata and filename extensions are hints only. Verify
                     # candidates with a tiny ranged GET and inspect the actual bytes.
