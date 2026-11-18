@@ -231,6 +231,97 @@ async def crawl(jobid, cfg: CrawlRequest):
     j["status"]="completed"; j["finished_at"]=now()
     log(f"Finished: {pages_seen} HTML pages, {j['stats']['pdfs_found']} PDF candidates, {j['stats']['matches']} content matches, {stored} new files stored.")
 
+
+class WildcardDiscoveryRequest(BaseModel):
+    url_pattern: str
+    max_results: int = Field(default=200, ge=1, le=2000)
+    indexes: int = Field(default=2, ge=1, le=5)
+
+class ImportURLsRequest(BaseModel):
+    urls: list[str] = Field(default_factory=list, max_length=500)
+    filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf"])
+    content_query: str = ""
+    max_bytes: int = Field(default=40_000_000, ge=1024, le=250_000_000)
+    respect_robots: bool = True
+
+def normalize_glob(pattern):
+    return pattern.strip().replace(r"\\*", "*").replace(r"\\?", "?").lower()
+
+def commoncrawl_query_pattern(pattern):
+    # CDX is efficient for domain wildcards; the complete glob is applied locally afterward.
+    p=normalize_glob(pattern)
+    m=re.search(r"\\*([a-z0-9.-]+\\.[a-z]{2,})",p)
+    if m:
+        suffix=m.group(1).lstrip(".")
+        return "*."+suffix+"/*"
+    host=re.search(r"https?://([^/]+)",p)
+    if host and "*" not in host.group(1):
+        return host.group(1)+"/*"
+    raise ValueError("For global discovery, include a recognizable domain suffix such as *.edu/**/*.pdf or *.gov/**/report*.pdf.")
+
+@app.post("/api/discover")
+async def discover_wildcard(req: WildcardDiscoveryRequest):
+    pattern=normalize_glob(req.url_pattern)
+    cdx_pattern=commoncrawl_query_pattern(pattern)
+    async with httpx.AsyncClient(timeout=30,headers={"User-Agent":UA}) as client:
+        info=await client.get("https://index.commoncrawl.org/collinfo.json")
+        info.raise_for_status()
+        collections=info.json()[:req.indexes]
+        results=[]; seen=set(); errors=[]
+        for collection in collections:
+            endpoint=collection.get("cdx-api")
+            if not endpoint: continue
+            try:
+                r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results*3,6000))})
+                if r.status_code==404: continue
+                r.raise_for_status()
+                for line in r.text.splitlines():
+                    try: item=json.loads(line)
+                    except Exception: continue
+                    url=item.get("url","")
+                    if not url or url in seen: continue
+                    if not re.match(r"^https?://",url,re.I): continue
+                    if not __import__("fnmatch").fnmatchcase(url.lower(),pattern): continue
+                    seen.add(url)
+                    results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
+                    if len(results)>=req.max_results: break
+                if len(results)>=req.max_results: break
+            except Exception as e: errors.append(collection.get("id","index")+": "+str(e)[:180])
+    return {"pattern":pattern,"cdx_pattern":cdx_pattern,"results":results,"count":len(results),"indexes_checked":len(collections),"errors":errors,"source":"Common Crawl URL index; captures may be historical"}
+
+@app.post("/api/import-urls")
+async def import_discovered_urls(req: ImportURLsRequest):
+    results=[]; errors=[]
+    async with httpx.AsyncClient(follow_redirects=False,timeout=25,headers={"User-Agent":UA}) as client:
+        for url in req.urls[:500]:
+            try:
+                if not valid_http(url): raise ValueError("URL is not a public http(s) target")
+                if not await can_fetch(client,url,req.respect_robots): raise ValueError("Disallowed by robots.txt")
+                async with client.stream("GET",url) as response:
+                    if 300 <= response.status_code < 400 and response.headers.get("location"):
+                        raise ValueError("Redirect not followed; add the final URL explicitly")
+                    if response.status_code!=200: raise ValueError("HTTP "+str(response.status_code))
+                    if not valid_http(str(response.url)): raise ValueError("Unsafe redirect target")
+                    ctype=response.headers.get("content-type","").lower()
+                    if "pdf" not in ctype and not urlparse(url).path.lower().endswith(".pdf"): raise ValueError("Not identified as a PDF")
+                    length=int(response.headers.get("content-length","0") or 0)
+                    if length>req.max_bytes: raise ValueError("PDF exceeds size limit")
+                    chunks=[]; total=0
+                    async for chunk in response.aiter_bytes():
+                        total+=len(chunk)
+                        if total>req.max_bytes: raise ValueError("PDF exceeds size limit")
+                        chunks.append(chunk)
+                    data=b"".join(chunks)
+                name=unquote(Path(urlparse(url).path).name) or "document.pdf"
+                if not name.lower().endswith(".pdf"): name+=".pdf"
+                if not filename_matches(name,req.filename_patterns): continue
+                body,np,pages=extract_pdf(data)
+                if not query_matches(body,req.content_query): continue
+                docid,new=store_pdf(url,name,data,name,body,np)
+                results.append({"id":docid,"filename":name,"url":url,"pages":np,"bytes":len(data),"new":new})
+            except Exception as e: errors.append({"url":url,"error":str(e)[:200]})
+    return {"imported":len(results),"results":results,"errors":errors}
+
 @app.get("/api/health")
 def health():
     c=connect(); count=c.execute("SELECT COUNT(*) n FROM documents").fetchone()["n"]; c.close()
