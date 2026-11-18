@@ -2263,7 +2263,8 @@ def worker_status():
             combined.append({
                 "id":item.get("id"),"type":kind,"status":item.get("status"),
                 "created_at":item.get("created_at"),"started_at":item.get("started_at"),
-                "finished_at":item.get("finished_at"),"stats":item.get("stats",{}),
+                "finished_at":item.get("finished_at"),"phase":item.get("phase"),
+                "stats":item.get("stats",{}),
                 "config":item.get("config",{}) if kind=="crawl" else {},
                 "error":item.get("error"),
             })
