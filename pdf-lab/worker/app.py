@@ -277,12 +277,24 @@ def glob_to_regex(pattern):
         i+=1
     return re.compile("^"+"".join(out)+"$",re.I)
 
-def commoncrawl_query_pattern(pattern):
+def commoncrawl_query_pattern(pattern, mode="glob"):
+    """Derive a narrow CDX prefix query; exact semantics are enforced locally."""
     p=pattern.lower()
-    m=re.search(r"\.([a-z]{2,})(?:[./*]|$)",p)
-    if m: return "*."+m.group(1)+"/*"
-    host=re.search(r"https?://([^/]+)",p)
-    if host and "*" not in host.group(1): return host.group(1)+"/*"
+    if mode=="regex":
+        # Recover a literal hostname/TLD from common anchored or unanchored URL regexes.
+        host=re.search(r"https?://(?:\\[\\^/\\]\\+|[^/]+)?(\\.[a-z]{2,})",p)
+        if host: return "*"+host.group(1)+"/*"
+        literal=re.search(r"https?://([a-z0-9.-]+)",p)
+        if literal: return literal.group(1)+"/*"
+        raise ValueError("Regex discovery needs a recognizable URL host or suffix, e.g. ^https://[^/]+\\\\.edu/...")
+    # Query just the URL prefix that exists before the first wildcard in the host/path.
+    literal=re.sub(r"[*?].*$","",p)
+    m=re.search(r"https?://([^/]+)",literal)
+    if m and m.group(1) and "." in m.group(1):
+        host=m.group(1)
+        if not host.startswith("."): return host+"/*"
+    tld=re.search(r"\\.([a-z]{2,})",p)
+    if tld: return "*."+tld.group(1)+"/*"
     raise ValueError("Global discovery needs a recognizable suffix (.edu/.gov/.org) or literal host.")
 
 def url_matcher(pattern, mode):
@@ -290,6 +302,23 @@ def url_matcher(pattern, mode):
         try: return re.compile(pattern,re.I)
         except re.error as e: raise HTTPException(400,"Invalid URL regular expression: "+str(e))
     return glob_to_regex(pattern)
+
+def cdx_query_candidates(pattern, mode):
+    """Create several narrower query candidates to avoid broad-index 504s."""
+    if mode=="regex":
+        return [commoncrawl_query_pattern(pattern,mode)]
+    p=normalize_glob(pattern)
+    # Literal hostname is the strongest possible CDX narrowing.
+    host=re.search(r"https?://([^/]+)",p)
+    if host and not any(ch in host.group(1) for ch in "*?"):
+        return [host.group(1)+"/*"]
+    # For a leading *.edu glob, split common useful first-level host labels into parallel CDX queries.
+    tld=re.search(r"\\.([a-z]{2,})(?:/|$)",p)
+    if not tld:
+        return [commoncrawl_query_pattern(pattern,mode)]
+    suffix="."+tld.group(1)
+    # Avoid one huge *.edu/* query. Query several narrower URL prefixes, still filtering full pattern locally.
+    return [prefix+suffix+"/*" for prefix in ("www","lib","archive","repository","digital","scholarship","docs","files","catalog","open")]
 
 async def recursive_url_discovery(client, seeds, matcher, req, results, seen, errors):
     """Bounded same-host crawl from up to five discovered host roots."""
@@ -331,35 +360,38 @@ async def recursive_url_discovery(client, seeds, matcher, req, results, seen, er
 async def discover_wildcard(req: WildcardDiscoveryRequest):
     pattern=req.url_pattern.strip()
     matcher=url_matcher(pattern,req.match_mode)
-    cdx_pattern=commoncrawl_query_pattern(pattern)
-    async with httpx.AsyncClient(timeout=30,headers={"User-Agent":UA}) as client:
+    query_patterns=cdx_query_candidates(pattern,req.match_mode)
+    async with httpx.AsyncClient(timeout=httpx.Timeout(18.0,connect=8.0),headers={"User-Agent":UA}) as client:
         info=await client.get("https://index.commoncrawl.org/collinfo.json")
         info.raise_for_status()
         collections=info.json()[:req.indexes]
-        results=[]; seen=set(); errors=[]
+        results=[]; seen=set(); errors=[]; queried=[]
         for collection in collections:
             endpoint=collection.get("cdx-api")
             if not endpoint: continue
-            try:
-                r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results*10,10000))})
-                if r.status_code==404: continue
-                r.raise_for_status()
-                for line in r.text.splitlines():
-                    try: item=json.loads(line)
-                    except Exception: continue
-                    url=item.get("url","")
-                    if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
-                    if not matcher.search(url): continue
-                    seen.add(url)
-                    results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
-                    if len(results)>=req.max_results: break
+            for cdx_pattern in query_patterns:
                 if len(results)>=req.max_results: break
-            except Exception as e: errors.append(collection.get("id","index")+": "+str(e)[:180])
+                try:
+                    r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results,1000))},timeout=18.0)
+                    if r.status_code==404: continue
+                    r.raise_for_status()
+                    queried.append(collection.get("id","index")+":"+cdx_pattern)
+                    for line in r.text.splitlines():
+                        try: item=json.loads(line)
+                        except Exception: continue
+                        url=item.get("url","")
+                        if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
+                        if not matcher.search(url): continue
+                        seen.add(url)
+                        results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
+                        if len(results)>=req.max_results: break
+                except Exception as e:
+                    errors.append(collection.get("id","index")+" "+cdx_pattern+": "+str(e)[:150])
+            if len(results)>=req.max_results: break
         pages_crawled=0
         if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
             pages_crawled=await recursive_url_discovery(client,[x["url"] for x in results],matcher,req,results,seen,errors)
-    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_pattern":cdx_pattern,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"source":"Common Crawl URL index + bounded live recursive crawl" if req.recursive else "Common Crawl URL index; captures may be historical"}
-
+    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,"queries_succeeded":queried,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"partial":bool(errors),"source":"Common Crawl URL index + bounded live recursive crawl" if req.recursive else "Common Crawl URL index; captures may be historical"}
 @app.post("/api/import-urls")
 async def import_discovered_urls(req: ImportURLsRequest):
     results=[]; errors=[]
