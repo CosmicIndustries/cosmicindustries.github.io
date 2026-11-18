@@ -494,17 +494,31 @@ def store_document(url, filename, data, title, text, pages):
     digest=hashlib.sha256(data).hexdigest()
     ext=Path(filename).suffix.lower() or ".bin"
     path=FILES/(digest+ext)
-    if not path.exists(): path.write_bytes(data)
+    metadata=derive_document_metadata(url,filename,title,text)
+    duplicate_key=document_duplicate_key(text,metadata)
     c=connect()
     existing=c.execute("SELECT id FROM documents WHERE sha256=?",(digest,)).fetchone()
     if existing:
         c.close()
         return existing["id"],False
+    if duplicate_key:
+        duplicate=c.execute("SELECT doc_id FROM document_metadata WHERE duplicate_key=?",(duplicate_key,)).fetchone()
+        if duplicate:
+            c.close()
+            return duplicate["doc_id"],False
+    if not path.exists():path.write_bytes(data)
     docid=str(uuid.uuid4())
     c.execute("INSERT INTO documents VALUES(?,?,?,?,?,?,?,?,?,?)",
       (docid,digest,url,filename,title,str(path),len(data),pages,text,now()))
     c.execute("INSERT INTO document_fts VALUES(?,?,?,?,?)",(docid,filename,title or "",url,text))
     c.execute("INSERT INTO document_fts_linguistic VALUES(?,?,?,?,?)",(docid,filename,title or "",url,text))
+    c.execute(
+      "INSERT INTO document_metadata(doc_id,domain,series_key,series_title,year,chapter,part,edition,version_label,duplicate_key) "
+      "VALUES(?,?,?,?,?,?,?,?,?,?)",
+      (docid,metadata["domain"],metadata["series_key"],metadata["series_title"],
+       metadata["year"],metadata["chapter"],metadata["part"],metadata["edition"],
+       metadata["version_label"],duplicate_key)
+    )
     c.commit();c.close()
     return docid,True
 
@@ -1899,27 +1913,31 @@ def get_job(jobid:str):
     return jobs[jobid]
 
 @app.get("/api/documents")
-def list_documents(q:str="",limit:int=200,format:str=""):
+def list_documents(q:str="",limit:int=0,format:str="",sort:str="date"):
     c=connect()
-    capped=min(max(limit,1),500)
+    capped=limit if limit>0 else 1000000
+    columns=(
+      "d.id,d.filename,d.title,d.url,d.bytes,d.pages,d.sha256,d.discovered_at,"
+      "m.domain,m.series_key,m.series_title,m.year,m.chapter,m.part,m.edition,m.version_label"
+    )
     if q.strip():
         try:
             rows=c.execute(
-                "SELECT d.id,d.filename,d.title,d.url,d.bytes,d.pages,d.sha256,d.discovered_at "
-                "FROM document_fts_linguistic f JOIN documents d ON d.id=f.id "
-                "WHERE document_fts_linguistic MATCH ? ORDER BY rank LIMIT ?",
-                (q,capped*3)
+                "SELECT "+columns+" FROM documents d "
+                "LEFT JOIN document_metadata m ON m.doc_id=d.id "
+                "JOIN document_fts_linguistic f ON f.id=d.id "
+                "WHERE document_fts_linguistic MATCH ?",
+                (q,)
             ).fetchall()
         except sqlite3.OperationalError:
             rows=c.execute(
-                "SELECT id,filename,title,url,bytes,pages,sha256,discovered_at FROM documents "
-                "WHERE filename LIKE ? OR title LIKE ? OR text LIKE ? ORDER BY discovered_at DESC LIMIT ?",
-                (f"%{q}%",f"%{q}%",f"%{q}%",capped*3)
+                "SELECT "+columns+" FROM documents d LEFT JOIN document_metadata m ON m.doc_id=d.id "
+                "WHERE d.filename LIKE ? OR d.title LIKE ? OR d.text LIKE ?",
+                (f"%{q}%",f"%{q}%",f"%{q}%")
             ).fetchall()
     else:
         rows=c.execute(
-            "SELECT id,filename,title,url,bytes,pages,sha256,discovered_at FROM documents ORDER BY discovered_at DESC LIMIT ?",
-            (capped*3,)
+            "SELECT "+columns+" FROM documents d LEFT JOIN document_metadata m ON m.doc_id=d.id"
         ).fetchall()
     c.close()
     output=[]
@@ -1931,8 +1949,17 @@ def list_documents(q:str="",limit:int=200,format:str=""):
         if format and item["format"]!=format.lower().lstrip("."):
             continue
         output.append(item)
-        if len(output)>=capped:break
-    return output
+    reverse=sort in ("date","year","size")
+    keys={
+        "date":lambda x:(x.get("discovered_at") or ""),
+        "title":lambda x:((x.get("series_title") or x.get("title") or x.get("filename") or "").casefold()),
+        "domain":lambda x:((x.get("domain") or "").casefold(),(x.get("series_title") or "").casefold()),
+        "year":lambda x:(x.get("year") or 0,x.get("chapter") or 0,x.get("part") or 0),
+        "size":lambda x:int(x.get("bytes") or 0),
+        "format":lambda x:(x.get("format") or "",(x.get("filename") or "").casefold()),
+    }
+    output.sort(key=keys.get(sort,keys["date"]),reverse=reverse)
+    return output[:capped]
 
 
 def document_row(docid):
