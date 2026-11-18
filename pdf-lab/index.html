@@ -316,8 +316,8 @@ function renderDockJob(job){
  const name=document.createElement('strong');name.textContent=kind.toUpperCase()+' · '+job.status;
  const detail=document.createElement('div');detail.className='dock-muted';
  let current=0,total=0,summary='';
- if(kind==='fuzzer'){current=stats.finished||0;total=stats.planned||0;summary=(stats.documents||0)+' documents · '+(stats.errors||0)+' errors'}
- else if(kind==='import'){current=stats.finished||0;total=stats.planned||0;summary=(stats.stored||0)+' indexed · '+(stats.errors||0)+' errors · '+(stats.excluded||0)+' excluded'}
+ if(kind==='fuzzer'){current=stats.finished||0;total=stats.planned||0;summary=(job.phase||'domain discovery')+' · '+(stats.domains_discovered||0)+' domains · '+(stats.indexed_candidates||0)+' index hits · '+(stats.local_index_seeds||0)+' local seeds · '+(stats.pdfs||0)+' PDFs · '+(stats.errors||0)+' errors'}
+ else if(kind==='import'){current=stats.finished||0;total=stats.planned||0;summary=(stats.stored||0)+' indexed · '+(stats.duplicates||0)+' duplicates skipped · '+(stats.errors||0)+' errors · '+(stats.excluded||0)+' excluded'}
  else{current=stats.pages_visited||0;total=Number((job.config||{}).max_pages||0);summary=(stats.matches||0)+' indexed matches · '+(stats.urls_visited||0)+' URLs'}
  detail.textContent=total?current+'/'+total+' · '+summary:summary;
  box.append(name,detail);
