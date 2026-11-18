@@ -53,7 +53,7 @@ class PDFLabCoreTests(unittest.TestCase):
     def test_arquivo_json_lines_are_normalized(self):
         payload = (
             '{"url":"https://example.edu/report.pdf","timestamp":"20261118010101",'
-            '"mime":"application/pdf","status":"200"}\\n'
+            '"mime":"application/pdf","status":"200"}\n'
             '{"url":"https://example.edu/handbook.pdf","timestamp":"20251118010101",'
             '"mime":"application/pdf","status":"200"}'
         )
