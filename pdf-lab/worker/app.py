@@ -1875,6 +1875,12 @@ async def expand_university_index(req: IndexedFuzzRequest, errors):
                             "mime":item.get("mime"),"status":item.get("status"),
                             "collection":"commoncrawl:"+str(collection.get("id","index")),
                         })
+                except (httpx.TimeoutException,httpx.TransportError) as exc:
+                    errors.append(
+                        "Common Crawl domain expansion stopped after network failure at "+
+                        str(collection.get("id","index"))+": "+type(exc).__name__+": "+str(exc)[:140]
+                    )
+                    break
                 except Exception as exc:
                     errors.append(
                         "Common Crawl domain expansion "+str(collection.get("id","index"))+": "+
