@@ -10,7 +10,7 @@ chmod +x run.sh
 ./run.sh
 ```
 
-Then open the PDF Lab page and set **Worker API** to `http://127.0.0.1:8787`. Keep the worker running while using Crawl, Search, and Library.
+Then open **http://127.0.0.1:8787/**. The worker serves the interface and API from the same origin, avoiding browser mixed-content / cross-origin failures. Keep the terminal running while searching.
 
 - API health: http://127.0.0.1:8787/api/health
 - Interactive API docs: http://127.0.0.1:8787/docs
