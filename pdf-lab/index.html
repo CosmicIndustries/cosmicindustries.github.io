@@ -47,18 +47,11 @@ $('run').onclick=runSearch;
 $('selectAll').onclick=()=>document.querySelectorAll('#results input[type=checkbox]').forEach(x=>x.checked=true);
 function renderFuzzResults(items){
  const root=$('results');root.replaceChildren();
- if(!items.length){root.innerHTML='<div class="empty">The host/path fuzzer completed without finding additional paths. Try another wordlist or use fewer seed hosts.</div>';return}
- for(const [i,x] of items.entries()){
-  const label=document.createElement('label');label.className='result';
-  const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!x.is_pdf;cb.dataset.pathIndex=i;cb.style.width='auto';
-  const span=document.createElement('span');span.textContent=x.status+' · '+x.url+' · '+(x.content_type||'unknown type')+' · '+(x.is_pdf?'PDF signature verified':'not verified as PDF')+' · seed: '+x.seed_url;
-  label.append(cb,span);root.append(label);
- }
  const archiveSeen=new Set();
  const archiveSources=candidates.filter(x=>x.archive_file_url&&String(x.mime||'').toLowerCase().includes('pdf'));
  if(archiveSources.length){
   const heading=document.createElement('p');heading.className='hint';
-  heading.textContent='Archived PDF copies · live URL is tried first; archived file is used if the original is unavailable or not a PDF.';
+  heading.textContent='ARCHIVED PDF RECOVERY · '+archiveSources.length+' archived PDF candidates · live source is tried first; the preserved binary is used if the original is unavailable or not a PDF.';
   root.append(heading);
  }
  for(const source of archiveSources){
@@ -71,6 +64,20 @@ function renderFuzzResults(items){
   span.textContent=(source.title||source.url)+' · '+(source.timestamp||'archive capture')+' · archived PDF; signature verified during import';
   const link=document.createElement('a');link.href=source.archive_url||source.archive_file_url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Open archive';
   label.append(cb,span,document.createTextNode(' · '),link);root.append(label);
+ }
+ if(items.length){
+  const heading=document.createElement('p');heading.className='hint';
+  heading.textContent='LIVE HOST/PATH PROBES · '+items.length+' HTTP responses · only signature-verified PDF files are preselected.';
+  root.append(heading);
+ }else if(!archiveSources.length){
+  root.innerHTML='<div class="empty">No live paths or archived PDF candidates were found. Try a broader archive search or another keyword.</div>';
+  return;
+ }
+ for(const [i,x] of items.entries()){
+  const label=document.createElement('label');label.className='result';
+  const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!x.is_pdf;cb.dataset.pathIndex=i;cb.style.width='auto';
+  const span=document.createElement('span');span.textContent=x.status+' · '+x.url+' · '+(x.content_type||'unknown type')+' · '+(x.is_pdf?'PDF signature verified':'not verified as PDF')+' · seed: '+x.seed_url;
+  label.append(cb,span);root.append(label);
  }
 }
 async function pollFuzz(jobId){
