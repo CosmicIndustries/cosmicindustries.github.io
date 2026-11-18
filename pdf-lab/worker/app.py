@@ -1006,6 +1006,7 @@ async def arquivo_discovery(client, pattern, mode, matcher, max_results, errors)
 async def discover_wildcard(req: WildcardDiscoveryRequest):
     pattern=req.url_pattern.strip()
     matcher=url_matcher(pattern,req.match_mode)
+    result_limit=req.max_results or 10000
     try:
         query_patterns=cdx_query_candidates(pattern,req.match_mode)
     except ValueError as exc:
@@ -1017,10 +1018,10 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
     async with httpx.AsyncClient(timeout=timeout,headers={"User-Agent":UA},limits=httpx.Limits(max_connections=12,max_keepalive_connections=6)) as client:
         # When a plain-term/phrase query is supplied, search archived PDF text
         # before falling back to URL-only CDX results.
-        if len(results)<req.max_results and "pdf" in {x.lower().lstrip(".") for x in req.extensions}:
+        if len(results)<result_limit and "pdf" in {x.lower().lstrip(".") for x in req.extensions}:
             text_results,text_requests,text_state=await arquivo_text_discovery(
                 client,req.content_query,pattern,req.match_mode,matcher,
-                req.max_results-len(results),errors
+                result_limit-len(results),errors
             )
             pages_fetched+=text_requests
             providers["arquivo-textsearch"]=text_state
@@ -1035,7 +1036,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             collection_data=info.json()
             if not isinstance(collection_data,list):
                 raise ValueError("Common Crawl collection list was not a JSON array")
-            collections=collection_data[:req.indexes]
+            collections=collection_data if req.indexes==0 else collection_data[:req.indexes]
             providers["commoncrawl"]="available"
         except Exception as exc:
             providers["commoncrawl"]="unavailable"
@@ -1069,13 +1070,13 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             endpoint=collection.get("cdx-api")
             if not endpoint: continue
             for query_index,cdx_pattern in enumerate(query_patterns):
-                if len(results)>=req.max_results or commoncrawl_abort: break
+                if len(results)>=result_limit or commoncrawl_abort: break
                 try:
                     # One bounded response per host shard. The old pageSize=1
                     # loop could issue dozens of calls for a single shard.
                     params={
                         "url":cdx_pattern,"output":"json","filter":"status:200",
-                        "collapse":"urlkey","limit":str(min(req.max_results,2000)),
+                        "collapse":"urlkey","limit":str(min(result_limit,2000)),
                         "fl":"url,timestamp,mime,status",
                     }
                     response=await cdx_get(endpoint,params)
@@ -1090,7 +1091,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                         seen.add(url)
                         results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),
                                         "status":item.get("status"),"collection":"commoncrawl"})
-                        if len(results)>=req.max_results: break
+                        if len(results)>=result_limit: break
                 except Exception as exc:
                     message="Common Crawl "+str(collection.get("id","index"))+" "+cdx_pattern+": "+type(exc).__name__+": "+str(exc)[:160]
                     errors.append(message)
@@ -1100,11 +1101,11 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                             or isinstance(exc,httpx.HTTPStatusError)):
                         commoncrawl_abort=True
                         break
-                if query_index+1<len(query_patterns) and len(results)<req.max_results and not commoncrawl_abort:
+                if query_index+1<len(query_patterns) and len(results)<result_limit and not commoncrawl_abort:
                     # Common Crawl asks clients to space CDX requests and avoid
                     # concurrent calls from the same IP.
                     await asyncio.sleep(1.05)
-            if len(results)>=req.max_results or commoncrawl_abort: break
+            if len(results)>=result_limit or commoncrawl_abort: break
 
         commoncrawl_count=sum(1 for item in results if item.get("collection")=="commoncrawl")
         commoncrawl_errors=any(error.startswith("Common Crawl ") for error in errors)
@@ -1116,10 +1117,10 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             providers["commoncrawl"]="empty"
         # Arquivo.pt is an independent CDX source and is queried before Wayback.
         # It is a supplement, not a complete mirror of the global web.
-        if len(results)<req.max_results:
+        if len(results)<result_limit:
             try:
                 arquivo_results,arquivo_requests=await arquivo_discovery(
-                    client,pattern,req.match_mode,matcher,req.max_results-len(results),errors
+                    client,pattern,req.match_mode,matcher,result_limit-len(results),errors
                 )
                 pages_fetched+=arquivo_requests
                 for item in arquivo_results:
@@ -1131,10 +1132,10 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                 errors.append("Arquivo.pt CDX: "+type(exc).__name__+": "+str(exc)[:160])
 
         # Internet Archive Wayback remains the final independent fallback.
-        if len(results)<req.max_results:
+        if len(results)<result_limit:
             try:
                 wayback_results,wayback_pages=await wayback_discovery(
-                    client,pattern,req.match_mode,matcher,req.max_results-len(results),errors
+                    client,pattern,req.match_mode,matcher,result_limit-len(results),errors
                 )
                 pages_fetched+=wayback_pages
                 for item in wayback_results:
@@ -1145,7 +1146,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                 providers["wayback"]="unavailable"
                 errors.append("Wayback CDX: "+type(exc).__name__+": "+str(exc)[:160])
 
-        if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
+        if req.recursive and req.recursive_depth>0 and len(results)<result_limit:
             before=len(results)
             pages_crawled=await recursive_url_discovery(client,[x["url"] for x in results],matcher,req,results,seen,errors)
             if len(results)>before: providers["live-recursive"]="results"
