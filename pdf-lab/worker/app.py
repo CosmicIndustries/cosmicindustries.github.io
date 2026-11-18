@@ -307,7 +307,7 @@ def glob_to_regex(pattern):
         elif ch=="?": out.append("[^/]")
         else: out.append(re.escape(ch))
         i+=1
-    return re.compile("^"+"".join(out)+"$",re.I)
+    return re.compile("^"+"".join(out)+r"(?:[?#].*)?$",re.I)
 
 def commoncrawl_query_pattern(pattern, mode="glob"):
     """Derive a narrow CDX prefix query; exact semantics are enforced locally."""
@@ -458,7 +458,10 @@ async def wayback_discovery(client, pattern, mode, matcher, max_results, errors)
 async def discover_wildcard(req: WildcardDiscoveryRequest):
     pattern=req.url_pattern.strip()
     matcher=url_matcher(pattern,req.match_mode)
-    query_patterns=cdx_query_candidates(pattern,req.match_mode)
+    try:
+        query_patterns=cdx_query_candidates(pattern,req.match_mode)
+    except ValueError as exc:
+        raise HTTPException(400,detail=str(exc))
     results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0
     pages_crawled=0; page_limit_reached=False
     providers={"commoncrawl":"not-run","wayback":"not-run"}
@@ -539,14 +542,18 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         # Use Wayback as an independent fallback when Common Crawl is unavailable,
         # failed, or did not find enough candidates.
         if len(results)<req.max_results:
-            wayback_results,wayback_pages=await wayback_discovery(
-                client,pattern,req.match_mode,matcher,req.max_results-len(results),errors
-            )
-            pages_fetched+=wayback_pages
-            for item in wayback_results:
-                if item["url"] not in seen:
-                    seen.add(item["url"]); results.append(item)
-            providers["wayback"]="results" if wayback_results else ("empty" if wayback_pages else "unavailable")
+            try:
+                wayback_results,wayback_pages=await wayback_discovery(
+                    client,pattern,req.match_mode,matcher,req.max_results-len(results),errors
+                )
+                pages_fetched+=wayback_pages
+                for item in wayback_results:
+                    if item["url"] not in seen:
+                        seen.add(item["url"]); results.append(item)
+                providers["wayback"]="results" if wayback_results else ("empty" if wayback_pages else "unavailable")
+            except Exception as exc:
+                providers["wayback"]="unavailable"
+                errors.append("Wayback CDX: "+type(exc).__name__+": "+str(exc)[:160])
 
         if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
             before=len(results)
@@ -571,37 +578,50 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         "source":" + ".join(source_names) if source_names else "No external index returned results; local tools remain available",
     }
 
+
 @app.post("/api/import-urls")
 async def import_discovered_urls(req: ImportURLsRequest):
-    results=[]; errors=[]
-    async with httpx.AsyncClient(follow_redirects=False,timeout=25,headers={"User-Agent":UA}) as client:
-        for url in req.urls[:500]:
+    sem=asyncio.Semaphore(6)
+    async with httpx.AsyncClient(follow_redirects=False,timeout=25,
+            headers={"User-Agent":UA},limits=httpx.Limits(max_connections=8,max_keepalive_connections=6)) as client:
+        async def import_one(url):
             try:
                 if not valid_http(url): raise ValueError("URL is not a public http(s) target")
-                if not await can_fetch(client,url,req.respect_robots): raise ValueError("Disallowed by robots.txt")
-                async with client.stream("GET",url) as response:
-                    if 300 <= response.status_code < 400 and response.headers.get("location"):
-                        raise ValueError("Redirect not followed; add the final URL explicitly")
-                    if response.status_code!=200: raise ValueError("HTTP "+str(response.status_code))
-                    if not valid_http(str(response.url)): raise ValueError("Unsafe redirect target")
-                    ctype=response.headers.get("content-type","").lower()
-                    if "pdf" not in ctype and not urlparse(url).path.lower().endswith(".pdf"): raise ValueError("Not identified as a PDF")
-                    length=int(response.headers.get("content-length","0") or 0)
-                    if length>req.max_bytes: raise ValueError("PDF exceeds size limit")
-                    chunks=[]; total=0
-                    async for chunk in response.aiter_bytes():
-                        total+=len(chunk)
-                        if total>req.max_bytes: raise ValueError("PDF exceeds size limit")
-                        chunks.append(chunk)
-                    data=b"".join(chunks)
+                async with sem:
+                    if not await can_fetch(client,url,req.respect_robots):
+                        raise ValueError("Disallowed by robots.txt")
+                    async with client.stream("GET",url) as response:
+                        if 300 <= response.status_code < 400 and response.headers.get("location"):
+                            raise ValueError("Redirect not followed; add the final URL explicitly")
+                        if response.status_code!=200: raise ValueError("HTTP "+str(response.status_code))
+                        if not valid_http(str(response.url)): raise ValueError("Unsafe redirect target")
+                        ctype=response.headers.get("content-type","").lower()
+                        if "pdf" not in ctype and not urlparse(url).path.lower().endswith(".pdf"):
+                            raise ValueError("Not identified as a PDF")
+                        length=int(response.headers.get("content-length","0") or 0)
+                        if length>req.max_bytes: raise ValueError("PDF exceeds size limit")
+                        chunks=[]; total=0
+                        async for chunk in response.aiter_bytes():
+                            total+=len(chunk)
+                            if total>req.max_bytes: raise ValueError("PDF exceeds size limit")
+                            chunks.append(chunk)
+                        data=b"".join(chunks)
                 name=unquote(Path(urlparse(url).path).name) or "document.pdf"
                 if not name.lower().endswith(".pdf"): name+=".pdf"
-                if not filename_matches(name,req.filename_patterns): continue
-                body,np,pages=extract_pdf(data)
-                if not query_matches(body,req.content_query): continue
+                if not filename_matches(name,req.filename_patterns):
+                    return None, None
+                body,np,pages=await asyncio.to_thread(extract_pdf,data)
+                if not query_matches(body,req.content_query):
+                    return None, None
+                # This synchronous DB/file commit is short and runs on the event loop,
+                # serializing SQLite writes while downloads and extraction stay concurrent.
                 docid,new=store_pdf(url,name,data,name,body,np)
-                results.append({"id":docid,"filename":name,"url":url,"pages":np,"bytes":len(data),"new":new})
-            except Exception as e: errors.append({"url":url,"error":str(e)[:200]})
+                return {"id":docid,"filename":name,"url":url,"pages":np,"bytes":len(data),"new":new},None
+            except Exception as exc:
+                return None,{"url":url,"error":str(exc)[:200]}
+        pairs=await asyncio.gather(*(import_one(url) for url in req.urls[:500]))
+    results=[item for item,error in pairs if item]
+    errors=[error for item,error in pairs if error]
     return {"imported":len(results),"results":results,"errors":errors}
 
 
@@ -644,7 +664,7 @@ DISCOVERY_TOOLS = ["ffuf","feroxbuster","dirsearch","gobuster","dirb","katana","
 def tool_inventory():
     import shutil
     return {"tools":[{"name":name,"available":shutil.which(name) is not None,"path":shutil.which(name)} for name in DISCOVERY_TOOLS],
-            "native_engines":["Common Crawl CDX","bounded async path probe","HTML link crawler","PDF text regex grep","SQLite FTS5"]}
+            "native_engines":["Common Crawl CDX with Wayback fallback","bounded concurrent indexed-host fuzzer","bounded async path probe","HTML link crawler","concurrent ripgrep with page-aware memoized extraction","SQLite FTS5 Porter stemming + BM25 ranking"]}
 
 
 @lru_cache(maxsize=32)
