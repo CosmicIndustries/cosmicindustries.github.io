@@ -655,7 +655,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
                     detail=str(exc).lower()
                     if ("cdx request failed" in detail or "http 429" in detail or "http 503" in detail
                             or isinstance(exc,(httpx.TimeoutException,httpx.TransportError))
-                            or (isinstance(exc,httpx.HTTPStatusError) and exc.response.status_code>=500)):
+                            or isinstance(exc,httpx.HTTPStatusError)):
                         commoncrawl_abort=True
                         break
                 if query_index+1<len(query_patterns) and len(results)<req.max_results and not commoncrawl_abort:
