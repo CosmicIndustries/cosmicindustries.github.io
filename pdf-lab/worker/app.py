@@ -1688,6 +1688,36 @@ def is_soft_404_response(status, headers, baseline):
     return False
 
 
+def adjacent_version_filenames(filename):
+    """Generate sibling filenames for adjacent years/chapters/parts seen in indexed files."""
+    suffix=Path(filename).suffix
+    stem=Path(filename).stem
+    variants=set()
+    year=re.search(r"(?<!\d)((?:19|20)\d{2})(?!\d)",stem)
+    if year:
+        current=int(year.group(1))
+        for value in (current-1,current+1):
+            if 1900<=value<=2099:
+                variants.add(stem[:year.start(1)]+str(value)+stem[year.end(1):]+suffix)
+    unit_patterns=(
+        r"(?i)\b(chapter|chap|ch)([-_. ]*)(\d{1,3})\b",
+        r"(?i)\b(part|pt|unit|module|lesson|volume|vol)([-_. ]*)(\d{1,3})\b",
+    )
+    for pattern in unit_patterns:
+        match=re.search(pattern,stem)
+        if not match:
+            continue
+        current=int(match.group(3))
+        for value in (current-1,current+1):
+            if value<1:
+                continue
+            variants.add(
+                stem[:match.start(3)]+str(value)+stem[match.end(3):]+suffix
+            )
+    variants.discard(filename)
+    return sorted(variants)
+
+
 def build_index_fuzz_plan(req: IndexedFuzzRequest):
     """Validate seeds and create a bounded, evenly distributed probe plan."""
     if not req.seed_urls and not req.institution_domains:
@@ -1746,14 +1776,27 @@ def build_index_fuzz_plan(req: IndexedFuzzRequest):
                 probe_jobs.append((seed,origin,seed))
                 host_added+=1
         directories={"/"}
+        derived_files=[]
         for seed in seeds:
-            parts=[x for x in urlparse(seed).path.split("/") if x]
+            seed_path=unquote(urlparse(seed).path)
+            parts=[x for x in seed_path.split("/") if x]
             if parts and "." in parts[-1]:
+                parent="/"+"/".join(parts[:-1])+"/" if len(parts)>1 else "/"
+                for sibling in adjacent_version_filenames(parts[-1]):
+                    derived_files.append((parent+sibling,seed))
                 parts=parts[:-1]
             prefix=[]
             for part in parts:
                 prefix.append(part)
                 directories.add("/"+"/".join(prefix)+"/")
+        # Probe adjacent years/chapters/parts from names already present in the
+        # index before falling back to generic wordlist paths.
+        for relative_path,seed in derived_files:
+            url=origin+relative_path
+            if url not in seen and (host_budget is None or host_added<host_budget):
+                seen.add(url)
+                probe_jobs.append((url,origin,seed))
+                host_added+=1
         ordered_dirs=sorted(directories,key=lambda x:(0 if x!="/" else 1,x.count("/"),x))
         for directory in ordered_dirs:
             for path in clean_paths:
