@@ -6,7 +6,7 @@ from functools import lru_cache
 from collections import deque
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin, urlparse, urldefrag, unquote
+from urllib.parse import urljoin, urlparse, urlsplit, urlunsplit, urldefrag, unquote
 from urllib.robotparser import RobotFileParser
 import xml.etree.ElementTree as ET
 
