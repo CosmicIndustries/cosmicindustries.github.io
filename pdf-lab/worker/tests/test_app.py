@@ -222,8 +222,10 @@ class PDFLabCoreTests(unittest.TestCase):
         with patch.object(worker, "valid_http", return_value=True):
             plan = worker.build_index_fuzz_plan(req)
         self.assertEqual(len(plan["origins"]), 2)
-        self.assertIn("https://mit.edu/", plan["origins"])
-        self.assertIn("https://mga.edu/", plan["origins"])
+        self.assertIn("https://mit.edu", plan["origins"])
+        self.assertIn("https://mga.edu", plan["origins"])
+        self.assertIn("https://mit.edu/", plan["origins"]["https://mit.edu"])
+        self.assertIn("https://mga.edu/", plan["origins"]["https://mga.edu"])
         self.assertTrue(any(x[0] == "https://mit.edu/manual.pdf" for x in plan["probe_jobs"]))
         self.assertTrue(any(x[0] == "https://mga.edu/manual.pdf" for x in plan["probe_jobs"]))
 
