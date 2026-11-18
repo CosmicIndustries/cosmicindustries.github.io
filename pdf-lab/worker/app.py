@@ -76,9 +76,10 @@ def domain_allowed(host, root_host, allow, same):
     host=(host or "").lower().rstrip(".")
     root_host=(root_host or "").lower().rstrip(".")
     allowed={x.lower().strip().rstrip(".") for x in allow if x.strip()}
-    if host==root_host or host.endswith("."+root_host): return True
+    if host==root_host: return True
+    if same and host.endswith("."+root_host): return True
     if any(host==x or host.endswith("."+x) for x in allowed): return True
-    return not same
+    return False
 
 async def can_fetch(client, url, respect):
     if not respect: return True
