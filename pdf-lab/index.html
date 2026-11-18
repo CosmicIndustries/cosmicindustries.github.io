@@ -51,7 +51,7 @@ function renderFuzzResults(items){
  for(const [i,x] of items.entries()){
   const label=document.createElement('label');label.className='result';
   const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!x.is_pdf;cb.dataset.pathIndex=i;cb.style.width='auto';
-  const span=document.createElement('span');span.textContent=x.status+' · '+x.url+' · '+(x.content_type||'unknown type')+' · seed: '+x.seed_url;
+  const span=document.createElement('span');span.textContent=x.status+' · '+x.url+' · '+(x.content_type||'unknown type')+' · '+(x.is_pdf?'PDF signature verified':'not verified as PDF')+' · seed: '+x.seed_url;
   label.append(cb,span);root.append(label);
  }
 }
@@ -65,7 +65,7 @@ async function pollFuzz(jobId){
   }
   if(d.status==='completed'){
    pathMatches=d.results||[];renderFuzzResults(pathMatches);
-   showStatus('Indexed-host fuzzing complete · '+s.hosts_checked+' hosts · '+s.seeds_used+' seeds · '+s.tested+'/'+s.planned+' requests tested · '+s.found+' paths found · '+s.errors+' errors · '+s.robots_blocked+' robots blocked. PDF results are preselected for import.');
+   showStatus('Indexed-host fuzzing complete · '+s.hosts_checked+' hosts · '+s.seeds_used+' seeds · '+s.tested+'/'+s.planned+' requests tested · '+s.found+' HTTP paths found · '+(s.pdfs||0)+' PDFs signature-verified · '+s.errors+' errors · '+s.robots_blocked+' robots blocked. Only verified PDFs are preselected.');
   }else{
    showStatus('Indexed-host fuzzer failed: '+(d.error||'unknown worker error'));
   }
@@ -94,7 +94,34 @@ $('fuzzIndexes').onclick=async()=>{
   showStatus('Indexed-host fuzzing failed: '+e.message);
  }
 };
-$('import').onclick=async()=>{const urls=[...document.querySelectorAll('#results input[type=checkbox]:checked')].map(x=>x.dataset.pathIndex!==undefined?pathMatches[Number(x.dataset.pathIndex)]?.url:candidates[Number(x.dataset.i)]?.url).filter(Boolean);if(!urls.length){showStatus('Select at least one candidate.');return}showStatus('Fetching '+urls.length+' PDFs…');try{const d=await api('/api/import-urls',{method:'POST',body:body({urls,filename_patterns:patterns(),content_query:$('terms').value.trim(),max_bytes:selectedMaxBytes(),respect_robots:$('robots').checked})});render(d.results||[]);showStatus('Stored '+d.imported+' PDFs; '+d.errors.length+' errors or exclusions.')}catch(e){showStatus('Import failed: '+e.message)}};
+$('import').onclick=async()=>{
+ const urls=[...document.querySelectorAll('#results input[type=checkbox]:checked')]
+  .map(x=>x.dataset.pathIndex!==undefined?pathMatches[Number(x.dataset.pathIndex)]?.url:candidates[Number(x.dataset.i)]?.url)
+  .filter(Boolean);
+ if(!urls.length){showStatus('Select at least one candidate. Only signature-verified fuzzer PDFs are preselected.');return}
+ showStatus('Fetching and verifying '+urls.length+' PDFs…');
+ try{
+  const d=await api('/api/import-urls',{method:'POST',body:body({
+   urls,filename_patterns:patterns(),content_query:$('terms').value.trim(),
+   max_bytes:selectedMaxBytes(),respect_robots:$('robots').checked
+  })});
+  render(d.results||[]);
+  const errors=d.errors||[],excluded=d.excluded||[];
+  showStatus('Stored '+d.imported+' PDFs · '+errors.length+' download/validation errors · '+excluded.length+' filter exclusions.');
+  if(errors.length||excluded.length){
+   const root=$('results');
+   const heading=document.createElement('p');heading.className='hint';
+   heading.textContent='Import diagnostics · showing up to 20 of '+(errors.length+excluded.length)+' rejected or excluded URLs';
+   root.append(heading);
+   for(const item of [...errors,...excluded].slice(0,20)){
+    const row=document.createElement('div');row.className='result';
+    const detail=document.createElement('small');
+    detail.textContent=(item.error||'Unknown reason')+' · '+(item.url||'');
+    row.append(detail);root.append(row);
+   }
+  }
+ }catch(e){showStatus('Import failed: '+e.message)}
+};
 $('refresh').onclick=async()=>{try{const d=await api('/api/documents?limit=500');render(d);showStatus('Catalog loaded · '+d.length+' documents.')}catch(e){showStatus('Catalog unavailable: '+e.message)}};
 fetch(WORKER+'/api/health').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(h=>{workerOnline=true;$('health').textContent='Local worker connected · '+h.documents+' PDFs indexed · '+h.data_dir;return fetch(WORKER+'/api/tools')}).then(r=>r.json()).then(d=>{$('toolInventory').textContent='Local tools detected: '+d.tools.filter(x=>x.available).map(x=>x.name).join(', ')+(d.tools.some(x=>x.available)?'':'none of the optional binaries')+' · native grep/crawler/path engines available'}).catch(()=>$('health').textContent='Local worker offline · browser search modes are available; start the worker at '+WORKER_HINT+'/ for full PDF processing.');setMode();
 </script></body></html>
