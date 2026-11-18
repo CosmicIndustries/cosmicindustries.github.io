@@ -165,9 +165,9 @@ class CrawlRequest(BaseModel):
     filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf","*.pptx","*.ppt","*.docx","*.doc","*.xlsx","*.xls","*.odp","*.odt","*.ods"])
     content_query: str = ""
     depth: int = Field(default=3, ge=0, le=12)
-    max_pages: int = Field(default=500, ge=1, le=5000)
-    max_files: int = Field(default=250, ge=1, le=2000)
-    max_bytes: int = Field(default=40_000_000, ge=1024, le=250_000_000)
+    max_pages: int = Field(default=0, ge=0)
+    max_files: int = Field(default=0, ge=0)
+    max_bytes: int = Field(default=0, ge=0)
     delay_seconds: float = Field(default=0.5, ge=0.1, le=30)
     same_domain: bool = True
     allow_domains: list[str] = Field(default_factory=list)
@@ -521,7 +521,7 @@ async def crawl(jobid, cfg: CrawlRequest):
     queue=deque([(start,0)]); visited=set(); found=set(); stored=0; pages_seen=0
     limits=httpx.Limits(max_connections=8,max_keepalive_connections=4)
     async with httpx.AsyncClient(follow_redirects=False,limits=limits,headers={"User-Agent":UA}) as client:
-      while queue and pages_seen<cfg.max_pages and len(found)<cfg.max_files:
+      while queue and (not cfg.max_pages or pages_seen<cfg.max_pages) and (not cfg.max_files or len(found)<cfg.max_files):
         url,level=queue.popleft(); url=urldefrag(url)[0]
         if url in visited: continue
         visited.add(url)
@@ -541,12 +541,12 @@ async def crawl(jobid, cfg: CrawlRequest):
                 if not valid_http(str(response.url)): continue
                 ctype=response.headers.get("content-type","").lower()
                 length=int(response.headers.get("content-length","0") or 0)
-                if length>cfg.max_bytes: continue
+                if cfg.max_bytes and length>cfg.max_bytes: continue
                 if is_document_candidate(url,ctype):
                     chunks=[]; total=0
                     async for chunk in response.aiter_bytes():
                         total+=len(chunk)
-                        if total>cfg.max_bytes: raise ValueError("file exceeds max_bytes")
+                        if cfg.max_bytes and total>cfg.max_bytes: raise ValueError("file exceeds max_bytes")
                         chunks.append(chunk)
                     data=b"".join(chunks)
                     name=unquote(Path(urlparse(url).path).name) or "document"
@@ -572,7 +572,7 @@ async def crawl(jobid, cfg: CrawlRequest):
                     log((("Stored " if new else "Already catalogued ") if cfg.download_matches else "Matched (download disabled) ")+name)
                 elif "text/html" in ctype and level<cfg.depth:
                     data=await response.aread()
-                    if len(data)>cfg.max_bytes: continue
+                    if cfg.max_bytes and len(data)>cfg.max_bytes: continue
                     soup=BeautifulSoup(data,"html.parser")
                     pages_seen+=1; j["stats"]["pages_visited"]=pages_seen
                     for a in soup.select("a[href]"):
@@ -593,13 +593,13 @@ async def crawl(jobid, cfg: CrawlRequest):
 class WildcardDiscoveryRequest(BaseModel):
     url_pattern: str
     content_query: str = ""
-    extensions: list[str] = Field(default_factory=lambda:["pdf","pptx","ppt","docx","doc","xlsx","xls","odp","odt","ods"], max_length=20)
+    extensions: list[str] = Field(default_factory=lambda:["pdf","pptx","ppt","docx","doc","xlsx","xls","odp","odt","ods"])
     match_mode: str = Field(default="glob", pattern="^(glob|regex)$")
-    max_results: int = Field(default=200, ge=1, le=2000)
-    indexes: int = Field(default=2, ge=1, le=5)
+    max_results: int = Field(default=0, ge=0)
+    indexes: int = Field(default=0, ge=0)
     recursive: bool = False
     recursive_depth: int = Field(default=2, ge=0, le=3)
-    max_pages: int = Field(default=30, ge=1, le=100)
+    max_pages: int = Field(default=0, ge=0)
     respect_robots: bool = True
 
 class ArchiveImportSource(BaseModel):
@@ -609,11 +609,11 @@ class ArchiveImportSource(BaseModel):
 
 
 class ImportURLsRequest(BaseModel):
-    urls: list[str] = Field(default_factory=list, max_length=500)
-    archive_sources: list[ArchiveImportSource] = Field(default_factory=list, max_length=500)
+    urls: list[str] = Field(default_factory=list)
+    archive_sources: list[ArchiveImportSource] = Field(default_factory=list)
     filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf","*.pptx","*.ppt","*.docx","*.doc","*.xlsx","*.xls","*.odp","*.odt","*.ods"])
     content_query: str = ""
-    max_bytes: int = Field(default=40_000_000, ge=1024, le=250_000_000)
+    max_bytes: int = Field(default=0, ge=0)
     respect_robots: bool = True
 
 
@@ -1194,13 +1194,13 @@ async def import_discovered_urls(req: ImportURLsRequest):
                     if not valid_http(str(response.url)):
                         raise ValueError("Unsafe redirect target")
                     length=int(response.headers.get("content-length","0") or 0)
-                    if length>req.max_bytes:
-                        raise ValueError("Document exceeds size limit")
+                    if req.max_bytes and length>req.max_bytes:
+                        raise ValueError("Document exceeds configured size limit")
                     chunks=[]; total=0
                     async for chunk in response.aiter_bytes():
                         total+=len(chunk)
-                        if total>req.max_bytes:
-                            raise ValueError("Document exceeds size limit")
+                        if req.max_bytes and total>req.max_bytes:
+                            raise ValueError("Document exceeds configured size limit")
                         chunks.append(chunk)
                     data=b"".join(chunks)
                     validate_document_signature(data,expected_filename)
