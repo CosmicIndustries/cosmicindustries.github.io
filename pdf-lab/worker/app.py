@@ -267,6 +267,24 @@ def connect():
             if not still_used:
                 try:Path(duplicate_path).unlink(missing_ok=True)
                 except OSError:pass
+    multi_version_sha=c.execute("SELECT value FROM pdf_lab_meta WHERE key='document_sha_multi_version_v1'").fetchone()
+    if not multi_version_sha:
+        # Keep the real content hash non-unique: one binary may legitimately
+        # represent multiple catalogued editions with distinct year/chapter metadata.
+        c.execute("DROP TABLE IF EXISTS documents_new")
+        c.execute("""CREATE TABLE documents_new(
+          id TEXT PRIMARY KEY, sha256 TEXT NOT NULL, url TEXT NOT NULL,
+          filename TEXT NOT NULL, title TEXT, path TEXT NOT NULL, bytes INTEGER NOT NULL,
+          pages INTEGER, text TEXT NOT NULL, discovered_at TEXT NOT NULL)""")
+        c.execute(
+            "INSERT INTO documents_new(id,sha256,url,filename,title,path,bytes,pages,text,discovered_at) "
+            "SELECT id,sha256,url,filename,title,path,bytes,pages,text,discovered_at FROM documents"
+        )
+        c.execute("DROP TABLE documents")
+        c.execute("ALTER TABLE documents_new RENAME TO documents")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_documents_sha256 ON documents(sha256)")
+        c.execute("INSERT INTO pdf_lab_meta(key,value) VALUES('document_sha_multi_version_v1','done')")
+        c.commit()
     migrated=c.execute("SELECT value FROM pdf_lab_meta WHERE key='linguistic_fts_v1'").fetchone()
     if not migrated:
         c.execute("""INSERT INTO document_fts_linguistic(id,filename,title,url,body)
@@ -613,10 +631,17 @@ def store_document(url, filename, data, title, text, pages):
     metadata=derive_document_metadata(url,filename,title,text)
     duplicate_key=document_duplicate_key(text,metadata)
     c=connect()
-    existing=c.execute("SELECT id FROM documents WHERE sha256=?",(digest,)).fetchone()
-    if existing:
-        c.close()
-        return existing["id"],False
+    existing=c.execute(
+        "SELECT d.id,m.year,m.chapter,m.part,m.edition FROM documents d "
+        "LEFT JOIN document_metadata m ON m.doc_id=d.id WHERE d.sha256=?",
+        (digest,)
+    ).fetchall()
+    version=(metadata["year"],metadata["chapter"],metadata["part"],metadata["edition"])
+    for row in existing:
+        existing_version=(row["year"],row["chapter"],row["part"],row["edition"])
+        if existing_version==version:
+            c.close()
+            return row["id"],False
     if duplicate_key:
         duplicate=c.execute("SELECT doc_id FROM document_metadata WHERE duplicate_key=?",(duplicate_key,)).fetchone()
         if duplicate:
