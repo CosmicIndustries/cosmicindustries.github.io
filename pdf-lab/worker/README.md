@@ -32,7 +32,7 @@ The crawler follows ordinary HTML links and direct PDF URLs. It does not bypass 
 
 Intelligent grep (POST /api/grep) searches extracted PDF pages with ripgrep when installed, otherwise Python regex. It supports literals, regex, case sensitivity, whole-word matching, filename globs, hit counts, page numbers, and line-numbered context. Page extraction is memoized and document searches run through a bounded worker pool.
 
-Directory / wordlist discovery (POST /api/discover-paths) provides bounded, concurrent, same-host path probing. The **Fuzz indexed hosts** action (POST /api/fuzz-indexes) takes URLs returned by global indexes, deduplicates their hosts, derives known directory prefixes from those URLs, and feeds both the directories and configured wordlist into a bounded async probe pool. Results are relevance-sorted with PDF candidates first and can be sent directly to PDF import. Both probes use HEAD with a one-byte Range fallback and respect robots.txt when enabled.
+Directory / wordlist discovery (POST /api/discover-paths) provides bounded, concurrent, same-host path probing. The **Fuzz indexed hosts** action (POST /api/fuzz-indexes) takes URLs returned by global indexes, deduplicates their hosts, derives known directory prefixes from those URLs, and feeds both the directories and configured wordlist into a bounded async probe pool. Results are relevance-sorted with PDF candidates first and can be sent directly to PDF import. Both probes use HEAD with a one-byte Range fallback and respect robots.txt when enabled. Path work uses fixed-size worker pools rather than one task per wordlist entry. Indexed-host fuzzing has a global concurrency cap, a two-request per-host cap, a per-host request interval, and shares its probe budget across all discovered hosts.
 
 The worker reports installed tool availability at GET /api/tools. The path fuzzer is a bounded native Python implementation; ripgrep is executed for PDF text grep when available. Other detected binaries are informational and are not silently launched. Probe only public systems you own or are explicitly authorized to assess.
 
@@ -60,6 +60,17 @@ Global discovery currently expects a recognizable public suffix such as `.edu`, 
 - `POST /api/search` linguistically normalized full-text search using FTS5 Porter stemming, Unicode diacritic folding, and BM25 relevance ranking
 - `POST /api/grep` concurrent ripgrep/Python regex with memoized page-aware PDF extraction
 - `GET /api/documents/{id}/download` retrieve a locally stored PDF
+
+## Regression tests
+
+From `pdf-lab/worker/`, run the offline regression suite:
+
+```bash
+python -m unittest discover -s tests -v
+python -m py_compile app.py
+```
+
+The suite checks recursive `.edu` glob matching, Wayback CDX JSON parsing, result ordering, boolean content expressions, private-address rejection, Porter stemming, and BM25 availability. GitHub Actions runs the same checks when worker files change.
 
 ## Data and privacy
 
