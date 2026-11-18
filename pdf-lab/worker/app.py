@@ -222,7 +222,7 @@ def document_signature_probe(data, filename, content_type=""):
     if ext=="pdf":
         return is_pdf_signature(prefix)
     if ext in OFFICE_ZIP_FORMATS:
-        return prefix.startswith(b"PK\\x03\\x04")
+        return prefix.startswith(b"PK\x03\x04")
     if ext in LEGACY_OFFICE_FORMATS:
         return prefix.startswith(bytes.fromhex("D0CF11E0A1B11AE1"))
     mime=(content_type or "").lower()
@@ -301,8 +301,8 @@ def _extract_ooxml(data, ext):
         names=set(archive.namelist())
         if ext=="pptx":
             slide_names=sorted(
-                (n for n in names if re.fullmatch(r"ppt/slides/slide\\d+\\.xml",n)),
-                key=lambda n:int(re.search(r"slide(\\d+)",n).group(1))
+                (n for n in names if re.fullmatch(r"ppt/slides/slide\d+\.xml",n)),
+                key=lambda n:int(re.search(r"slide(\d+)",n).group(1))
             )
             if not slide_names:
                 raise ValueError("Presentation contains no readable slides.")
@@ -315,7 +315,7 @@ def _extract_ooxml(data, ext):
             if "word/document.xml" not in names:
                 raise ValueError("Word document body is missing.")
             paragraphs=_xml_paragraph_text(archive.read("word/document.xml"))
-            for part in sorted(n for n in names if re.fullmatch(r"word/(header|footer)\\d+\\.xml",n)):
+            for part in sorted(n for n in names if re.fullmatch(r"word/(header|footer)\d+\.xml",n)):
                 paragraphs.extend(_xml_paragraph_text(archive.read(part)))
             lines.extend(paragraphs)
             page_records=[{"page":1,"line":i+1,"text":p[:500]} for i,p in enumerate(paragraphs)]
@@ -326,8 +326,8 @@ def _extract_ooxml(data, ext):
                 for si in root:
                     shared.append("".join(node.text or "" for node in si.iter()
                                           if node.tag.rsplit("}",1)[-1]=="t"))
-            sheets=sorted((n for n in names if re.fullmatch(r"xl/worksheets/sheet\\d+\\.xml",n)),
-                          key=lambda n:int(re.search(r"sheet(\\d+)",n).group(1)))
+            sheets=sorted((n for n in names if re.fullmatch(r"xl/worksheets/sheet\d+\.xml",n)),
+                          key=lambda n:int(re.search(r"sheet(\d+)",n).group(1)))
             for number,name in enumerate(sheets,1):
                 root=ET.fromstring(archive.read(name)); rows=[]
                 for row in root.iter():
