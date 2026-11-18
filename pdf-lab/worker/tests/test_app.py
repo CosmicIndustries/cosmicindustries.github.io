@@ -75,6 +75,17 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertEqual(rows[0]["url"], "https://example.edu/report.pdf")
         self.assertEqual(rows[1]["mime"], "application/pdf")
 
+    def test_discovery_sort_prioritizes_verified_keyword_hits(self):
+        items = [
+            {"url": "https://example.edu/new.pdf", "mime": "application/pdf",
+             "timestamp": "20261118010101", "collection": "commoncrawl"},
+            {"url": "https://example.edu/match.pdf", "mime": "application/pdf",
+             "timestamp": "20240101000000", "collection": "arquivo-textsearch",
+             "query_match": True},
+        ]
+        items.sort(key=worker.discovery_sort_key)
+        self.assertEqual(items[0]["url"], "https://example.edu/match.pdf")
+
     def test_discovery_sort_prefers_pdf_then_newest_capture(self):
         items = [
             {"url": "https://example.edu/old.pdf", "mime": "application/pdf",
