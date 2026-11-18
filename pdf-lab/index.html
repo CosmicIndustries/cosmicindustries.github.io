@@ -59,7 +59,7 @@ async function pollFuzz(jobId){
  try{
   const d=await api('/api/fuzz-indexes/'+encodeURIComponent(jobId));
   const s=d.stats||{};
-  showStatus('Indexed-host fuzzer '+d.status+' · '+(s.finished||0)+'/'+(s.planned||0)+' probes · '+(s.found||0)+' paths found · '+(s.errors||0)+' errors · '+(s.robots_blocked||0)+' robots blocked');
+  showStatus('Indexed-host fuzzer '+d.status+' · '+(s.finished||0)+'/'+(s.planned||0)+' probes · '+(s.found||0)+' paths · '+(s.pdfs||0)+' verified PDFs · '+(s.errors||0)+' errors · '+(s.robots_blocked||0)+' robots blocked');
   if(['queued','running'].includes(d.status)){
    setTimeout(()=>pollFuzz(jobId),900);return;
   }
