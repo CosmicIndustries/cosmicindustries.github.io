@@ -476,10 +476,15 @@ def arquivo_text_query(query):
     value=(query or "").strip()
     if not value:
         return None
-    if re.search(r"\b(?:OR|NOT)\b|[()]",value,re.I):
-        return None
-    value=re.sub(r"\bAND\b"," ",value,flags=re.I)
-    value=" ".join(value.split())
+    tokens=re.findall(r'"[^"]+"|[()]|\S+',value)
+    for token in tokens:
+        quoted=token.startswith('"') and token.endswith('"')
+        if not quoted and (token in ("(",")") or token.upper() in ("OR","NOT")):
+            return None
+    # Arquivo.pt treats separate terms as AND; retain the AND word inside
+    # quoted phrases and remove only standalone Boolean AND operators.
+    tokens=[token for token in tokens if token.startswith('"') or token.upper()!="AND"]
+    value=" ".join(tokens).strip()
     return value or None
 
 
