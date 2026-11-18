@@ -604,60 +604,73 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             for attempt in range(2):
                 try:
                     response=await client.get(endpoint,params=params,timeout=timeout)
-                    if response.status_code in (429,500,502,503,504):
+                    # Rate limiting or overload should stop this provider's run;
+                    # retrying a blocked IP immediately only adds load.
+                    if response.status_code in (429,503):
+                        raise RuntimeError("HTTP "+str(response.status_code)+"; stopping Common Crawl queries for this run")
+                    if response.status_code in (500,502,504):
                         last_error=RuntimeError("HTTP "+str(response.status_code))
-                        if attempt==0: await asyncio.sleep(1.0)
-                        continue
+                        if attempt==0:
+                            await asyncio.sleep(2.0)
+                            continue
                     response.raise_for_status()
                     return response
                 except (httpx.TimeoutException,httpx.TransportError) as exc:
                     last_error=exc
-                    if attempt==0: await asyncio.sleep(1.0)
+                    if attempt==0:
+                        await asyncio.sleep(2.0)
+                        continue
             raise RuntimeError("CDX request failed: "+str(last_error)[:140])
 
+        commoncrawl_abort=False
         for collection in collections:
             endpoint=collection.get("cdx-api")
             if not endpoint: continue
             for query_index,cdx_pattern in enumerate(query_patterns):
-                if len(results)>=req.max_results: break
+                if len(results)>=req.max_results or commoncrawl_abort: break
                 try:
-                    meta=await cdx_get(endpoint,{"url":cdx_pattern,"showNumPages":"true","pageSize":"1","filter":"status:200"})
-                    try:
-                        page_info=meta.json()
-                        total_pages=max(1,int(page_info.get("pages",1)))
-                    except Exception:
-                        total_pages=1
-                    page_cap=min(total_pages,50)
-                    await asyncio.sleep(0.5)
-                    for page_no in range(page_cap):
+                    # One bounded response per host shard. The old pageSize=1
+                    # loop could issue dozens of calls for a single shard.
+                    params={
+                        "url":cdx_pattern,"output":"json","filter":"status:200",
+                        "collapse":"urlkey","limit":str(min(req.max_results,2000)),
+                        "fl":"url,timestamp,mime,status",
+                    }
+                    response=await cdx_get(endpoint,params)
+                    pages_fetched+=1
+                    queried.append(collection.get("id","index")+":"+cdx_pattern)
+                    for line in response.text.splitlines():
+                        try: item=json.loads(line)
+                        except Exception: continue
+                        url=item.get("url","")
+                        if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
+                        if not matcher.search(url): continue
+                        seen.add(url)
+                        results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),
+                                        "status":item.get("status"),"collection":"commoncrawl"})
                         if len(results)>=req.max_results: break
-                        params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey",
-                                "pageSize":"1","page":str(page_no),"limit":str(min(req.max_results,2000)),
-                                "fl":"url,timestamp,mime,status"}
-                        response=await cdx_get(endpoint,params)
-                        pages_fetched+=1
-                        queried.append(collection.get("id","index")+":"+cdx_pattern+"#"+str(page_no))
-                        for line in response.text.splitlines():
-                            try: item=json.loads(line)
-                            except Exception: continue
-                            url=item.get("url","")
-                            if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
-                            if not matcher.search(url): continue
-                            seen.add(url)
-                            results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),
-                                            "status":item.get("status"),"collection":collection.get("id")})
-                            if len(results)>=req.max_results: break
-                        if page_no+1<page_cap and len(results)<req.max_results:
-                            await asyncio.sleep(0.5)
-                    if total_pages>50 and len(results)<req.max_results: page_limit_reached=True
                 except Exception as exc:
-                    errors.append("Common Crawl "+str(collection.get("id","index"))+" "+cdx_pattern+": "+type(exc).__name__+": "+str(exc)[:160])
-                if query_index+1<len(query_patterns) and len(results)<req.max_results:
-                    await asyncio.sleep(0.5)
-            if len(results)>=req.max_results: break
+                    message="Common Crawl "+str(collection.get("id","index"))+" "+cdx_pattern+": "+type(exc).__name__+": "+str(exc)[:160]
+                    errors.append(message)
+                    detail=str(exc).lower()
+                    if ("cdx request failed" in detail or "http 429" in detail or "http 503" in detail
+                            or isinstance(exc,(httpx.TimeoutException,httpx.TransportError))):
+                        commoncrawl_abort=True
+                        break
+                if query_index+1<len(query_patterns) and len(results)<req.max_results and not commoncrawl_abort:
+                    # Common Crawl asks clients to space CDX requests and avoid
+                    # concurrent calls from the same IP.
+                    await asyncio.sleep(1.05)
+            if len(results)>=req.max_results or commoncrawl_abort: break
 
-        if results:
-            providers["commoncrawl"]="results" if providers["commoncrawl"]=="available" else providers["commoncrawl"]
+        commoncrawl_count=sum(1 for item in results if item.get("collection")=="commoncrawl")
+        commoncrawl_errors=any(error.startswith("Common Crawl ") for error in errors)
+        if commoncrawl_count:
+            providers["commoncrawl"]="results"
+        elif commoncrawl_errors:
+            providers["commoncrawl"]="unavailable"
+        elif collections:
+            providers["commoncrawl"]="empty"
         # Arquivo.pt is an independent CDX source and is queried before Wayback.
         # It is a supplement, not a complete mirror of the global web.
         if len(results)<req.max_results:
