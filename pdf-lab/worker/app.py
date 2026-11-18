@@ -297,12 +297,28 @@ class WildcardDiscoveryRequest(BaseModel):
     max_pages: int = Field(default=30, ge=1, le=100)
     respect_robots: bool = True
 
+class ArchiveImportSource(BaseModel):
+    original_url: str
+    archive_file_url: str
+    title: str = ""
+
+
 class ImportURLsRequest(BaseModel):
     urls: list[str] = Field(default_factory=list, max_length=500)
+    archive_sources: list[ArchiveImportSource] = Field(default_factory=list, max_length=500)
     filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf"])
     content_query: str = ""
     max_bytes: int = Field(default=40_000_000, ge=1024, le=250_000_000)
     respect_robots: bool = True
+
+
+def import_source_targets(original_url, archive_file_url=None):
+    """Try the live original first and its exact archived binary second."""
+    targets=[]
+    for target in (original_url,archive_file_url):
+        if target and target not in targets:
+            targets.append(target)
+    return targets
 
 def normalize_glob(pattern):
     return pattern.strip().replace(r"\*", "*").replace(r"\?", "?").lower()
@@ -563,6 +579,7 @@ async def arquivo_text_discovery(client, query, pattern, mode, matcher, max_resu
                 "title":clean_archive_text(item.get("title"),400),
                 "snippet":clean_archive_text(item.get("snippet"),1200),
                 "archive_url":item.get("linkToArchive"),
+                "archive_file_url":item.get("linkToOriginalFile"),
                 "query_match":True,
             })
             if len(found)>=max_results:
@@ -854,52 +871,93 @@ async def import_discovered_urls(req: ImportURLsRequest):
     extract_sem=asyncio.Semaphore(4)
     async with httpx.AsyncClient(follow_redirects=False,timeout=25,
             headers={"User-Agent":UA},limits=httpx.Limits(max_connections=8,max_keepalive_connections=6)) as client:
-        async def import_one(url):
+        async def download_pdf(target_url):
+            if not valid_http(target_url):
+                raise ValueError("URL is not a public http(s) target")
+            async with sem:
+                if not await can_fetch(client,target_url,req.respect_robots):
+                    raise ValueError("Disallowed by robots.txt")
+                async with client.stream("GET",target_url) as response:
+                    if 300 <= response.status_code < 400 and response.headers.get("location"):
+                        raise ValueError("Redirect not followed; add the final URL explicitly")
+                    if response.status_code!=200:
+                        raise ValueError("HTTP "+str(response.status_code))
+                    if not valid_http(str(response.url)):
+                        raise ValueError("Unsafe redirect target")
+                    ctype=response.headers.get("content-type","").lower()
+                    length=int(response.headers.get("content-length","0") or 0)
+                    if length>req.max_bytes:
+                        raise ValueError("PDF exceeds size limit")
+                    chunks=[]; total=0
+                    async for chunk in response.aiter_bytes():
+                        total+=len(chunk)
+                        if total>req.max_bytes:
+                            raise ValueError("PDF exceeds size limit")
+                        chunks.append(chunk)
+                    data=b"".join(chunks)
+                    if not is_pdf_signature(data):
+                        mime=ctype.split(";",1)[0].strip() or "unknown MIME type"
+                        raise ValueError(
+                            f"Response is not a PDF: Content-Type={mime}; "
+                            "missing %PDF- file signature (a .pdf URL suffix is not proof)."
+                        )
+                    return data
+
+        async def import_one(url, archive_file_url=None, title=""):
+            attempts=[]
+            data=None
+            download_url=None
+            for target in import_source_targets(url,archive_file_url):
+                try:
+                    data=await download_pdf(target)
+                    download_url=target
+                    break
+                except Exception as exc:
+                    attempts.append({"url":target,"error":str(exc)[:200]})
+            if data is None:
+                if len(attempts)>1:
+                    reason="Live URL failed: "+attempts[0]["error"]+"; archived copy failed: "+attempts[1]["error"]
+                else:
+                    reason=attempts[0]["error"] if attempts else "No import source was supplied"
+                return None,{"url":url,"error":reason,"attempts":attempts}
+
+            # Use the original source's filename, not the archive's id_ endpoint path.
+            name=unquote(Path(urlparse(url).path).name) or "document.pdf"
+            if not name.lower().endswith(".pdf"):
+                name+=".pdf"
+            if not filename_matches(name,req.filename_patterns):
+                return None,{"url":url,"error":"Excluded: filename did not match the selected glob(s).","excluded":True}
             try:
-                if not valid_http(url): raise ValueError("URL is not a public http(s) target")
-                async with sem:
-                    if not await can_fetch(client,url,req.respect_robots):
-                        raise ValueError("Disallowed by robots.txt")
-                    async with client.stream("GET",url) as response:
-                        if 300 <= response.status_code < 400 and response.headers.get("location"):
-                            raise ValueError("Redirect not followed; add the final URL explicitly")
-                        if response.status_code!=200: raise ValueError("HTTP "+str(response.status_code))
-                        if not valid_http(str(response.url)): raise ValueError("Unsafe redirect target")
-                        ctype=response.headers.get("content-type","").lower()
-                        length=int(response.headers.get("content-length","0") or 0)
-                        if length>req.max_bytes: raise ValueError("PDF exceeds size limit")
-                        chunks=[]; total=0
-                        async for chunk in response.aiter_bytes():
-                            total+=len(chunk)
-                            if total>req.max_bytes: raise ValueError("PDF exceeds size limit")
-                            chunks.append(chunk)
-                        data=b"".join(chunks)
-                        if not is_pdf_signature(data):
-                            mime=ctype.split(";",1)[0].strip() or "unknown MIME type"
-                            raise ValueError(
-                                f"Response is not a PDF: Content-Type={mime}; "
-                                "missing %PDF- file signature (a .pdf URL suffix is not proof)."
-                            )
-                name=unquote(Path(urlparse(url).path).name) or "document.pdf"
-                if not name.lower().endswith(".pdf"): name+=".pdf"
-                if not filename_matches(name,req.filename_patterns):
-                    return None, {"url":url,"error":"Excluded: filename did not match the selected glob(s).","excluded":True}
                 async with extract_sem:
                     body,np,pages=await asyncio.to_thread(extract_pdf,data)
-                if not query_matches(body,req.content_query):
-                    return None, {"url":url,"error":"Excluded: extracted PDF text did not match the content expression.","excluded":True}
-                # This synchronous DB/file commit is short and runs on the event loop,
-                # serializing SQLite writes while downloads and extraction stay concurrent.
-                docid,new=store_pdf(url,name,data,name,body,np)
-                return {"id":docid,"filename":name,"url":url,"pages":np,"bytes":len(data),"new":new},None
             except Exception as exc:
-                return None,{"url":url,"error":str(exc)[:200]}
-        pairs=await asyncio.gather(*(import_one(url) for url in req.urls[:500]))
+                return None,{"url":url,"error":"Verified PDF could not be parsed: "+str(exc)[:160]}
+            if not query_matches(body,req.content_query):
+                return None,{"url":url,"error":"Excluded: extracted PDF text did not match the content expression.","excluded":True}
+
+            document_title=clean_archive_text(title,400) or name
+            docid,new=store_pdf(download_url,name,data,document_title,body,np)
+            return {
+                "id":docid,"filename":name,"title":document_title,
+                "url":url,"download_url":download_url,
+                "retrieved_from_archive":download_url!=url,
+                "pages":np,"bytes":len(data),"new":new,
+            },None
+
+        tasks=[]
+        tasks.extend(import_one(url) for url in req.urls[:500])
+        tasks.extend(
+            import_one(source.original_url,source.archive_file_url,source.title)
+            for source in req.archive_sources[:500]
+        )
+        pairs=await asyncio.gather(*tasks)
     results=[item for item,error in pairs if item]
     outcomes=[error for item,error in pairs if error]
     errors=[item for item in outcomes if not item.get("excluded")]
     excluded=[item for item in outcomes if item.get("excluded")]
     return {"imported":len(results),"results":results,"errors":errors,"excluded":excluded}
+
+
 
 
 class GrepRequest(BaseModel):
