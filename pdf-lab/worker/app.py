@@ -170,6 +170,11 @@ def query_matches(text, query):
         else: stack.append(t in text.lower())
     return len(stack)==1 and bool(stack[0])
 
+def is_pdf_signature(data):
+    """A .pdf filename or MIME label is not proof; require a PDF header near byte zero."""
+    return b"%PDF-" in (data or b"")[:1024]
+
+
 def extract_pdf(data):
     import io
     reader=PdfReader(io.BytesIO(data), strict=False)
@@ -857,14 +862,20 @@ async def import_discovered_urls(req: ImportURLsRequest):
                             if total>req.max_bytes: raise ValueError("PDF exceeds size limit")
                             chunks.append(chunk)
                         data=b"".join(chunks)
+                        if not is_pdf_signature(data):
+                            mime=ctype.split(";",1)[0].strip() or "unknown MIME type"
+                            raise ValueError(
+                                f"Response is not a PDF: Content-Type={mime}; "
+                                "missing %PDF- file signature (a .pdf URL suffix is not proof)."
+                            )
                 name=unquote(Path(urlparse(url).path).name) or "document.pdf"
                 if not name.lower().endswith(".pdf"): name+=".pdf"
                 if not filename_matches(name,req.filename_patterns):
-                    return None, None
+                    return None, {"url":url,"error":"Excluded: filename did not match the selected glob(s).","excluded":True}
                 async with extract_sem:
                     body,np,pages=await asyncio.to_thread(extract_pdf,data)
                 if not query_matches(body,req.content_query):
-                    return None, None
+                    return None, {"url":url,"error":"Excluded: extracted PDF text did not match the content expression.","excluded":True}
                 # This synchronous DB/file commit is short and runs on the event loop,
                 # serializing SQLite writes while downloads and extraction stay concurrent.
                 docid,new=store_pdf(url,name,data,name,body,np)
@@ -873,8 +884,10 @@ async def import_discovered_urls(req: ImportURLsRequest):
                 return None,{"url":url,"error":str(exc)[:200]}
         pairs=await asyncio.gather(*(import_one(url) for url in req.urls[:500]))
     results=[item for item,error in pairs if item]
-    errors=[error for item,error in pairs if error]
-    return {"imported":len(results),"results":results,"errors":errors}
+    outcomes=[error for item,error in pairs if error]
+    errors=[item for item in outcomes if not item.get("excluded")]
+    excluded=[item for item in outcomes if item.get("excluded")]
+    return {"imported":len(results),"results":results,"errors":errors,"excluded":excluded}
 
 
 class GrepRequest(BaseModel):
@@ -1176,13 +1189,28 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
                             await asyncio.sleep(wait)
                         origin_last_request[origin]=time.monotonic()
                     response=await client.head(url)
-                    if response.status_code in (405,501):
-                        async with client.stream("GET",url,headers={"Range":"bytes=0-0"}) as streamed:
+                    status=response.status_code
+                    headers=response.headers
+                    candidate_pdf=(
+                        urlparse(url).path.lower().endswith(".pdf")
+                        or "pdf" in headers.get("content-type","").lower()
+                    )
+                    pdf_verified=False
+                    # HEAD metadata and filename extensions are hints only. Verify
+                    # candidates with a tiny ranged GET and inspect the actual bytes.
+                    if status in (405,501) or (status in (200,206) and candidate_pdf):
+                        async with client.stream("GET",url,headers={"Range":"bytes=0-1023"}) as streamed:
                             status=streamed.status_code
                             headers=streamed.headers
-                    else:
-                        status=response.status_code
-                        headers=response.headers
+                            prefix=bytearray()
+                            if status in (200,206):
+                                async for chunk in streamed.aiter_bytes():
+                                    remaining=1024-len(prefix)
+                                    if remaining>0:
+                                        prefix.extend(chunk[:remaining])
+                                    if len(prefix)>=1024:
+                                        break
+                            pdf_verified=is_pdf_signature(bytes(prefix))
                     stats["tested"]+=1
                     if status in (200,206,301,302,307,308,401,403):
                         result={
@@ -1193,11 +1221,12 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
                             "interesting":status in (401,403),
                             "seed_url":seed,
                             "host":urlparse(origin).hostname,
-                            "is_pdf":("pdf" in headers.get("content-type","").lower()
-                                      or urlparse(url).path.lower().endswith(".pdf")),
+                            "is_pdf":pdf_verified,
+                            "pdf_verified":pdf_verified,
                         }
                         job["results"].append(result)
                         stats["found"]=len(job["results"])
+                        stats["pdfs"]=sum(1 for result in job["results"] if result.get("is_pdf"))
                 except Exception as exc:
                     stats["errors"]+=1
                     if len(job["errors"])<100:
@@ -1252,6 +1281,7 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
             "finished":0,
             "tested":0,
             "found":0,
+            "pdfs":0,
             "errors":0,
             "skipped":0,
             "robots_blocked":0,
