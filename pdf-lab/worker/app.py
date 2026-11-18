@@ -33,6 +33,8 @@ def serve_pdf_lab():
 app.add_middleware(CORSMiddleware, allow_origins=["https://cosmicindustries.github.io","http://127.0.0.1:5500","http://localhost:5500"], allow_methods=["*"], allow_headers=["*"])
 jobs: dict[str, dict] = {}
 job_tasks: dict[str, asyncio.Task] = {}
+fuzz_jobs: dict[str, dict] = {}
+fuzz_job_tasks: dict[str, asyncio.Task] = {}
 robots_cache: dict[str, RobotFileParser] = {}
 robots_locks: dict[str, asyncio.Lock] = {}
 host_validation_cache: dict[str, tuple[float, bool]] = {}
@@ -897,8 +899,8 @@ class IndexedFuzzRequest(BaseModel):
     paths: list[str] = Field(default_factory=list, max_length=1000)
     extensions: list[str] = Field(default_factory=lambda:["pdf"])
     concurrency: int = Field(default=24, ge=1, le=40)
-    timeout: float = Field(default=8, ge=2, le=30)
-    max_probes: int = Field(default=5000, ge=1, le=8000)
+    timeout: float = Field(default=5, ge=2, le=30)
+    max_probes: int = Field(default=800, ge=1, le=8000)
     respect_robots: bool = True
 
 DEFAULT_PATHS = [
@@ -1072,9 +1074,8 @@ async def discover_paths(req: PathDiscoveryRequest):
             "engine":"bounded fixed-worker same-host path probe","available_external_tools":tool_inventory()["tools"]}
 
 
-@app.post("/api/fuzz-indexes")
-async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
-    """Feed index-discovered URLs into a bounded, concurrent same-origin path fuzzer."""
+def build_index_fuzz_plan(req: IndexedFuzzRequest):
+    """Validate seeds and create a bounded, evenly distributed probe plan."""
     if not req.seed_urls:
         raise HTTPException(400,"Supply URL candidates from an index search first.")
     origins={}
@@ -1082,7 +1083,8 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
     for seed in req.seed_urls:
         seed=seed.strip()
         if not valid_http(seed):
-            invalid+=1; continue
+            invalid+=1
+            continue
         parsed=urlparse(seed)
         origin=f"{parsed.scheme}://{parsed.netloc}"
         origins.setdefault(origin,[]).append(seed)
@@ -1090,105 +1092,202 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
         raise HTTPException(400,"No valid public HTTP(S) index URLs were supplied.")
 
     word_paths=req.paths or DEFAULT_PATHS
-    extensions=[x.lower().lstrip(".") for x in req.extensions if re.fullmatch(r"[A-Za-z0-9]{1,8}",x.lstrip("."))]
+    extensions=[x.lower().lstrip(".") for x in req.extensions
+                if re.fullmatch(r"[A-Za-z0-9]{1,8}",x.lstrip("."))]
     clean_paths=[]
     for raw in word_paths:
         p=raw.strip().replace("\\","/").lstrip("/")
         if not p or "://" in p or any(part==".." for part in p.split("/")) or p.startswith("?"):
             continue
         clean_paths.append(p)
-        if not Path(p).suffix:
+        # Directory entries should be probed as directories, not turned into
+        # meaningless paths such as "documents/.pdf".
+        if not p.endswith("/") and not Path(p).suffix:
             clean_paths.extend(p+"."+ext for ext in extensions)
     clean_paths=list(dict.fromkeys(clean_paths))[:1500]
 
-    jobs=[]; seen=set()
-    # Share the global probe budget across hosts so an early index result cannot
-    # consume the entire scan before later institutions receive any coverage.
+    probe_jobs=[]; seen=set()
     origin_items=list(origins.items())
     base_budget,extra_budget=divmod(req.max_probes,len(origin_items))
     for origin_index,(origin,seeds) in enumerate(origin_items):
         host_budget=base_budget+(1 if origin_index<extra_budget else 0)
-        if host_budget<1: continue
+        if host_budget<1:
+            continue
         host_added=0
         directories={"/"}
         for seed in seeds:
             parts=[x for x in urlparse(seed).path.split("/") if x]
-            # Treat the final segment as a filename when it has a suffix.
-            if parts and "." in parts[-1]: parts=parts[:-1]
+            if parts and "." in parts[-1]:
+                parts=parts[:-1]
             prefix=[]
             for part in parts:
                 prefix.append(part)
                 directories.add("/"+"/".join(prefix)+"/")
-        # Search known directories before the domain root, then common root paths.
         ordered_dirs=sorted(directories,key=lambda x:(0 if x!="/" else 1,x.count("/"),x))
         for directory in ordered_dirs:
             for path in clean_paths:
                 url=origin+directory+path
                 if url not in seen:
-                    seen.add(url); jobs.append((url,origin,seeds[0])); host_added+=1
-                if host_added>=host_budget: break
-            if host_added>=host_budget: break
+                    seen.add(url)
+                    probe_jobs.append((url,origin,seeds[0]))
+                    host_added+=1
+                if host_added>=host_budget:
+                    break
+            if host_added>=host_budget:
+                break
 
+    return {
+        "origins":origins,
+        "invalid_seeds":invalid,
+        "probe_jobs":probe_jobs,
+    }
+
+
+async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict):
+    """Execute a fuzzer job while publishing progress and partial results."""
+    job=fuzz_jobs[job_id]
+    origins=plan["origins"]
+    probe_jobs=plan["probe_jobs"]
     sem=asyncio.Semaphore(req.concurrency)
     origin_semaphores={origin:asyncio.Semaphore(2) for origin in origins}
     origin_gates={origin:asyncio.Lock() for origin in origins}
     origin_last_request={origin:0.0 for origin in origins}
-    found=[]; errors=[]; checked=0
-    async with httpx.AsyncClient(follow_redirects=False,timeout=req.timeout,
-            headers={"User-Agent":UA},limits=httpx.Limits(max_connections=req.concurrency,max_keepalive_connections=req.concurrency)) as client:
+    async with httpx.AsyncClient(
+        follow_redirects=False,
+        timeout=req.timeout,
+        headers={"User-Agent":UA},
+        limits=httpx.Limits(max_connections=req.concurrency,max_keepalive_connections=req.concurrency),
+    ) as client:
         async def probe(item):
-            nonlocal checked
             url,origin,seed=item
-            async with sem, origin_semaphores[origin]:
-                if not valid_http(url) or urlparse(url).netloc.lower()!=urlparse(origin).netloc.lower():
-                    return
-                if not await can_fetch(client,url,req.respect_robots):
-                    return
+            stats=job["stats"]
+            async with sem,origin_semaphores[origin]:
                 try:
-                    # At most two concurrent requests per host and >=300 ms between
-                    # request starts per host; other hosts continue in parallel.
+                    if not valid_http(url) or urlparse(url).netloc.lower()!=urlparse(origin).netloc.lower():
+                        stats["skipped"]+=1
+                        return
+                    if not await can_fetch(client,url,req.respect_robots):
+                        stats["robots_blocked"]+=1
+                        stats["skipped"]+=1
+                        return
                     async with origin_gates[origin]:
                         wait=max(0.0,0.30-(time.monotonic()-origin_last_request[origin]))
-                        if wait: await asyncio.sleep(wait)
+                        if wait:
+                            await asyncio.sleep(wait)
                         origin_last_request[origin]=time.monotonic()
                     response=await client.head(url)
                     if response.status_code in (405,501):
                         async with client.stream("GET",url,headers={"Range":"bytes=0-0"}) as streamed:
-                            status=streamed.status_code; headers=streamed.headers
+                            status=streamed.status_code
+                            headers=streamed.headers
                     else:
-                        status=response.status_code; headers=response.headers
-                    checked+=1
+                        status=response.status_code
+                        headers=response.headers
+                    stats["tested"]+=1
                     if status in (200,206,301,302,307,308,401,403):
-                        found.append({
-                            "url":url,"status":status,"content_type":headers.get("content-type",""),
-                            "bytes":headers.get("content-length"),"interesting":status in (401,403),
-                            "seed_url":seed,"host":urlparse(origin).hostname,
-                            "is_pdf":("pdf" in headers.get("content-type","").lower() or urlparse(url).path.lower().endswith(".pdf")),
-                        })
+                        result={
+                            "url":url,
+                            "status":status,
+                            "content_type":headers.get("content-type",""),
+                            "bytes":headers.get("content-length"),
+                            "interesting":status in (401,403),
+                            "seed_url":seed,
+                            "host":urlparse(origin).hostname,
+                            "is_pdf":("pdf" in headers.get("content-type","").lower()
+                                      or urlparse(url).path.lower().endswith(".pdf")),
+                        }
+                        job["results"].append(result)
+                        stats["found"]=len(job["results"])
                 except Exception as exc:
-                    errors.append({"url":url,"error":str(exc)[:120]})
-        # Fixed-size worker set avoids creating thousands of pending asyncio tasks.
+                    stats["errors"]+=1
+                    if len(job["errors"])<100:
+                        job["errors"].append({"url":url,"error":str(exc)[:160]})
+                finally:
+                    stats["finished"]+=1
+
         queue=asyncio.Queue()
-        for item in jobs: queue.put_nowait(item)
+        for item in probe_jobs:
+            queue.put_nowait(item)
+
         async def worker():
             while True:
-                try: item=queue.get_nowait()
-                except asyncio.QueueEmpty: return
-                try: await probe(item)
-                finally: queue.task_done()
-        await asyncio.gather(*(worker() for _ in range(min(req.concurrency,len(jobs)))))
-    found.sort(key=lambda x:(
+                try:
+                    item=queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    return
+                try:
+                    await probe(item)
+                finally:
+                    queue.task_done()
+
+        await asyncio.gather(*(worker() for _ in range(min(req.concurrency,len(probe_jobs)))))
+
+    job["results"].sort(key=lambda x:(
         0 if x["is_pdf"] else 1,
         0 if x["status"] in (200,206) else 1,
         0 if x["interesting"] else 1,
         x["url"].casefold(),
     ))
-    return {
-        "hosts_checked":len(origins),"seeds_used":sum(len(v) for v in origins.values()),
-        "invalid_seeds":invalid,"planned":len(jobs),"tested":checked,"count":len(found),
-        "truncated":len(jobs)>=req.max_probes,"results":found,"errors":errors[:40],
-        "engine":"bounded async indexed-host path fuzzer","concurrency":req.concurrency,
+    stats=job["stats"]
+    stats["hosts_checked"]=len(origins)
+    stats["seeds_used"]=sum(len(v) for v in origins.values())
+    stats["invalid_seeds"]=plan["invalid_seeds"]
+    job["status"]="completed"
+    job["finished_at"]=now()
+
+
+@app.post("/api/fuzz-indexes")
+async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
+    """Queue indexed-host fuzzing and return an ID immediately for progress polling."""
+    plan=build_index_fuzz_plan(req)
+    job_id=str(uuid.uuid4())
+    planned=len(plan["probe_jobs"])
+    fuzz_jobs[job_id]={
+        "id":job_id,
+        "status":"queued",
+        "created_at":now(),
+        "stats":{
+            "planned":planned,
+            "started":0,
+            "finished":0,
+            "tested":0,
+            "found":0,
+            "errors":0,
+            "skipped":0,
+            "robots_blocked":0,
+            "hosts_checked":len(plan["origins"]),
+            "seeds_used":sum(len(v) for v in plan["origins"].values()),
+            "invalid_seeds":plan["invalid_seeds"],
+        },
+        "results":[],
+        "errors":[],
     }
+
+    async def run():
+        fuzz_jobs[job_id]["status"]="running"
+        fuzz_jobs[job_id]["started_at"]=now()
+        try:
+            await run_indexed_fuzz_job(job_id,req,plan)
+        except Exception as exc:
+            fuzz_jobs[job_id]["status"]="failed"
+            fuzz_jobs[job_id]["error"]=str(exc)[:240]
+            fuzz_jobs[job_id]["finished_at"]=now()
+
+    fuzz_job_tasks[job_id]=asyncio.create_task(run())
+    return {
+        "id":job_id,
+        "status":fuzz_jobs[job_id]["status"],
+        "stats":fuzz_jobs[job_id]["stats"],
+    }
+
+
+@app.get("/api/fuzz-indexes/{job_id}")
+def get_index_fuzz_job(job_id: str):
+    """Return live fuzzer progress and any paths discovered so far."""
+    if job_id not in fuzz_jobs:
+        raise HTTPException(404,"Unknown fuzzer job")
+    return fuzz_jobs[job_id]
+
 
 
 @app.get("/api/health")
