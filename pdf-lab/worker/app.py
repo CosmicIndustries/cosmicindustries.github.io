@@ -260,8 +260,14 @@ def normalize_glob(pattern):
     return pattern.strip().replace(r"\*", "*").replace(r"\?", "?").lower()
 
 def glob_to_regex(pattern):
-    """Translate URL glob: * stays within a path segment; ** crosses separators."""
-    p=normalize_glob(pattern); out=[]; i=0
+    """Translate URL glob: * stays within a path segment; ** crosses separators.
+
+    Bare host/path patterns such as *.edu/**/*.pdf are matched against absolute
+    URLs by implicitly adding the HTTP(S) scheme.
+    """
+    p=normalize_glob(pattern)
+    prefix = "" if re.match(r"^https?://",p,re.I) else r"https?://"
+    out=[prefix]; i=0
     while i<len(p):
         ch=p[i]
         if ch=="*":
