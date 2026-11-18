@@ -38,19 +38,19 @@ The worker reports installed tool availability at GET /api/tools. The path fuzze
 
 ## Global wildcard discovery
 
-The interface queries Common Crawl URL indexes and falls back to the independent Internet Archive Wayback CDX index when Common Crawl is unavailable or returns too few candidates, so a search does not need a seed website. Examples:
+The interface queries Common Crawl URL indexes, then supplements them with Arquivo.pt CDX and the independent Internet Archive Wayback CDX index when earlier providers are unavailable or return too few candidates, so a search does not need a seed website. Examples:
 
 - `*.edu/**/*.pdf`
 - `*.gov/**/budget*.pdf`
 - `*.org/**/*manual*.pdf`
 
-The URL matcher supports recursive globs (`*`, `**`, `?`) or full Python regular expressions against complete URLs, including optional URL query strings after a matched PDF path. A single `*` stays within one path segment; `**` crosses path separators, and `**/` can match zero or more directories. Common Crawl queries use bounded host/TLD shards. Wayback CDX acts as a fallback provider when Common Crawl connectivity or coverage is insufficient. Exact glob/regex matching is enforced locally. Provider failures are returned as source-level diagnostics while the endpoint still returns HTTP 200 and any results from other sources. Optional bounded live recursion follows same-host HTML links from up to five discovered host roots. Once URL candidates appear, **Fuzz indexed hosts** feeds their origins and known directory ancestors to the path fuzzer. Both indexes are historical and incomplete; discovered URLs may be stale or unavailable. Use the result selector to fetch, inspect, and store matching PDFs.
+The URL matcher supports recursive globs (`*`, `**`, `?`) or full Python regular expressions against complete URLs, including optional URL query strings after a matched PDF path. A single `*` stays within one path segment; `**` crosses path separators, and `**/` can match zero or more directories. Common Crawl queries use bounded host/TLD shards. Arquivo.pt CDX and Wayback CDX act as independent fallback providers when Common Crawl connectivity or coverage is insufficient. Arquivo.pt is a supplementary web archive with broader-than-Portuguese coverage but is not a complete global index; its CDX API returns newline-delimited JSON. Exact glob/regex matching is enforced locally. Provider failures are returned as source-level diagnostics while the endpoint still returns HTTP 200 and any results from other sources. Optional bounded live recursion follows same-host HTML links from up to five discovered host roots. Once URL candidates appear, **Fuzz indexed hosts** feeds their origins and known directory ancestors to the path fuzzer. Both indexes are historical and incomplete; discovered URLs may be stale or unavailable. Use the result selector to fetch, inspect, and store matching PDFs.
 
 Global discovery currently expects a recognizable public suffix such as `.edu`, `.gov`, or `.org`, or a literal host. It does not enumerate the entire live DNS namespace.
 
 ## API
 
-- `POST /api/discover` search Common Crawl and Wayback CDX indexes with a full-URL glob or regex, optionally adding bounded recursive live-link discovery
+- `POST /api/discover` search Common Crawl, Arquivo.pt, and Wayback CDX indexes with a full-URL glob or regex, optionally adding bounded recursive live-link discovery
 - `POST /api/fuzz-indexes` use index-discovered URLs as seeds for concurrent same-host directory/path probing
 - `POST /api/discover-paths` probe a supplied host with a bounded path wordlist
 - `POST /api/import-urls` concurrently fetch, extract, filter, and store selected discovered PDFs
@@ -70,7 +70,7 @@ python -m unittest discover -s tests -v
 python -m py_compile app.py
 ```
 
-The suite checks recursive `.edu` glob matching, Wayback CDX JSON parsing, result ordering, boolean content expressions, private-address rejection, Porter stemming, and BM25 availability. GitHub Actions runs the same checks when worker files change.
+The suite checks recursive `.edu` glob matching, Wayback header-row and Arquivo.pt NDJSON parsing, archive query construction, result ordering, boolean content expressions, private-address rejection, Porter stemming, and BM25 availability. GitHub Actions runs the same checks when worker files change.
 
 ## Data and privacy
 
