@@ -533,7 +533,7 @@ def intelligent_grep(req: GrepRequest):
     try:
         flags=0 if req.case_sensitive else re.IGNORECASE
         expression=req.pattern if req.regex else re.escape(req.pattern)
-        if req.whole_word: expression=r"\\b(?:"+expression+r")\\b"
+        if req.whole_word: expression=r"\b(?:"+expression+r")\b"
         rx=re.compile(expression,flags)
     except re.error as e: raise HTTPException(400,"Invalid regular expression: "+str(e))
     c=connect()
@@ -557,7 +557,7 @@ def intelligent_grep(req: GrepRequest):
         if rg:
             # Feed page-tagged extracted text to ripgrep over stdin. This keeps rg's
             # regex engine while preserving an exact PDF page/line mapping.
-            payload="".join(f"{x['page']}\\t{x['line']}\\t{x['text']}\\n" for x in records)
+            payload="".join(f"{x['page']}\t{x['line']}\t{x['text']}\n" for x in records)
             cmd=[rg,"--json","--line-number","--color","never"]
             if not req.regex: cmd.append("--fixed-strings")
             if not req.case_sensitive: cmd.append("--ignore-case")
@@ -594,7 +594,7 @@ def intelligent_grep(req: GrepRequest):
             if any(k in used for k in range(lo,hi)): continue
             used.update(range(lo,hi))
             snippets.append({"page":hit["page"],"line":hit["line"],
-                "text":"\\n".join(f"{records[k]['line']}: {records[k]['text'][:500]}" for k in range(lo,hi))})
+                "text":"\n".join(f"{records[k]['line']}: {records[k]['text'][:500]}" for k in range(lo,hi))})
             if len(snippets)>=12: break
         results.append({"id":row["id"],"filename":row["filename"],"title":row["title"],"url":row["url"],
             "hit_count":len(hit_indexes),"pages":matched_pages,"snippets":snippets,"engine":engine})
