@@ -22,6 +22,13 @@ DB = ROOT / "catalog.sqlite3"
 ROOT.mkdir(parents=True, exist_ok=True); FILES.mkdir(parents=True, exist_ok=True)
 UA = "CosmicPDFLab/1.0 (+local research crawler)"
 app = FastAPI(title="Cosmic PDF Lab Worker", version="1.0.0")
+PDF_LAB_PAGE = Path(__file__).resolve().parent.parent / "index.html"
+
+@app.get("/", include_in_schema=False)
+def serve_pdf_lab():
+    if not PDF_LAB_PAGE.is_file():
+        raise HTTPException(404, "PDF Lab interface not found beside the worker.")
+    return FileResponse(PDF_LAB_PAGE, media_type="text/html")
 app.add_middleware(CORSMiddleware, allow_origins=["https://cosmicindustries.github.io","http://127.0.0.1:5500","http://localhost:5500"], allow_methods=["*"], allow_headers=["*"])
 jobs: dict[str, dict] = {}
 job_tasks: dict[str, asyncio.Task] = {}
