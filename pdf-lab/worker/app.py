@@ -1268,10 +1268,10 @@ async def import_discovered_urls(req: ImportURLsRequest):
             },None
 
         job_id=str(uuid.uuid4())
-        planned=len(req.urls[:500])+len(req.archive_sources[:500])
         import_jobs[job_id]={
             "id":job_id,"type":"import","status":"running","created_at":now(),
-            "stats":{"planned":planned,"started":0,"finished":0,"stored":0,"errors":0,"excluded":0},
+            "stats":{"planned":0,"started":0,"finished":0,"stored":0,"duplicates":0,
+                     "duplicate_inputs_skipped":0,"errors":0,"excluded":0},
         }
 
         async def import_one(url,archive_file_url=None,title=""):
@@ -1280,7 +1280,8 @@ async def import_discovered_urls(req: ImportURLsRequest):
             try:
                 item,error=await import_one_core(url,archive_file_url,title)
                 if item:
-                    stats["stored"]+=1
+                    if item.get("new"):stats["stored"]+=1
+                    else:stats["duplicates"]+=1
                 elif error and error.get("excluded"):
                     stats["excluded"]+=1
                 elif error:
@@ -1289,12 +1290,31 @@ async def import_discovered_urls(req: ImportURLsRequest):
             finally:
                 stats["finished"]+=1
 
-        tasks=[]
-        tasks.extend(import_one(url) for url in req.urls[:500])
-        tasks.extend(
-            import_one(source.original_url,source.archive_file_url,source.title)
-            for source in req.archive_sources[:500]
-        )
+        unique_sources={}
+        duplicate_inputs=0
+        for url in req.urls:
+            key=normalize_document_url(url)
+            if key in unique_sources:
+                duplicate_inputs+=1
+            else:
+                unique_sources[key]={"url":url,"archive_file_url":None,"title":""}
+        for source in req.archive_sources:
+            key=normalize_document_url(source.original_url)
+            if key in unique_sources:
+                current=unique_sources[key]
+                if source.archive_file_url and not current.get("archive_file_url"):
+                    current["archive_file_url"]=source.archive_file_url
+                if source.title and not current.get("title"):
+                    current["title"]=source.title
+                duplicate_inputs+=1
+            else:
+                unique_sources[key]={"url":source.original_url,"archive_file_url":source.archive_file_url,"title":source.title}
+        import_jobs[job_id]["stats"]["planned"]=len(unique_sources)
+        import_jobs[job_id]["stats"]["duplicate_inputs_skipped"]=duplicate_inputs
+        tasks=[
+            import_one(source["url"],source["archive_file_url"],source["title"])
+            for source in unique_sources.values()
+        ]
         pairs=await asyncio.gather(*tasks)
     results=[item for item,error in pairs if item]
     outcomes=[error for item,error in pairs if error]
@@ -1303,7 +1323,9 @@ async def import_discovered_urls(req: ImportURLsRequest):
     import_jobs[job_id]["status"]="completed"
     import_jobs[job_id]["finished_at"]=now()
     import_jobs[job_id]["stats"]["imported"]=len(results)
-    return {"job_id":job_id,"imported":len(results),"results":results,"errors":errors,"excluded":excluded}
+    duplicates_skipped=import_jobs[job_id]["stats"]["duplicates"]+duplicate_inputs
+    return {"job_id":job_id,"imported":len(results),"duplicates_skipped":duplicates_skipped,
+            "results":results,"errors":errors,"excluded":excluded}
 
 
 
