@@ -488,6 +488,17 @@ def arquivo_text_query(query):
     return value or None
 
 
+def clean_archive_text(value, max_chars=1200):
+    """Convert archive HTML fragments/entities into safe, readable plain text."""
+    if value is None:
+        return None
+    cleaned=BeautifulSoup(str(value), "html.parser").get_text(" ", strip=True)
+    cleaned=re.sub(r"\s+", " ", cleaned).strip()
+    if len(cleaned)>max_chars:
+        cleaned=cleaned[:max_chars].rsplit(" ",1)[0]+" …"
+    return cleaned or None
+
+
 async def arquivo_text_discovery(client, query, pattern, mode, matcher, max_results, errors):
     """Search archived PDF contents by terms and URL scope."""
     if not (query or "").strip():
@@ -528,8 +539,8 @@ async def arquivo_text_discovery(client, query, pattern, mode, matcher, max_resu
                 "url":url,"timestamp":item.get("tstamp"),
                 "mime":item.get("mimeType"),"status":None,
                 "collection":"arquivo-textsearch",
-                "title":item.get("title"),
-                "snippet":item.get("snippet"),
+                "title":clean_archive_text(item.get("title"),400),
+                "snippet":clean_archive_text(item.get("snippet"),1200),
                 "archive_url":item.get("linkToArchive"),
                 "query_match":True,
             })
