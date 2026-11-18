@@ -334,6 +334,38 @@ class PDFLabCoreTests(unittest.TestCase):
             "https://www.mit.edu/manual.pdf",
         )
 
+    def test_metadata_migration_rewrites_archive_urls_without_losing_document(self):
+        body = "Aviation training reference and aircraft systems procedures " * 8
+        doc_id, created = worker.store_document(
+            "https://mga.edu/aviation/pa28-manual-2024.pdf",
+            "pa28-manual-2024.pdf",
+            b"migration-archive-source-binary",
+            "PA-28 Manual 2024",
+            body,
+            10,
+        )
+        self.assertTrue(created)
+        replay = (
+            "https://arquivo.pt/noFrame/replay/20260101010101id_/"
+            "https://mga.edu/aviation/pa28-manual-2024.pdf"
+        )
+        self.conn.execute("UPDATE documents SET url=? WHERE id=?", (replay, doc_id))
+        self.conn.execute("UPDATE document_fts SET url=? WHERE id=?", (replay, doc_id))
+        self.conn.execute("UPDATE document_fts_linguistic SET url=? WHERE id=?", (replay, doc_id))
+        self.conn.execute("DELETE FROM pdf_lab_meta WHERE key='document_metadata_v4'")
+        self.conn.commit()
+        self.conn.close()
+
+        self.conn = worker.connect()
+        row = self.conn.execute(
+            "SELECT d.url,m.domain,m.year FROM documents d "
+            "JOIN document_metadata m ON m.doc_id=d.id WHERE d.id=?",
+            (doc_id,),
+        ).fetchone()
+        self.assertEqual(row["url"], "https://mga.edu/aviation/pa28-manual-2024.pdf")
+        self.assertEqual(row["domain"], "mga.edu")
+        self.assertEqual(row["year"], 2024)
+
     def test_canonical_document_url_unwraps_arquivo_replay(self):
         replay = (
             "https://arquivo.pt/noFrame/replay/20260101010101id_/"
