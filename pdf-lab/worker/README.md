@@ -99,3 +99,6 @@ Files are downloaded only to the machine running this worker. The static GitHub 
 ### PDF size limits
 
 The import and crawl worker cap each PDF at 250,000,000 bytes. The interface exposes a compatible maximum of 238 MiB (binary MiB), preventing UI values from exceeding the backend byte cap. The PDF parser itself enforces the `%PDF-` signature before calling pypdf, so HTML fallback pages cannot reach the parser. Import verifies the `%PDF-` file signature within the first 1,024 bytes; a `.pdf` filename or MIME header alone is not accepted as proof. Generic binary MIME responses are allowed through to signature verification. Indexed-host fuzzing performs a small ranged GET for `.pdf`, PDF-MIME, and generic binary responses, and only signature-verified PDFs are preselected for import. Import responses separate download/validation errors from filename/content-filter exclusions and display representative reasons in the UI.
+
+
+PDF font decoding: the worker pins `pypdf>=6.20,<7` and `fonttools>=4.60,<5`. This enables CFF Type 1 font decoding; pypdf 6.20 includes caching for the embedded CFF font map. Malformed source CMaps may still produce skipped-line warnings, but these are distinct from import/HTTP failures.
