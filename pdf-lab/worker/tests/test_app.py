@@ -383,6 +383,35 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertIn("https://mga.edu/aviation/flight-manual.pdf", seeds)
         self.assertFalse(any("arquivo.pt" in url for url in seeds))
 
+    def test_adjacent_version_filenames_generate_year_chapter_and_part_siblings(self):
+        variants = worker.adjacent_version_filenames("flight-manual-2024-chapter-3-part-2.pdf")
+        self.assertIn("flight-manual-2023-chapter-3-part-2.pdf", variants)
+        self.assertIn("flight-manual-2025-chapter-3-part-2.pdf", variants)
+        self.assertIn("flight-manual-2024-chapter-2-part-2.pdf", variants)
+        self.assertIn("flight-manual-2024-chapter-4-part-2.pdf", variants)
+        self.assertIn("flight-manual-2024-chapter-3-part-1.pdf", variants)
+        self.assertIn("flight-manual-2024-chapter-3-part-3.pdf", variants)
+
+    def test_fuzzer_plan_probes_adjacent_indexed_chapters(self):
+        req = worker.IndexedFuzzRequest(
+            seed_urls=["https://mga.edu/aviation/flight-manual-2024-chapter-2.pdf"],
+            institution_domains=[],
+            paths=[],
+            extensions=["pdf"],
+            max_probes=0,
+        )
+        with patch.object(worker, "valid_http", return_value=True):
+            plan = worker.build_index_fuzz_plan(req)
+        urls = {item[0] for item in plan["probe_jobs"]}
+        self.assertIn(
+            "https://mga.edu/aviation/flight-manual-2024-chapter-1.pdf",
+            urls,
+        )
+        self.assertIn(
+            "https://mga.edu/aviation/flight-manual-2024-chapter-3.pdf",
+            urls,
+        )
+
     def test_index_fuzz_plan_distributes_budget_across_hosts(self):
         req = worker.IndexedFuzzRequest(
             seed_urls=[
