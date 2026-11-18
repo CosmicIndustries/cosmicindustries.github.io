@@ -293,7 +293,7 @@ def commoncrawl_query_pattern(pattern, mode="glob"):
     if m and m.group(1) and "." in m.group(1):
         host=m.group(1)
         if not host.startswith("."): return host+"/*"
-    tld=re.search(r"\\.([a-z]{2,})",p)
+    tld=re.search(r"\.([a-z]{2,})",p)
     if tld: return "*."+tld.group(1)+"/*"
     raise ValueError("Global discovery needs a recognizable suffix (.edu/.gov/.org) or literal host.")
 
