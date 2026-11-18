@@ -290,6 +290,36 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertEqual(metadata["chapter"], 3)
         self.assertEqual(metadata["series_title"], "PA 28 Warrior Flight Manual")
 
+    def test_identical_binary_keeps_distinct_year_versions_but_skips_same_version(self):
+        body = "Flight training procedures and aircraft limitations " * 10
+        binary = b"same exact PDF binary payload"
+        first_id, first_new = worker.store_document(
+            "https://mga.edu/aviation/flight-manual-2022.pdf",
+            "flight-manual-2022.pdf", binary,
+            "Flight Manual 2022", body, 20,
+        )
+        second_id, second_new = worker.store_document(
+            "https://mga.edu/archive/flight-manual-2023.pdf",
+            "flight-manual-2023.pdf", binary,
+            "Flight Manual 2023", body, 20,
+        )
+        repeat_id, repeat_new = worker.store_document(
+            "https://mga.edu/other/flight-manual-2023.pdf",
+            "flight-manual-2023.pdf", binary,
+            "Flight Manual 2023", body, 20,
+        )
+        self.assertTrue(first_new)
+        self.assertTrue(second_new)
+        self.assertNotEqual(first_id, second_id)
+        self.assertFalse(repeat_new)
+        self.assertEqual(second_id, repeat_id)
+        rows = self.conn.execute(
+            "SELECT d.sha256,m.year FROM documents d "
+            "JOIN document_metadata m ON m.doc_id=d.id WHERE d.sha256=? ORDER BY m.year",
+            (worker.hashlib.sha256(binary).hexdigest(),),
+        ).fetchall()
+        self.assertEqual([row["year"] for row in rows], [2022, 2023])
+
     def test_store_document_skips_same_version_text_duplicate(self):
         body = "Aircraft operating limitations and procedures. " * 12
         data_a = b"document bytes with different metadata A"
