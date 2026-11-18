@@ -56,6 +56,12 @@ class PDFLabCoreTests(unittest.TestCase):
             ["*.edu"],
         )
 
+    def test_arquivo_text_query_translation(self):
+        self.assertEqual(worker.arquivo_text_query("aviation AND aircraft"), "aviation aircraft")
+        self.assertEqual(worker.arquivo_text_query('"flight control"'), '"flight control"')
+        self.assertIsNone(worker.arquivo_text_query("aviation OR helicopter"))
+        self.assertIsNone(worker.arquivo_text_query("aviation NOT obsolete"))
+
     def test_arquivo_json_lines_are_normalized(self):
         payload = (
             '{"url":"https://example.edu/report.pdf","timestamp":"20261118010101",'
