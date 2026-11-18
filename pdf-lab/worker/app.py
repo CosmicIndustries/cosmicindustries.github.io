@@ -1779,13 +1779,71 @@ async def expand_university_index(req: IndexedFuzzRequest, errors):
     pattern="*.edu/**/*.*"
     matcher=glob_to_regex(pattern)
     found=[]; seen=set(); requests_made=0
+    allowed_extensions={x.lower().lstrip(".") for x in req.extensions}
     async with httpx.AsyncClient(
         timeout=httpx.Timeout(24.0,connect=8.0),
         headers={"User-Agent":UA},
         limits=httpx.Limits(max_connections=5,max_keepalive_connections=3),
     ) as client:
-        # Broad CDX expansion discovers document URLs from universities beyond the
-        # initial institutional seeds. It does not rely on path guessing to find hosts.
+        # Search every Common Crawl collection it advertises for university URLs.
+        try:
+            info=await client.get(
+                "https://index.commoncrawl.org/collinfo.json",
+                timeout=httpx.Timeout(12.0,connect=6.0)
+            )
+            info.raise_for_status()
+            collections=info.json()
+            if not isinstance(collections,list):
+                raise ValueError("Common Crawl collection list is not an array")
+            for collection in collections:
+                endpoint=collection.get("cdx-api")
+                if not endpoint:
+                    continue
+                try:
+                    response=await client.get(
+                        endpoint,
+                        params={
+                            "url":"*.edu/*","output":"json","filter":"status:200",
+                            "collapse":"urlkey","limit":"2000",
+                            "fl":"url,timestamp,mime,status",
+                        },
+                        timeout=httpx.Timeout(24.0,connect=8.0)
+                    )
+                    if response.status_code in (429,503):
+                        errors.append("Common Crawl expansion stopped by HTTP "+str(response.status_code))
+                        break
+                    response.raise_for_status()
+                    requests_made+=1
+                    for line in response.text.splitlines():
+                        try:
+                            item=json.loads(line)
+                        except Exception:
+                            continue
+                        url=item.get("url","")
+                        ext=Path(urlparse(url).path).suffix.lower().lstrip(".")
+                        if not url or ext not in allowed_extensions or not matcher.search(url):
+                            continue
+                        key=normalize_document_url(url)
+                        if key in seen:
+                            continue
+                        seen.add(key)
+                        found.append({
+                            "url":url,"timestamp":item.get("timestamp"),
+                            "mime":item.get("mime"),"status":item.get("status"),
+                            "collection":"commoncrawl:"+str(collection.get("id","index")),
+                        })
+                except Exception as exc:
+                    errors.append(
+                        "Common Crawl domain expansion "+str(collection.get("id","index"))+": "+
+                        type(exc).__name__+": "+str(exc)[:140]
+                    )
+                await asyncio.sleep(1.05)
+        except Exception as exc:
+            errors.append(
+                "Common Crawl collection discovery: "+type(exc).__name__+": "+str(exc)[:160]
+            )
+
+        # Arquivo.pt is an independent archive fallback.
         try:
             rows,count=await arquivo_discovery(
                 client,pattern,"glob",matcher,2000,errors
@@ -1793,7 +1851,7 @@ async def expand_university_index(req: IndexedFuzzRequest, errors):
             requests_made+=count
             for item in rows:
                 ext=Path(urlparse(item["url"]).path).suffix.lower().lstrip(".")
-                if ext not in SUPPORTED_FORMATS:
+                if ext not in allowed_extensions:
                     continue
                 key=normalize_document_url(item["url"])
                 if key in seen:
