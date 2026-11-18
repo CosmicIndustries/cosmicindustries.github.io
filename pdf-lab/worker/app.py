@@ -1622,6 +1622,69 @@ def build_index_fuzz_plan(req: IndexedFuzzRequest):
     }
 
 
+async def expand_university_index(req: IndexedFuzzRequest, errors):
+    """Passively expand from archive-indexed .edu documents to previously unseen domains."""
+    pattern="*.edu/**/*.*"
+    matcher=glob_to_regex(pattern)
+    found=[]; seen=set(); requests_made=0
+    async with httpx.AsyncClient(
+        timeout=httpx.Timeout(24.0,connect=8.0),
+        headers={"User-Agent":UA},
+        limits=httpx.Limits(max_connections=5,max_keepalive_connections=3),
+    ) as client:
+        # Broad CDX expansion discovers document URLs from universities beyond the
+        # initial institutional seeds. It does not rely on path guessing to find hosts.
+        try:
+            rows,count=await arquivo_discovery(
+                client,pattern,"glob",matcher,2000,errors
+            )
+            requests_made+=count
+            for item in rows:
+                ext=Path(urlparse(item["url"]).path).suffix.lower().lstrip(".")
+                if ext not in SUPPORTED_FORMATS:
+                    continue
+                key=normalize_document_url(item["url"])
+                if key in seen:
+                    continue
+                seen.add(key)
+                found.append(item)
+        except Exception as exc:
+            errors.append(
+                "University-domain CDX expansion: "+type(exc).__name__+": "+str(exc)[:160]
+            )
+
+        # Keyword archive search returns titles/snippets and direct preserved file
+        # links. It is deliberately global across .edu rather than tied to seed hosts.
+        if req.content_query.strip() and "pdf" in {x.lower().lstrip(".") for x in req.extensions}:
+            try:
+                text_rows,count,state=await arquivo_text_discovery(
+                    client,req.content_query,pattern,"glob",matcher,500,errors
+                )
+                requests_made+=count
+                by_url={normalize_document_url(item["url"]):item for item in found}
+                for item in text_rows:
+                    key=normalize_document_url(item["url"])
+                    if key in by_url:
+                        by_url[key].update({k:v for k,v in item.items() if v})
+                    else:
+                        found.append(item);by_url[key]=item
+            except Exception as exc:
+                errors.append(
+                    "University-domain full-text expansion: "+type(exc).__name__+": "+str(exc)[:160]
+                )
+
+    domains=sorted({
+        (urlparse(item["url"]).hostname or "").lower().removeprefix("www.")
+        for item in found if urlparse(item["url"]).hostname
+    })
+    found.sort(key=lambda item:(
+        0 if item.get("query_match") else 1,
+        0 if Path(urlparse(item["url"]).path).suffix.lower()==".pdf" else 1,
+        item["url"].casefold()
+    ))
+    return found,domains,requests_made
+
+
 async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict):
     """Execute a fuzzer job while publishing progress and partial results."""
     job=fuzz_jobs[job_id]
@@ -1753,48 +1816,55 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
 
 @app.post("/api/fuzz-indexes")
 async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
-    """Queue indexed-host fuzzing and return an ID immediately for progress polling."""
-    plan=build_index_fuzz_plan(req)
+    """Expand from the global university index, then probe discovered institution domains."""
     job_id=str(uuid.uuid4())
-    planned=len(plan["probe_jobs"])
+    initial_domains=sorted(set(req.institution_domains))
     fuzz_jobs[job_id]={
-        "id":job_id,
-        "status":"queued",
-        "created_at":now(),
+        "id":job_id,"status":"queued","created_at":now(),"phase":"domain-discovery",
         "stats":{
-            "planned":planned,
-            "started":0,
-            "finished":0,
-            "tested":0,
-            "found":0,
-            "pdfs":0,
-            "documents":0,
-            "soft_404s":0,
-            "errors":0,
-            "skipped":0,
-            "robots_blocked":0,
-            "hosts_checked":len(plan["origins"]),
-            "seeds_used":sum(len(v) for v in plan["origins"].values()),
-            "invalid_seeds":plan["invalid_seeds"],
+            "planned":0,"started":0,"finished":0,"tested":0,"found":0,
+            "pdfs":0,"documents":0,"soft_404s":0,"errors":0,"skipped":0,
+            "robots_blocked":0,"hosts_checked":0,"seeds_used":len(req.seed_urls),
+            "invalid_seeds":0,"domains_discovered":len(initial_domains),
+            "indexed_candidates":0,"probe_budget":"unlimited" if req.max_probes==0 else req.max_probes,
         },
-        "results":[],
-        "errors":[],
+        "results":[],"errors":[],"discovered_candidates":[],"discovered_domains":initial_domains,
     }
 
     async def run():
-        fuzz_jobs[job_id]["status"]="running"
-        fuzz_jobs[job_id]["started_at"]=now()
+        job=fuzz_jobs[job_id]
+        job["status"]="running";job["started_at"]=now()
         try:
-            await run_indexed_fuzz_job(job_id,req,plan)
+            candidates,archive_domains,index_requests=await expand_university_index(req,job["errors"])
+            job["discovered_candidates"]=candidates
+            domains=sorted(set(initial_domains)|set(archive_domains))
+            job["discovered_domains"]=domains
+            job["stats"]["domains_discovered"]=len(domains)
+            job["stats"]["indexed_candidates"]=len(candidates)
+            job["stats"]["index_requests"]=index_requests
+
+            # Feed all archive-indexed URLs and all institutional roots back into
+            # the same host/path plan, with no fixed global probe budget by default.
+            merged_urls=list(req.seed_urls)
+            merged_urls.extend(item["url"] for item in candidates)
+            expanded=req.model_copy(update={
+                "seed_urls":list(dict.fromkeys(merged_urls)),
+                "institution_domains":domains,
+            })
+            plan=build_index_fuzz_plan(expanded)
+            job["phase"]="host-and-path-probing"
+            job["stats"]["planned"]=len(plan["probe_jobs"])
+            job["stats"]["hosts_checked"]=len(plan["origins"])
+            job["stats"]["seeds_used"]=sum(len(v) for v in plan["origins"].values())
+            job["stats"]["invalid_seeds"]=plan["invalid_seeds"]
+            await run_indexed_fuzz_job(job_id,expanded,plan)
+            job["phase"]="completed"
         except Exception as exc:
-            fuzz_jobs[job_id]["status"]="failed"
-            fuzz_jobs[job_id]["error"]=str(exc)[:240]
-            fuzz_jobs[job_id]["finished_at"]=now()
+            job["status"]="failed";job["error"]=str(exc)[:240];job["finished_at"]=now()
 
     fuzz_job_tasks[job_id]=asyncio.create_task(run())
     return {
-        "id":job_id,
-        "status":fuzz_jobs[job_id]["status"],
+        "id":job_id,"status":fuzz_jobs[job_id]["status"],
         "stats":fuzz_jobs[job_id]["stats"],
     }
 
