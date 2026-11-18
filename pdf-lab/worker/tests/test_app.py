@@ -59,6 +59,7 @@ class PDFLabCoreTests(unittest.TestCase):
     def test_arquivo_text_query_translation(self):
         self.assertEqual(worker.arquivo_text_query("aviation AND aircraft"), "aviation aircraft")
         self.assertEqual(worker.arquivo_text_query('"flight control"'), '"flight control"')
+        self.assertEqual(worker.arquivo_text_query('"flight AND control"'), '"flight AND control"')
         self.assertIsNone(worker.arquivo_text_query("aviation OR helicopter"))
         self.assertIsNone(worker.arquivo_text_query("aviation NOT obsolete"))
 
