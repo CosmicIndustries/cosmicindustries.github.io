@@ -566,7 +566,11 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         is_pdf=(str(item.get("mime") or "").lower()=="application/pdf" or
                 urlparse(item["url"]).path.lower().endswith(".pdf"))
         stamp=str(item.get("timestamp") or "")
-        return (0 if is_pdf else 1, 0 if item.get("collection")=="commoncrawl" else 1, tuple(-ord(ch) for ch in stamp), item["url"].casefold())
+        # Common Crawl uses YYYYMMDD; Wayback uses YYYYMMDDhhmmss.
+        # Right-pad to a common precision, then sort newest first.
+        stamp_number=int(stamp.ljust(14,"0")) if stamp.isdigit() else 0
+        source_priority=0 if item.get("collection")=="commoncrawl" else 1
+        return (0 if is_pdf else 1, -stamp_number, source_priority, item["url"].casefold())
     results.sort(key=result_key)
     source_names=[name for name,state in providers.items() if state=="results"]
     return {
@@ -774,15 +778,25 @@ async def discover_paths(req: PathDiscoveryRequest):
         if not p: continue
         candidates.append(p)
         if not Path(p).suffix:
-            candidates.extend(p+("."+ext) for ext in extensions)
+            candidates.extend(p+"."+ext for ext in extensions)
     candidates=list(dict.fromkeys(candidates))[:5000]
-    sem=asyncio.Semaphore(req.concurrency); found=[]; errors=[]
-    async with httpx.AsyncClient(follow_redirects=False,timeout=req.timeout,headers={"User-Agent":UA}) as client:
+    found=[]; errors=[]; checked=0
+    host_sem=asyncio.Semaphore(min(req.concurrency,4))
+    request_gate=asyncio.Lock()
+    last_request=0.0
+    async with httpx.AsyncClient(follow_redirects=False,timeout=req.timeout,
+            headers={"User-Agent":UA},limits=httpx.Limits(max_connections=req.concurrency,max_keepalive_connections=req.concurrency)) as client:
         async def probe(path):
-            async with sem:
-                url=urljoin(base,path)
-                if not valid_http(url) or urlparse(url).hostname!=host: return
-                if req.respect_robots and not await can_fetch(client,url,True): return
+            nonlocal checked,last_request
+            url=urljoin(base,path)
+            if not valid_http(url) or urlparse(url).hostname!=host: return
+            if req.respect_robots and not await can_fetch(client,url,True): return
+            async with host_sem:
+                # Pace requests to the one target host even when several workers are active.
+                async with request_gate:
+                    wait=max(0.0,0.20-(time.monotonic()-last_request))
+                    if wait: await asyncio.sleep(wait)
+                    last_request=time.monotonic()
                 try:
                     r=await client.head(url)
                     if r.status_code in (405,501):
@@ -790,13 +804,28 @@ async def discover_paths(req: PathDiscoveryRequest):
                             status=streamed.status_code; headers=streamed.headers
                     else:
                         status=r.status_code; headers=r.headers
+                    checked+=1
                     if status in (200,206,301,302,307,308,401,403):
-                        found.append({"url":url,"status":status,"content_type":headers.get("content-type",""),"bytes":headers.get("content-length"),"interesting":status in (401,403)})
-                except Exception as e: errors.append({"path":path,"error":str(e)[:120]})
-        await asyncio.gather(*(probe(p) for p in candidates))
-    found.sort(key=lambda x:(0 if x["url"].lower().endswith(".pdf") else 1,x["status"],x["url"]))
-    return {"base_url":base,"tested":len(candidates),"count":len(found),"results":found,"errors":errors[:30],
-            "engine":"bounded native ffuf-style wordlist probe","available_external_tools":tool_inventory()["tools"]}
+                        found.append({"url":url,"status":status,"content_type":headers.get("content-type",""),
+                                      "bytes":headers.get("content-length"),"interesting":status in (401,403)})
+                except Exception as exc:
+                    errors.append({"path":path,"error":str(exc)[:120]})
+        queue=asyncio.Queue()
+        for path in candidates: queue.put_nowait(path)
+        async def worker():
+            while True:
+                try: path=queue.get_nowait()
+                except asyncio.QueueEmpty: return
+                try: await probe(path)
+                finally: queue.task_done()
+        await asyncio.gather(*(worker() for _ in range(min(req.concurrency,len(candidates)))))
+    found.sort(key=lambda x:(
+        0 if x["url"].lower().endswith(".pdf") or "pdf" in x["content_type"].lower() else 1,
+        0 if x["status"] in (200,206) else 1,
+        x["url"].casefold(),
+    ))
+    return {"base_url":base,"tested":checked,"planned":len(candidates),"count":len(found),"results":found,"errors":errors[:30],
+            "engine":"bounded fixed-worker same-host path probe","available_external_tools":tool_inventory()["tools"]}
 
 
 @app.post("/api/fuzz-indexes")
@@ -857,18 +886,27 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
             if host_added>=host_budget: break
 
     sem=asyncio.Semaphore(req.concurrency)
+    origin_semaphores={origin:asyncio.Semaphore(2) for origin in origins}
+    origin_gates={origin:asyncio.Lock() for origin in origins}
+    origin_last_request={origin:0.0 for origin in origins}
     found=[]; errors=[]; checked=0
     async with httpx.AsyncClient(follow_redirects=False,timeout=req.timeout,
             headers={"User-Agent":UA},limits=httpx.Limits(max_connections=req.concurrency,max_keepalive_connections=req.concurrency)) as client:
         async def probe(item):
             nonlocal checked
             url,origin,seed=item
-            async with sem:
+            async with sem, origin_semaphores[origin]:
                 if not valid_http(url) or urlparse(url).netloc.lower()!=urlparse(origin).netloc.lower():
                     return
                 if not await can_fetch(client,url,req.respect_robots):
                     return
                 try:
+                    # At most two concurrent requests per host and >=300 ms between
+                    # request starts per host; other hosts continue in parallel.
+                    async with origin_gates[origin]:
+                        wait=max(0.0,0.30-(time.monotonic()-origin_last_request[origin]))
+                        if wait: await asyncio.sleep(wait)
+                        origin_last_request[origin]=time.monotonic()
                     response=await client.head(url)
                     if response.status_code in (405,501):
                         async with client.stream("GET",url,headers={"Range":"bytes=0-0"}) as streamed:
