@@ -322,6 +322,55 @@ class PDFLabCoreTests(unittest.TestCase):
             "https://www.mit.edu/manual.pdf",
         )
 
+    def test_canonical_document_url_unwraps_arquivo_replay(self):
+        replay = (
+            "https://arquivo.pt/noFrame/replay/20260101010101id_/"
+            "https://aviation.example.edu/courses/flight-manual.pdf"
+        )
+        self.assertEqual(
+            worker.canonical_document_url(replay),
+            "https://aviation.example.edu/courses/flight-manual.pdf",
+        )
+
+    def test_canonical_document_url_unwraps_wayback_replay(self):
+        replay = (
+            "https://web.archive.org/web/20260101010101id_/"
+            "https://library.example.edu/manuals/warrior.pdf"
+        )
+        self.assertEqual(
+            worker.canonical_document_url(replay),
+            "https://library.example.edu/manuals/warrior.pdf",
+        )
+
+    def test_metadata_domain_uses_original_archive_source_host(self):
+        replay = (
+            "https://arquivo.pt/noFrame/replay/20260101010101id_/"
+            "https://aviation.example.edu/courses/flight-manual-2024-chapter-2.pdf"
+        )
+        metadata = worker.derive_document_metadata(
+            replay,
+            "flight-manual-2024-chapter-2.pdf",
+            "Flight Manual 2024 Chapter 2",
+        )
+        self.assertEqual(metadata["domain"], "aviation.example.edu")
+        self.assertEqual(metadata["year"], 2024)
+        self.assertEqual(metadata["chapter"], 2)
+
+    def test_local_index_seeds_return_original_source_urls(self):
+        body = "Aviation systems and flight training procedures " * 8
+        worker.store_document(
+            "https://arquivo.pt/noFrame/replay/20260101010101id_/"
+            "https://mga.edu/aviation/flight-manual.pdf",
+            "flight-manual.pdf",
+            b"local-index-seed-binary",
+            "Flight Manual",
+            body,
+            12,
+        )
+        seeds = worker.local_index_seed_urls(["pdf"])
+        self.assertIn("https://mga.edu/aviation/flight-manual.pdf", seeds)
+        self.assertFalse(any("arquivo.pt" in url for url in seeds))
+
     def test_index_fuzz_plan_distributes_budget_across_hosts(self):
         req = worker.IndexedFuzzRequest(
             seed_urls=[
