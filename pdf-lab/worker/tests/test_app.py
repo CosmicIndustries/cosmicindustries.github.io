@@ -50,6 +50,12 @@ class PDFLabCoreTests(unittest.TestCase):
             ["library.example.edu/*"],
         )
 
+    def test_arquivo_regex_suffix_query(self):
+        self.assertEqual(
+            worker.arquivo_query_patterns(r"^https://[^/]+\.edu/.+\.pdf$", "regex"),
+            ["*.edu"],
+        )
+
     def test_arquivo_json_lines_are_normalized(self):
         payload = (
             '{"url":"https://example.edu/report.pdf","timestamp":"20261118010101",'
