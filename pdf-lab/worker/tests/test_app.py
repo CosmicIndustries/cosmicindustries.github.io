@@ -21,6 +21,24 @@ class PDFLabCoreTests(unittest.TestCase):
     def tearDown(self):
         self.conn.close()
 
+    def test_archive_import_source_falls_back_after_live_url(self):
+        original = "https://example.edu/handbook.pdf"
+        archived = (
+            "https://arquivo.pt/noFrame/replay/"
+            "20260101010101id_/https://example.edu/handbook.pdf"
+        )
+        source = worker.ArchiveImportSource(
+            original_url=original,
+            archive_file_url=archived,
+            title="Aviation handbook",
+        )
+        self.assertEqual(
+            worker.import_source_targets(source.original_url, source.archive_file_url),
+            [original, archived],
+        )
+        request = worker.ImportURLsRequest(archive_sources=[source])
+        self.assertEqual(request.archive_sources[0].title, "Aviation handbook")
+
     def test_pdf_candidate_includes_generic_binary_responses(self):
         self.assertTrue(worker.is_pdf_candidate("https://example.edu/scan.pdf", "text/html"))
         self.assertTrue(worker.is_pdf_candidate("https://example.edu/download?id=9", "application/pdf"))
