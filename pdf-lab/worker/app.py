@@ -409,6 +409,29 @@ def wayback_query_patterns(pattern, mode):
     return ["*."+tld.group(1)+"/*"]
 
 
+def parse_wayback_cdx_payload(payload):
+    """Normalize Wayback CDX JSON's header-row format into dictionaries."""
+    if isinstance(payload,list) and payload:
+        header=payload[0] if isinstance(payload[0],list) else None
+        if header:
+            return [dict(zip(header,values)) for values in payload[1:] if isinstance(values,list)]
+        return [item for item in payload if isinstance(item,dict)]
+    if isinstance(payload,dict):
+        return [payload]
+    return []
+
+
+def discovery_sort_key(item):
+    is_pdf=(str(item.get("mime") or "").lower()=="application/pdf" or
+            urlparse(item["url"]).path.lower().endswith(".pdf"))
+    stamp=str(item.get("timestamp") or "")
+    # Common Crawl uses YYYYMMDD; Wayback uses YYYYMMDDhhmmss.
+    # Right-pad to a common precision, then sort newest first.
+    stamp_number=int(stamp.ljust(14,"0")) if stamp.isdigit() else 0
+    source_priority=0 if item.get("collection")=="commoncrawl" else 1
+    return (0 if is_pdf else 1, -stamp_number, source_priority, item["url"].casefold())
+
+
 async def wayback_discovery(client, pattern, mode, matcher, max_results, errors):
     """Retrieve archived URL candidates from Internet Archive CDX; exact-match locally."""
     endpoint="https://web.archive.org/cdx/search/cdx"
@@ -426,17 +449,7 @@ async def wayback_discovery(client, pattern, mode, matcher, max_results, errors)
             response.raise_for_status()
             pages_fetched+=1
             payload=response.json()
-            records=[]
-            if isinstance(payload,list) and payload:
-                header=payload[0] if isinstance(payload[0],list) else None
-                if header:
-                    for values in payload[1:]:
-                        if isinstance(values,list):
-                            records.append(dict(zip(header,values)))
-                else:
-                    records=[x for x in payload if isinstance(x,dict)]
-            elif isinstance(payload,dict):
-                records=[payload]
+            records=parse_wayback_cdx_payload(payload)
             for item in records:
                 url=item.get("original") or item.get("url") or ""
                 if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
@@ -562,16 +575,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             else: providers["live-recursive"]="empty"
 
     # Stable, relevance-aware ordering: direct PDF MIME/extension first, then newest capture.
-    def result_key(item):
-        is_pdf=(str(item.get("mime") or "").lower()=="application/pdf" or
-                urlparse(item["url"]).path.lower().endswith(".pdf"))
-        stamp=str(item.get("timestamp") or "")
-        # Common Crawl uses YYYYMMDD; Wayback uses YYYYMMDDhhmmss.
-        # Right-pad to a common precision, then sort newest first.
-        stamp_number=int(stamp.ljust(14,"0")) if stamp.isdigit() else 0
-        source_priority=0 if item.get("collection")=="commoncrawl" else 1
-        return (0 if is_pdf else 1, -stamp_number, source_priority, item["url"].casefold())
-    results.sort(key=result_key)
+    results.sort(key=discovery_sort_key)
     source_names=[name for name,state in providers.items() if state=="results"]
     return {
         "pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,
