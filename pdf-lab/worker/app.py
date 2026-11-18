@@ -827,8 +827,13 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
     clean_paths=list(dict.fromkeys(clean_paths))[:1500]
 
     jobs=[]; seen=set()
-    # Index URLs contribute both the host and their existing directory hierarchy.
-    for origin,seeds in origins.items():
+    # Share the global probe budget across hosts so an early index result cannot
+    # consume the entire scan before later institutions receive any coverage.
+    origin_items=list(origins.items())
+    base_budget,extra_budget=divmod(req.max_probes,len(origin_items))
+    for origin_index,(origin,seeds) in enumerate(origin_items):
+        host_budget=base_budget+(1 if origin_index<extra_budget else 0)
+        host_added=0
         directories={"/"}
         for seed in seeds:
             parts=[x for x in urlparse(seed).path.split("/") if x]
@@ -844,10 +849,9 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
             for path in clean_paths:
                 url=origin+directory+path
                 if url not in seen:
-                    seen.add(url); jobs.append((url,origin,seeds[0]))
-                if len(jobs)>=req.max_probes: break
-            if len(jobs)>=req.max_probes: break
-        if len(jobs)>=req.max_probes: break
+                    seen.add(url); jobs.append((url,origin,seeds[0])); host_added+=1
+                if host_added>=host_budget: break
+            if host_added>=host_budget: break
 
     sem=asyncio.Semaphore(req.concurrency)
     found=[]; errors=[]; checked=0
