@@ -24,7 +24,7 @@ Then open **http://127.0.0.1:8787/**. The worker serves the interface and API fr
 - **Depth**: link hops from the start URL (0 means only the start URL).
 - **Same-domain**: on by default; subdomains are included. Add explicitly allowed external domains when needed.
 - **Respect robots.txt**: on by default.
-- **Limits**: page count, PDF count, max bytes per PDF, and request delay.
+- **Optional limits**: set page count, document count, or maximum bytes to `0` for no configured limit. Request pacing and parser/container safety checks remain enabled.
 
 The crawler follows ordinary HTML links and direct PDF URLs. It does not bypass authentication, paywalls, CAPTCHAs, robots exclusions, or access controls. It refuses localhost and non-public IP targets to reduce SSRF risk. JavaScript-only portals may require a rendered crawler such as WebGrep/Katana; this worker intentionally stays lightweight and auditable.
 
@@ -48,13 +48,13 @@ Intelligent grep (POST /api/grep) searches extracted PDF pages with ripgrep when
 
 Directory / wordlist discovery (POST /api/discover-paths) provides bounded, concurrent, same-host path probing. Archived PDF recovery choices are displayed before live path-probe results, so historical copies remain accessible even when current university URLs return HTML, redirects, or errors. Import tries the live source first and then Arquivo.pt's direct archived file payload, validating the PDF signature on either source.
 
-The **Fuzz indexed hosts** action (POST /api/fuzz-indexes) queues a background job and returns a job ID immediately. Poll GET /api/fuzz-indexes/{job_id} for live progress and partial results. It deduplicates discovered hosts, derives known directory prefixes from seed URLs, and feeds those directories plus the configured wordlist into a bounded async probe pool. Results are relevance-sorted with PDF candidates first and can be sent directly to PDF import. Both probes use HEAD with a one-byte Range fallback and respect robots.txt when enabled. Path work uses fixed-size worker pools rather than one task per wordlist entry. Indexed-host fuzzing has a global concurrency cap, a two-request per-host cap, a per-host request interval, and shares its probe budget across all discovered hosts. The interface uses an 800-probe starter budget and shows tested/found/verified-PDF/soft-404/error/robots-blocked counters while the job runs; increase the API request budget for deliberate deeper scans.
+The **Expand domains & find new documents** action (POST /api/fuzz-indexes) is a two-stage, index-driven expansion workflow. It starts from (1) URLs already stored in the local document library, (2) the current URL-discovery results, (3) editable institutional seeds including MIT (`mit.edu`), University of Georgia (`uga.edu`), Middle Georgia State (`mga.edu`), and other Georgia institutions, and (4) new `.edu` document URLs retrieved from Common Crawl and Arquivo.pt archives. Newly discovered hostnames are merged into the domain set before host/path probing. The default UI targets PDFs; broader formats can be selected in the extension input. It returns a job ID immediately; poll GET /api/fuzz-indexes/{job_id} for live progress and partial results.\n\nThe fuzzer tests exact indexed URLs first, then derives adjacent year/chapter/part filenames from indexed names (for example, neighboring chapters or annual editions), then probes their known directory ancestors and the configured wordlist. It verifies candidate responses with a small ranged GET and the actual file signature. Only verified document files are preselected for import. Exact-content/version duplicates are skipped; different years, chapters, parts and editions are kept as distinct entries and grouped into ordered series stacks in the Library.\n\nThe default probe budget is `0` (all generated probes). A positive `max_probes` value can be supplied to the API when a deliberate cap is required. The request engine still uses fixed-size worker pools, a global concurrency ceiling, at most two in-flight requests per host, per-host request spacing and robots.txt checks when enabled. There is no configured file-size limit when `max_bytes=0`; available disk, RAM and parser/container safeguards still apply.
 
 The worker reports installed tool availability at GET /api/tools. The path fuzzer is a bounded native Python implementation; ripgrep is executed for PDF text grep when available. Other detected binaries are informational and are not silently launched. Probe only public systems you own or are explicitly authorized to assess.
 
 ## Global wildcard discovery
 
-The interface queries Arquivo.pt's full-text PDF index first when a keyword/phrase is supplied, then supplements with Common Crawl, Arquivo.pt CDX, and Internet Archive Wayback CDX when the result limit is not met. Without a keyword query, it starts with Common Crawl. URL-only index candidates are explicitly marked as keyword-unverified; the import stage still applies the full local content expression. Examples:
+The interface queries Arquivo.pt's full-text PDF index first when a keyword/phrase is supplied, then supplements with Common Crawl, Arquivo.pt CDX, and Internet Archive Wayback CDX. A candidate limit of `0` means all results returned by the configured providers; provider APIs still impose their own per-response caps. Common Crawl index count `0` means all collections advertised by its collection list. URL-only index candidates are explicitly marked as keyword-unverified; the import stage still applies the full local content expression. Examples:
 
 - `*.edu/**/*.pdf`
 - `*.gov/**/budget*.pdf`
@@ -67,12 +67,12 @@ Global discovery currently expects a recognizable public suffix such as `.edu`, 
 ## API
 
 - `POST /api/discover` search Common Crawl, Arquivo.pt, and Wayback CDX indexes with a full-URL glob or regex, optionally adding bounded recursive live-link discovery
-- `POST /api/fuzz-indexes` queue a bounded indexed-host fuzzer job; `GET /api/fuzz-indexes/{job_id}` returns live progress and results
+- `POST /api/fuzz-indexes` discover new `.edu` domains from the local index and archive indexes, then probe indexed paths; `GET /api/fuzz-indexes/{job_id}` returns live progress, domains, candidate URLs and results
 - `POST /api/discover-paths` probe a supplied host with a bounded path wordlist
 - `POST /api/import-urls` concurrently fetch, extract, filter, and store selected PDF/Office/OpenDocument files
 - `POST /api/jobs` create recursive site crawl
 - `GET /api/jobs/{id}` job status, counters, matches, and log
-- `GET /api/documents?q=...&format=...` list/search indexed documents by query and file format
+- `GET /api/documents?q=...&format=...&sort=...` list/search indexed documents by query, format and sort order; `limit=0` returns the full local catalogue
 - `GET /api/documents/{id}/content` return extracted text and reader metadata
 - `GET /api/documents/{id}/view` serve a stored PDF inline for the lightweight reader
 - `GET /api/worker/status` report worker health, storage, format counts, and active/recent job progress
@@ -96,9 +96,9 @@ The suite checks recursive `.edu` glob matching, Wayback header-row and Arquivo.
 Files are downloaded only to the machine running this worker. The static GitHub Pages site does not receive your PDFs. The worker binds to loopback by default. Do not expose it to the public internet without authentication, TLS, and a deliberate access-control design.
 
 
-### PDF size limits
+### File-size and candidate limits
 
-The import and crawl worker cap each PDF at 250,000,000 bytes. The interface exposes a compatible maximum of 238 MiB (binary MiB), preventing UI values from exceeding the backend byte cap. The PDF parser itself enforces the `%PDF-` signature before calling pypdf, so HTML fallback pages cannot reach the parser. Import verifies the `%PDF-` file signature within the first 1,024 bytes; a `.pdf` filename or MIME header alone is not accepted as proof. Generic binary MIME responses are allowed through to signature verification. Indexed-host fuzzing performs a small ranged GET for `.pdf`, PDF-MIME, and generic binary responses, and only signature-verified PDFs are preselected for import. Import responses separate download/validation errors from filename/content-filter exclusions and display representative reasons in the UI.
+The UI and worker use `0` to mean no configured byte, result, page, document or probe budget. Positive values apply explicit ceilings. A zero size cap does not mean infinite hardware capacity: downloads and extraction still require sufficient disk/RAM, and Office ZIP/XML parsing enforces archive-entry and expanded-size safety checks. Provider APIs also cap individual index responses. The PDF parser checks the `%PDF-` signature before calling pypdf; a `.pdf` filename or MIME header alone is not accepted as proof.
 
 
 PDF font decoding: the worker pins `pypdf>=6.20,<7` and `fonttools>=4.60,<5`. This enables CFF Type 1 font decoding; pypdf 6.20 includes caching for the embedded CFF font map. Malformed source CMaps may still produce skipped-line warnings, but these are distinct from import/HTTP failures.
