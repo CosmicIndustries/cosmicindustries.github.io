@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Local-first, bounded PDF crawler and searchable document catalog."""
 from __future__ import annotations
-import asyncio, hashlib, json, os, re, sqlite3, time, uuid, shutil, subprocess, traceback
+import asyncio, hashlib, json, os, re, sqlite3, time, uuid, shutil, subprocess, traceback, mimetypes, tempfile, zipfile
 from functools import lru_cache
 from collections import deque
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin, urlparse, urldefrag, unquote
 from urllib.robotparser import RobotFileParser
+import xml.etree.ElementTree as ET
 
 import httpx
 from bs4 import BeautifulSoup
@@ -35,6 +36,7 @@ jobs: dict[str, dict] = {}
 job_tasks: dict[str, asyncio.Task] = {}
 fuzz_jobs: dict[str, dict] = {}
 fuzz_job_tasks: dict[str, asyncio.Task] = {}
+import_jobs: dict[str, dict] = {}
 robots_cache: dict[str, RobotFileParser] = {}
 robots_locks: dict[str, asyncio.Lock] = {}
 host_validation_cache: dict[str, tuple[float, bool]] = {}
@@ -63,7 +65,7 @@ def now(): return datetime.now(timezone.utc).isoformat()
 
 class CrawlRequest(BaseModel):
     start_url: str
-    filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf"])
+    filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf","*.pptx","*.ppt","*.docx","*.doc","*.xlsx","*.xls","*.odp","*.odt","*.ods"])
     content_query: str = ""
     depth: int = Field(default=3, ge=0, le=12)
     max_pages: int = Field(default=500, ge=1, le=5000)
@@ -177,14 +179,90 @@ def is_pdf_signature(data):
     return bool(match)
 
 
-def is_pdf_candidate(url, content_type):
-    """Identify responses worth a lightweight PDF-signature probe."""
+SUPPORTED_FORMATS = ("pdf","pptx","ppt","docx","doc","xlsx","xls","odp","odt","ods")
+OFFICE_ZIP_FORMATS = {"pptx","docx","xlsx","odp","odt","ods"}
+LEGACY_OFFICE_FORMATS = {"ppt","doc","xls"}
+DOCUMENT_MIME = {
+    "pdf":"application/pdf",
+    "pptx":"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "ppt":"application/vnd.ms-powerpoint",
+    "docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "doc":"application/msword",
+    "xlsx":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "xls":"application/vnd.ms-excel",
+    "odp":"application/vnd.oasis.opendocument.presentation",
+    "odt":"application/vnd.oasis.opendocument.text",
+    "ods":"application/vnd.oasis.opendocument.spreadsheet",
+}
+
+
+def document_format(value):
+    suffix=Path(urlparse(value).path).suffix.lower().lstrip(".")
+    return suffix if suffix in SUPPORTED_FORMATS else ""
+
+
+def is_document_candidate(url, content_type):
+    """Identify URLs/MIME types for supported PDF and office document formats."""
+    ext=document_format(url)
     mime=(content_type or "").split(";",1)[0].strip().lower()
-    return (
-        urlparse(url).path.lower().endswith(".pdf")
-        or "pdf" in mime
-        or mime in {"application/octet-stream","binary/octet-stream"}
-    )
+    return bool(ext in SUPPORTED_FORMATS or mime in set(DOCUMENT_MIME.values())
+                or mime in {"application/octet-stream","binary/octet-stream"})
+
+
+def is_pdf_candidate(url, content_type):
+    """Backward-compatible PDF candidate helper."""
+    mime=(content_type or "").split(";",1)[0].strip().lower()
+    return document_format(url)=="pdf" or "pdf" in mime
+
+
+def document_signature_probe(data, filename, content_type=""):
+    """Fast ranged-response signature check; full container validation occurs at import."""
+    ext=Path(filename).suffix.lower().lstrip(".")
+    prefix=(data or b"")[:1024]
+    if ext=="pdf":
+        return is_pdf_signature(prefix)
+    if ext in OFFICE_ZIP_FORMATS:
+        return prefix.startswith(b"PK\\x03\\x04")
+    if ext in LEGACY_OFFICE_FORMATS:
+        return prefix.startswith(bytes.fromhex("D0CF11E0A1B11AE1"))
+    mime=(content_type or "").lower()
+    return bool("officedocument" in mime or "opendocument" in mime)
+
+
+def validate_document_signature(data, filename):
+    """Validate a supported file's real signature and Office container markers."""
+    ext=Path(filename).suffix.lower().lstrip(".")
+    if ext not in SUPPORTED_FORMATS:
+        raise ValueError("Unsupported document format: ."+(ext or "(none)"))
+    if ext=="pdf":
+        if not is_pdf_signature(data):
+            raise ValueError("Invalid PDF: missing %PDF- signature.")
+        return
+    if ext in OFFICE_ZIP_FORMATS:
+        try:
+            with zipfile.ZipFile(__import__("io").BytesIO(data)) as archive:
+                names=set(archive.namelist())
+                expected={
+                    "pptx":{"ppt/presentation.xml"},
+                    "docx":{"word/document.xml"},
+                    "xlsx":{"xl/workbook.xml"},
+                    "odp":{"content.xml","mimetype"},
+                    "odt":{"content.xml","mimetype"},
+                    "ods":{"content.xml","mimetype"},
+                }[ext]
+                if not expected.issubset(names):
+                    raise ValueError("ZIP container does not contain the expected "+ext.upper()+" document structure.")
+                if len(names)>5000 or sum(x.file_size for x in archive.infolist())>100_000_000:
+                    raise ValueError("Office archive exceeds safe extraction limits.")
+        except zipfile.BadZipFile as exc:
+            raise ValueError("Office document is not a valid ZIP container.") from exc
+        return
+    if ext in LEGACY_OFFICE_FORMATS:
+        if not (data or b"").startswith(bytes.fromhex("D0CF11E0A1B11AE1")):
+            raise ValueError("Legacy Office file is missing the OLE compound-document signature.")
+        return
+
+
 
 
 def extract_pdf(data):
@@ -199,19 +277,141 @@ def extract_pdf(data):
             if line.strip(): pages.append({"page":i+1,"line":line_no,"text":line[:500]})
     return "\n".join(texts),len(reader.pages),pages
 
-def store_pdf(url, filename, data, title, text, pages):
-    digest=hashlib.sha256(data).hexdigest(); path=FILES/(digest+".pdf")
+def _xml_paragraph_text(xml_bytes):
+    root=ET.fromstring(xml_bytes)
+    output=[]
+    for paragraph in root.iter():
+        if paragraph.tag.rsplit("}",1)[-1] not in ("p","si","is"):
+            continue
+        parts=[node.text or "" for node in paragraph.iter()
+               if node.tag.rsplit("}",1)[-1] in ("t","tab")]
+        value="".join(parts).strip()
+        if value:
+            output.append(value)
+    return output
+
+
+def _extract_ooxml(data, ext):
+    import io
+    lines=[]; page_records=[]
+    with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        infos=archive.infolist()
+        if len(infos)>5000 or sum(x.file_size for x in infos)>100_000_000:
+            raise ValueError("Office archive exceeds safe extraction limits.")
+        names=set(archive.namelist())
+        if ext=="pptx":
+            slide_names=sorted(
+                (n for n in names if re.fullmatch(r"ppt/slides/slide\\d+\\.xml",n)),
+                key=lambda n:int(re.search(r"slide(\\d+)",n).group(1))
+            )
+            if not slide_names:
+                raise ValueError("Presentation contains no readable slides.")
+            for number,name in enumerate(slide_names,1):
+                paragraphs=_xml_paragraph_text(archive.read(name))
+                text="\\n".join(paragraphs)
+                lines.append(f"[Slide {number}]\\n{text}")
+                page_records.append({"page":number,"line":1,"text":text[:500]})
+        elif ext=="docx":
+            if "word/document.xml" not in names:
+                raise ValueError("Word document body is missing.")
+            paragraphs=_xml_paragraph_text(archive.read("word/document.xml"))
+            for part in sorted(n for n in names if re.fullmatch(r"word/(header|footer)\\d+\\.xml",n)):
+                paragraphs.extend(_xml_paragraph_text(archive.read(part)))
+            lines.extend(paragraphs)
+            page_records=[{"page":1,"line":i+1,"text":p[:500]} for i,p in enumerate(paragraphs)]
+        elif ext=="xlsx":
+            shared=[]
+            if "xl/sharedStrings.xml" in names:
+                root=ET.fromstring(archive.read("xl/sharedStrings.xml"))
+                for si in root:
+                    shared.append("".join(node.text or "" for node in si.iter()
+                                          if node.tag.rsplit("}",1)[-1]=="t"))
+            sheets=sorted((n for n in names if re.fullmatch(r"xl/worksheets/sheet\\d+\\.xml",n)),
+                          key=lambda n:int(re.search(r"sheet(\\d+)",n).group(1)))
+            for number,name in enumerate(sheets,1):
+                root=ET.fromstring(archive.read(name)); rows=[]
+                for row in root.iter():
+                    if row.tag.rsplit("}",1)[-1]!="row":continue
+                    values=[]
+                    for cell in row:
+                        if cell.tag.rsplit("}",1)[-1]!="c":continue
+                        cell_type=cell.attrib.get("t","")
+                        value_node=next((x for x in cell if x.tag.rsplit("}",1)[-1]=="v"),None)
+                        value=value_node.text if value_node is not None else ""
+                        if cell_type=="s" and value.isdigit() and int(value)<len(shared):
+                            value=shared[int(value)]
+                        elif cell_type=="inlineStr":
+                            value="".join(x.text or "" for x in cell.iter()
+                                          if x.tag.rsplit("}",1)[-1]=="t")
+                        if value: values.append(value)
+                    if values: rows.append(" | ".join(values))
+                text="\\n".join(rows)
+                lines.append(f"[Sheet {number}]\\n{text}")
+                page_records.append({"page":number,"line":1,"text":text[:500]})
+        else:
+            if "content.xml" not in names:
+                raise ValueError("OpenDocument content.xml is missing.")
+            paragraphs=_xml_paragraph_text(archive.read("content.xml"))
+            # ODF paragraphs include table-cell text, making a useful flattened reader.
+            lines.extend(paragraphs)
+            page_records=[{"page":1,"line":i+1,"text":p[:500]} for i,p in enumerate(paragraphs)]
+    body="\\n\\n".join(x for x in lines if x.strip())
+    count=max(1,len(page_records))
+    return body,count,page_records
+
+
+def _extract_legacy_office(data, filename):
+    office=shutil.which("libreoffice") or shutil.which("soffice")
+    if not office:
+        raise ValueError("Legacy Office format requires LibreOffice (soffice) on the worker machine.")
+    with tempfile.TemporaryDirectory(prefix="pdf-lab-office-") as tmp:
+        src=Path(tmp)/(Path(filename).name or "document.bin")
+        src.write_bytes(data)
+        converted=subprocess.run(
+            [office,"--headless","--convert-to","pdf","--outdir",tmp,str(src)],
+            capture_output=True,text=True,timeout=60,check=False
+        )
+        target=Path(tmp)/(src.stem+".pdf")
+        if converted.returncode!=0 or not target.is_file():
+            detail=(converted.stderr or converted.stdout or "LibreOffice conversion failed")[:240]
+            raise ValueError("Legacy Office conversion failed: "+detail)
+        return extract_pdf(target.read_bytes())
+
+
+def extract_document(data, filename):
+    """Extract searchable text from PDF, OOXML and OpenDocument formats."""
+    ext=Path(filename).suffix.lower().lstrip(".")
+    validate_document_signature(data,filename)
+    if ext=="pdf":
+        return extract_pdf(data)
+    if ext in OFFICE_ZIP_FORMATS:
+        return _extract_ooxml(data,ext)
+    if ext in LEGACY_OFFICE_FORMATS:
+        return _extract_legacy_office(data,filename)
+    raise ValueError("Unsupported document format: ."+ext)
+
+
+def store_document(url, filename, data, title, text, pages):
+    digest=hashlib.sha256(data).hexdigest()
+    ext=Path(filename).suffix.lower() or ".bin"
+    path=FILES/(digest+ext)
     if not path.exists(): path.write_bytes(data)
-    docid=str(uuid.uuid4())
     c=connect()
     existing=c.execute("SELECT id FROM documents WHERE sha256=?",(digest,)).fetchone()
-    if existing: c.close(); return existing["id"],False
+    if existing:
+        c.close()
+        return existing["id"],False
+    docid=str(uuid.uuid4())
     c.execute("INSERT INTO documents VALUES(?,?,?,?,?,?,?,?,?,?)",
       (docid,digest,url,filename,title,str(path),len(data),pages,text,now()))
     c.execute("INSERT INTO document_fts VALUES(?,?,?,?,?)",(docid,filename,title or "",url,text))
     c.execute("INSERT INTO document_fts_linguistic VALUES(?,?,?,?,?)",(docid,filename,title or "",url,text))
-    c.commit(); c.close()
+    c.commit();c.close()
     return docid,True
+
+
+def store_pdf(url, filename, data, title, text, pages):
+    return store_document(url,filename,data,title,text,pages)
 
 async def crawl(jobid, cfg: CrawlRequest):
     j=jobs[jobid]; j["status"]="running"; j["started_at"]=now()
@@ -243,28 +443,33 @@ async def crawl(jobid, cfg: CrawlRequest):
                 ctype=response.headers.get("content-type","").lower()
                 length=int(response.headers.get("content-length","0") or 0)
                 if length>cfg.max_bytes: continue
-                if "pdf" in ctype or urlparse(url).path.lower().endswith(".pdf"):
+                if is_document_candidate(url,ctype):
                     chunks=[]; total=0
                     async for chunk in response.aiter_bytes():
                         total+=len(chunk)
                         if total>cfg.max_bytes: raise ValueError("file exceeds max_bytes")
                         chunks.append(chunk)
-                    data=b"".join(chunks); name=unquote(Path(urlparse(url).path).name) or "document.pdf"
-                    if not name.lower().endswith(".pdf"): name+=".pdf"
-                    if not filename_matches(name,cfg.filename_patterns): continue
+                    data=b"".join(chunks)
+                    name=unquote(Path(urlparse(url).path).name) or "document"
+                    ext=document_format(name)
+                    if not ext:
+                        ext=next((x for x in SUPPORTED_FORMATS if DOCUMENT_MIME.get(x,"") in ctype),"")
+                        if ext:name+="."+ext
+                    if not ext or not filename_matches(name,cfg.filename_patterns): continue
                     found.add(url); j["stats"]["pdfs_found"]+=1
                     try:
-                        body,np,pagematches=extract_pdf(data)
+                        validate_document_signature(data,name)
+                        body,np,pagematches=extract_document(data,name)
                     except Exception as e:
-                        j["stats"]["parse_errors"]+=1; log(f"PDF parse failed: {name}: {e}"); continue
+                        j["stats"]["parse_errors"]+=1; log(f"Document parse failed: {name}: {e}"); continue
                     if not query_matches(body,cfg.content_query): continue
                     if cfg.download_matches:
-                        docid,new=store_pdf(url,name,data,name,body,np)
+                        docid,new=store_document(url,name,data,name,body,np)
                         stored+=int(new)
                     else:
                         docid,new=None,False
                     j["stats"]["matches"]+=1
-                    j["results"].append({"id":docid,"filename":name,"url":url,"pages":np,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest(),"new":new,"snippets":[x for x in pagematches if query_matches(x["text"],cfg.content_query)][:8]})
+                    j["results"].append({"id":docid,"filename":name,"url":url,"pages":np,"bytes":len(data),"format":ext,"sha256":hashlib.sha256(data).hexdigest(),"new":new,"snippets":[x for x in pagematches if query_matches(x["text"],cfg.content_query)][:8]})
                     log((("Stored " if new else "Already catalogued ") if cfg.download_matches else "Matched (download disabled) ")+name)
                 elif "text/html" in ctype and level<cfg.depth:
                     data=await response.aread()
@@ -289,6 +494,7 @@ async def crawl(jobid, cfg: CrawlRequest):
 class WildcardDiscoveryRequest(BaseModel):
     url_pattern: str
     content_query: str = ""
+    extensions: list[str] = Field(default_factory=lambda:["pdf","pptx","ppt","docx","doc","xlsx","xls","odp","odt","ods"], max_length=20)
     match_mode: str = Field(default="glob", pattern="^(glob|regex)$")
     max_results: int = Field(default=200, ge=1, le=2000)
     indexes: int = Field(default=2, ge=1, le=5)
@@ -306,7 +512,7 @@ class ArchiveImportSource(BaseModel):
 class ImportURLsRequest(BaseModel):
     urls: list[str] = Field(default_factory=list, max_length=500)
     archive_sources: list[ArchiveImportSource] = Field(default_factory=list, max_length=500)
-    filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf"])
+    filename_patterns: list[str] = Field(default_factory=lambda:["*.pdf","*.pptx","*.ppt","*.docx","*.doc","*.xlsx","*.xls","*.odp","*.odt","*.ods"])
     content_query: str = ""
     max_bytes: int = Field(default=40_000_000, ge=1024, le=250_000_000)
     respect_robots: bool = True
@@ -712,7 +918,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
     async with httpx.AsyncClient(timeout=timeout,headers={"User-Agent":UA},limits=httpx.Limits(max_connections=12,max_keepalive_connections=6)) as client:
         # When a plain-term/phrase query is supplied, search archived PDF text
         # before falling back to URL-only CDX results.
-        if len(results)<req.max_results:
+        if len(results)<req.max_results and "pdf" in {x.lower().lstrip(".") for x in req.extensions}:
             text_results,text_requests,text_state=await arquivo_text_discovery(
                 client,req.content_query,pattern,req.match_mode,matcher,
                 req.max_results-len(results),errors
@@ -852,6 +1058,10 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
     if req.content_query.strip():
         for item in results:
             item["query_verified"]=bool(item.get("query_match"))
+    allowed_extensions={x.lower().lstrip(".") for x in req.extensions if re.fullmatch(r"[A-Za-z0-9]{1,8}",x.lstrip("."))}
+    if allowed_extensions:
+        results=[item for item in results
+                 if Path(urlparse(item["url"]).path).suffix.lower().lstrip(".") in allowed_extensions]
     # Verified keyword hits first, then PDFs, then newest archive capture.
     results.sort(key=discovery_sort_key)
     source_names=[name for name,state in providers.items() if state=="results"]
@@ -1313,11 +1523,13 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
                     response=await client.head(url)
                     status=response.status_code
                     headers=response.headers
-                    candidate_pdf=is_pdf_candidate(url,headers.get("content-type",""))
+                    candidate_document=is_document_candidate(url,headers.get("content-type",""))
+                    ext=document_format(url)
+                    document_verified=False
                     pdf_verified=False
-                    # HEAD metadata and filename extensions are hints only. Verify
-                    # candidates with a tiny ranged GET and inspect the actual bytes.
-                    if status in (405,501) or (status in (200,206) and candidate_pdf):
+                    # Metadata/extension are hints only. Verify signatures using a
+                    # bounded ranged read before declaring a candidate importable.
+                    if status in (405,501) or (status in (200,206) and candidate_document):
                         async with client.stream("GET",url,headers={"Range":"bytes=0-1023"}) as streamed:
                             status=streamed.status_code
                             headers=streamed.headers
@@ -1329,7 +1541,9 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
                                         prefix.extend(chunk[:remaining])
                                     if len(prefix)>=1024:
                                         break
-                            pdf_verified=is_pdf_signature(bytes(prefix))
+                            probe_name=Path(urlparse(url).path).name or ("document."+ext if ext else "document")
+                            document_verified=document_signature_probe(bytes(prefix),probe_name,headers.get("content-type",""))
+                            pdf_verified=(ext=="pdf" and is_pdf_signature(bytes(prefix)))
                     stats["tested"]+=1
                     if is_soft_404_response(status,headers,baselines.get(origin)):
                         stats["soft_404s"]+=1
@@ -1344,11 +1558,14 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
                             "seed_url":seed,
                             "host":urlparse(origin).hostname,
                             "is_pdf":pdf_verified,
+                            "is_document":document_verified,
+                            "document_format":ext or "unknown",
                             "pdf_verified":pdf_verified,
                         }
                         job["results"].append(result)
                         stats["found"]=len(job["results"])
                         stats["pdfs"]=sum(1 for result in job["results"] if result.get("is_pdf"))
+                        stats["documents"]=sum(1 for result in job["results"] if result.get("is_document"))
                 except Exception as exc:
                     stats["errors"]+=1
                     if len(job["errors"])<100:
@@ -1404,6 +1621,7 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
             "tested":0,
             "found":0,
             "pdfs":0,
+            "documents":0,
             "soft_404s":0,
             "errors":0,
             "skipped":0,
