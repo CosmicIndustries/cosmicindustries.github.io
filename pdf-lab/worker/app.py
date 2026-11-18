@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local-first, bounded PDF crawler and searchable document catalog."""
 from __future__ import annotations
-import asyncio, hashlib, json, os, re, sqlite3, time, uuid
+import asyncio, hashlib, json, os, re, sqlite3, time, uuid, shutil, subprocess, traceback
 from collections import deque
 from datetime import datetime, timezone
 from pathlib import Path
@@ -377,9 +377,18 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
     matcher=url_matcher(pattern,req.match_mode)
     query_patterns=cdx_query_candidates(pattern,req.match_mode)
     async with httpx.AsyncClient(timeout=httpx.Timeout(60.0,connect=12.0),headers={"User-Agent":UA}) as client:
-        info=await client.get("https://index.commoncrawl.org/collinfo.json")
-        info.raise_for_status()
-        collections=info.json()[:req.indexes]
+        try:
+            info=await client.get("https://index.commoncrawl.org/collinfo.json")
+            info.raise_for_status()
+            collection_data=info.json()
+            if not isinstance(collection_data,list):
+                raise ValueError("Common Crawl collection list was not a JSON array")
+            collections=collection_data[:req.indexes]
+            if not collections:
+                raise ValueError("Common Crawl returned no available indexes")
+        except Exception as exc:
+            traceback.print_exc()
+            raise HTTPException(502,detail=f"Common Crawl index discovery failed ({type(exc).__name__}): {str(exc)[:220]}")
         results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0; page_limit_reached=False
         async def cdx_get(endpoint, params):
             # Common Crawl asks clients to be serial and polite. Retry transient gateway
@@ -524,27 +533,73 @@ def intelligent_grep(req: GrepRequest):
     try:
         flags=0 if req.case_sensitive else re.IGNORECASE
         expression=req.pattern if req.regex else re.escape(req.pattern)
-        if req.whole_word: expression=r"\b(?:"+expression+r")\b"
+        if req.whole_word: expression=r"\\b(?:"+expression+r")\\b"
         rx=re.compile(expression,flags)
     except re.error as e: raise HTTPException(400,"Invalid regular expression: "+str(e))
     c=connect()
-    rows=c.execute("SELECT id,filename,title,url,text FROM documents ORDER BY discovered_at DESC").fetchall()
-    c.close(); results=[]
+    rows=c.execute("SELECT id,filename,title,url,path FROM documents ORDER BY discovered_at DESC").fetchall()
+    c.close()
+    rg=shutil.which("rg")
+    results=[]
     for row in rows:
         if not fnmatch.fnmatch(row["filename"].lower(),req.filename_pattern.lower()): continue
-        lines=(row["text"] or "").splitlines()
-        hits=[i for i,line in enumerate(lines) if rx.search(line)]
-        if not hits: continue
-        snippets=[]; used=set()
-        for i in hits:
-            lo=max(0,i-req.context_lines); hi=min(len(lines),i+req.context_lines+1)
+        try:
+            reader=PdfReader(row["path"],strict=False)
+            records=[]
+            for page_no,page in enumerate(reader.pages,1):
+                page_text=page.extract_text() or ""
+                for line_no,line in enumerate(page_text.splitlines(),1):
+                    records.append({"page":page_no,"line":line_no,"text":line[:4000]})
+        except Exception:
+            continue
+        if not records: continue
+        hit_indexes=[]
+        if rg:
+            # Feed page-tagged extracted text to ripgrep over stdin. This keeps rg's
+            # regex engine while preserving an exact PDF page/line mapping.
+            payload="".join(f"{x['page']}\\t{x['line']}\\t{x['text']}\\n" for x in records)
+            cmd=[rg,"--json","--line-number","--color","never"]
+            if not req.regex: cmd.append("--fixed-strings")
+            if not req.case_sensitive: cmd.append("--ignore-case")
+            if req.whole_word: cmd.append("--word-regexp")
+            cmd.extend(["-e",req.pattern,"-"])
+            try:
+                proc=subprocess.run(cmd,input=payload,text=True,capture_output=True,timeout=20,check=False)
+                if proc.returncode not in (0,1):
+                    raise RuntimeError(proc.stderr.strip() or f"rg exited {proc.returncode}")
+                for raw in proc.stdout.splitlines():
+                    try:
+                        event=json.loads(raw)
+                        if event.get("type")!="match": continue
+                        n=event.get("data",{}).get("line_number")
+                        if n and 1<=n<=len(records): hit_indexes.append(n-1)
+                    except (ValueError,TypeError):
+                        continue
+                engine="ripgrep" 
+            except (OSError,subprocess.SubprocessError,RuntimeError):
+                hit_indexes=[i for i,x in enumerate(records) if rx.search(x["text"])]
+                engine="Python regex fallback"
+        else:
+            hit_indexes=[i for i,x in enumerate(records) if rx.search(x["text"])]
+            engine="Python regex fallback (ripgrep not installed)"
+        if not hit_indexes: continue
+        snippets=[]; used=set(); matched_pages=[]
+        for idx in hit_indexes:
+            hit=records[idx]
+            if hit["page"] not in matched_pages: matched_pages.append(hit["page"])
+            lo=max(0,idx-req.context_lines); hi=min(len(records),idx+req.context_lines+1)
+            # Do not let context bleed across PDF page boundaries.
+            lo=max(lo,next((k for k in range(idx,-1,-1) if records[k]["page"]!=hit["page"]),-1)+1)
+            hi=min(hi,next((k for k in range(idx+1,len(records)) if records[k]["page"]!=hit["page"]),len(records)))
             if any(k in used for k in range(lo,hi)): continue
             used.update(range(lo,hi))
-            snippets.append({"line":i+1,"text":"\\n".join(f"{k+1}: {lines[k][:500]}" for k in range(lo,hi))})
+            snippets.append({"page":hit["page"],"line":hit["line"],
+                "text":"\\n".join(f"{records[k]['line']}: {records[k]['text'][:500]}" for k in range(lo,hi))})
             if len(snippets)>=12: break
-        results.append({"id":row["id"],"filename":row["filename"],"title":row["title"],"url":row["url"],"hit_count":len(hits),"snippets":snippets})
+        results.append({"id":row["id"],"filename":row["filename"],"title":row["title"],"url":row["url"],
+            "hit_count":len(hit_indexes),"pages":matched_pages,"snippets":snippets,"engine":engine})
         if len(results)>=req.limit: break
-    return {"count":len(results),"results":results,"engine":"Python regex grep over extracted PDF text"}
+    return {"count":len(results),"results":results,"engine":"ripgrep with page-aware PDF extraction" if rg else "Python regex fallback; install ripgrep for faster search"}
 
 @app.post("/api/discover-paths")
 async def discover_paths(req: PathDiscoveryRequest):
