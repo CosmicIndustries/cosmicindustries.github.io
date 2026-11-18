@@ -171,8 +171,10 @@ def query_matches(text, query):
     return len(stack)==1 and bool(stack[0])
 
 def is_pdf_signature(data):
-    """A .pdf filename or MIME label is not proof; require a PDF header near byte zero."""
-    return b"%PDF-" in (data or b"")[:1024]
+    """Accept a PDF header near byte zero, but not a header embedded in an HTML page."""
+    prefix=(data or b"")[:1024]
+    match=re.match(rb"^(?:\xef\xbb\xbf)?[ \t\r\n\x00]*%PDF-[0-9]\.[0-9]",prefix)
+    return bool(match)
 
 
 def is_pdf_candidate(url, content_type):
@@ -187,6 +189,8 @@ def is_pdf_candidate(url, content_type):
 
 def extract_pdf(data):
     import io
+    if not is_pdf_signature(data):
+        raise ValueError("Invalid PDF: missing %PDF- file signature in the first 1,024 bytes.")
     reader=PdfReader(io.BytesIO(data), strict=False)
     pages=[]; texts=[]
     for i,page in enumerate(reader.pages):
@@ -1095,6 +1099,38 @@ async def discover_paths(req: PathDiscoveryRequest):
             "engine":"bounded fixed-worker same-host path probe","available_external_tools":tool_inventory()["tools"]}
 
 
+def response_fingerprint(status, headers):
+    """Comparable metadata from a HEAD response."""
+    h={str(k).lower():str(v).strip() for k,v in dict(headers or {}).items()}
+    return {
+        "status":int(status),
+        "mime":h.get("content-type","").split(";",1)[0].strip().lower(),
+        "length":h.get("content-length",""),
+        "etag":h.get("etag","").strip(),
+        "last_modified":h.get("last-modified","").strip(),
+    }
+
+
+def is_soft_404_response(status, headers, baseline):
+    """Detect hosts that return the same HTTP-200 HTML page for unknown paths."""
+    if not baseline:
+        return False
+    current=response_fingerprint(status,headers)
+    if current["status"] not in (200,206) or baseline.get("status") not in (200,206):
+        return False
+    if current["mime"] not in ("text/html","application/xhtml+xml"):
+        return False
+    if current["mime"]!=baseline.get("mime"):
+        return False
+    if current["etag"] and baseline.get("etag"):
+        return current["etag"]==baseline["etag"]
+    if current["length"] and baseline.get("length"):
+        return current["length"]==baseline["length"]
+    if current["last_modified"] and baseline.get("last_modified"):
+        return current["last_modified"]==baseline["last_modified"]
+    return False
+
+
 def build_index_fuzz_plan(req: IndexedFuzzRequest):
     """Validate seeds and create a bounded, evenly distributed probe plan."""
     if not req.seed_urls:
@@ -1135,6 +1171,13 @@ def build_index_fuzz_plan(req: IndexedFuzzRequest):
         if host_budget<1:
             continue
         host_added=0
+        # Test the exact archived/indexed candidates first; they are stronger
+        # evidence than synthetic wordlist guesses and were previously omitted.
+        for seed in seeds:
+            if seed not in seen and host_added<host_budget:
+                seen.add(seed)
+                probe_jobs.append((seed,origin,seed))
+                host_added+=1
         directories={"/"}
         for seed in seeds:
             parts=[x for x in urlparse(seed).path.split("/") if x]
@@ -1179,6 +1222,19 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
         headers={"User-Agent":UA},
         limits=httpx.Limits(max_connections=req.concurrency,max_keepalive_connections=req.concurrency),
     ) as client:
+        async def get_baseline(origin):
+            marker=urljoin(origin+"/","/.cosmic-pdf-lab-missing-"+job_id+".pdf")
+            try:
+                if not await can_fetch(client,marker,req.respect_robots):
+                    return None
+                response=await client.head(marker)
+                return response_fingerprint(response.status_code,response.headers)
+            except Exception:
+                return None
+
+        baseline_pairs=await asyncio.gather(*(get_baseline(origin) for origin in origins))
+        baselines=dict(zip(origins.keys(),baseline_pairs))
+
         async def probe(item):
             url,origin,seed=item
             stats=job["stats"]
@@ -1217,6 +1273,9 @@ async def run_indexed_fuzz_job(job_id: str, req: IndexedFuzzRequest, plan: dict)
                                         break
                             pdf_verified=is_pdf_signature(bytes(prefix))
                     stats["tested"]+=1
+                    if is_soft_404_response(status,headers,baselines.get(origin)):
+                        stats["soft_404s"]+=1
+                        return
                     if status in (200,206,301,302,307,308,401,403):
                         result={
                             "url":url,
@@ -1287,6 +1346,7 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
             "tested":0,
             "found":0,
             "pdfs":0,
+            "soft_404s":0,
             "errors":0,
             "skipped":0,
             "robots_blocked":0,
