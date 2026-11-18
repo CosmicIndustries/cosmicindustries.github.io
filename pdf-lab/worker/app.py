@@ -267,6 +267,7 @@ async def crawl(jobid, cfg: CrawlRequest):
 
 class WildcardDiscoveryRequest(BaseModel):
     url_pattern: str
+    content_query: str = ""
     match_mode: str = Field(default="glob", pattern="^(glob|regex)$")
     max_results: int = Field(default=200, ge=1, le=2000)
     indexes: int = Field(default=2, ge=1, le=5)
@@ -466,6 +467,74 @@ def parse_arquivo_cdx_payload(payload):
     return rows
 
 
+def arquivo_text_query(query):
+    """Translate supported PDF Lab terms into Arquivo.pt's full-text syntax.
+
+    Arquivo.pt supports required terms, quoted phrases, and '-' exclusions.
+    Its API does not implement this worker's OR/NOT/parenthesis grammar.
+    """
+    value=(query or "").strip()
+    if not value:
+        return None
+    if re.search(r"\b(?:OR|NOT)\b|[()]",value,re.I):
+        return None
+    value=re.sub(r"\bAND\b"," ",value,flags=re.I)
+    value=" ".join(value.split())
+    return value or None
+
+
+async def arquivo_text_discovery(client, query, pattern, mode, matcher, max_results, errors):
+    """Search archived PDF contents by terms and URL scope."""
+    if not (query or "").strip():
+        return [],0,"not-run"
+    normalized=arquivo_text_query(query)
+    if not normalized:
+        return [],0,"skipped"
+    try:
+        site_patterns=arquivo_query_patterns(pattern,mode)
+        site_scope=",".join(site_patterns)
+        # TextSearch accepts a host/path prefix, not the CDX trailing wildcard.
+        if site_scope.endswith("/*"):
+            site_scope=site_scope[:-1]
+        params=[
+            ("q",normalized),("type","pdf"),("siteSearch",site_scope),
+            ("maxItems",str(min(max_results,500))),
+            ("dedupField","url"),("dedupValue","1"),
+            ("fields","title,originalURL,linkToArchive,tstamp,mimeType,snippet,linkToOriginalFile"),
+        ]
+        response=await client.get(
+            "https://arquivo.pt/textsearch",params=params,
+            timeout=httpx.Timeout(20.0,connect=8.0),
+        )
+        response.raise_for_status()
+        payload=response.json()
+        records=payload.get("response_items",[]) if isinstance(payload,dict) else []
+        found=[]; seen=set()
+        for item in records:
+            if not isinstance(item,dict):
+                continue
+            url=item.get("originalURL") or ""
+            if not url or url in seen or not re.match(r"^https?://",url,re.I):
+                continue
+            if not matcher.search(url):
+                continue
+            seen.add(url)
+            found.append({
+                "url":url,"timestamp":item.get("tstamp"),
+                "mime":item.get("mimeType"),"status":None,
+                "collection":"arquivo-textsearch",
+                "title":item.get("title"),
+                "snippet":item.get("snippet"),
+                "archive_url":item.get("linkToArchive"),
+            })
+            if len(found)>=max_results:
+                break
+        return found,1,("results" if found else "empty")
+    except Exception as exc:
+        errors.append("Arquivo.pt full-text: "+type(exc).__name__+": "+str(exc)[:160])
+        return [],0,"unavailable"
+
+
 def discovery_sort_key(item):
     is_pdf=(str(item.get("mime") or "").lower()=="application/pdf" or
             urlparse(item["url"]).path.lower().endswith(".pdf"))
@@ -473,7 +542,7 @@ def discovery_sort_key(item):
     # Common Crawl uses YYYYMMDD; Wayback uses YYYYMMDDhhmmss.
     # Right-pad to a common precision, then sort newest first.
     stamp_number=int(stamp.ljust(14,"0")) if stamp.isdigit() else 0
-    source_priority={"commoncrawl":0,"arquivo-cdx":1,"wayback-cdx":2}.get(item.get("collection"),3)
+    source_priority={"commoncrawl":0,"arquivo-textsearch":1,"arquivo-cdx":2,"wayback-cdx":3}.get(item.get("collection"),4)
     return (0 if is_pdf else 1, -stamp_number, source_priority, item["url"].casefold())
 
 
@@ -583,7 +652,7 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
         raise HTTPException(400,detail=str(exc))
     results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0
     pages_crawled=0; page_limit_reached=False
-    providers={"commoncrawl":"not-run","arquivo":"not-run","wayback":"not-run"}
+    providers={"commoncrawl":"not-run","arquivo-textsearch":"not-run","arquivo":"not-run","wayback":"not-run"}
     timeout=httpx.Timeout(22.0,connect=6.0)
     async with httpx.AsyncClient(timeout=timeout,headers={"User-Agent":UA},limits=httpx.Limits(max_connections=12,max_keepalive_connections=6)) as client:
         collections=[]
@@ -672,6 +741,19 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
             providers["commoncrawl"]="unavailable"
         elif collections:
             providers["commoncrawl"]="empty"
+        # When a plain-term/phrase query is supplied, search archived PDF text
+        # before falling back to URL-only CDX results.
+        if len(results)<req.max_results:
+            text_results,text_requests,text_state=await arquivo_text_discovery(
+                client,req.content_query,pattern,req.match_mode,matcher,
+                req.max_results-len(results),errors
+            )
+            pages_fetched+=text_requests
+            providers["arquivo-textsearch"]=text_state
+            for item in text_results:
+                if item["url"] not in seen:
+                    seen.add(item["url"]); results.append(item)
+
         # Arquivo.pt is an independent CDX source and is queried before Wayback.
         # It is a supplement, not a complete mirror of the global web.
         if len(results)<req.max_results:
