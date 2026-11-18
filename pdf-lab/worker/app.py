@@ -111,6 +111,42 @@ def normalize_document_url(url):
     return urlunsplit((parts.scheme.lower(),netloc,parts.path or "/",parts.query,""))
 
 
+def valid_document_source_url(url):
+    parsed=urlsplit(url or "")
+    return parsed.scheme in ("http","https") and bool(parsed.hostname)
+
+
+def canonical_document_url(url):
+    """Unwrap archive replay URLs back to the original source URL when possible."""
+    value=(url or "").strip()
+    parsed=urlsplit(value)
+    host=(parsed.hostname or "").lower()
+    if host.endswith("arquivo.pt") or host=="web.archive.org":
+        decoded=unquote(parsed.path)
+        candidates=re.findall(r"https?://[^\s<>\"']+",decoded,re.I)
+        for candidate in candidates:
+            candidate=candidate.rstrip("),;]")
+            if valid_document_source_url(candidate):
+                return normalize_document_url(candidate)
+    return normalize_document_url(value)
+
+
+def local_index_seed_urls(extensions=None):
+    """Return original source URLs already present in the local index."""
+    extensions=set(x.lower().lstrip(".") for x in (extensions or ["pdf"]))
+    c=connect()
+    rows=c.execute("SELECT url,filename FROM documents ORDER BY discovered_at DESC").fetchall()
+    c.close()
+    seeds=[]
+    for row in rows:
+        ext=Path(row["filename"]).suffix.lower().lstrip(".")
+        if ext in extensions:
+            url=canonical_document_url(row["url"])
+            if valid_document_source_url(url):
+                seeds.append(url)
+    return list(dict.fromkeys(seeds))
+
+
 def document_duplicate_key(text, metadata):
     """Detect same-content duplicates but keep different years/chapters/parts."""
     normalized=re.sub(r"\s+"," ",(text or "").casefold()).strip()
@@ -1283,7 +1319,7 @@ async def import_discovered_urls(req: ImportURLsRequest):
                 return None,{"url":url,"error":"Excluded: extracted PDF text did not match the content expression.","excluded":True}
 
             document_title=clean_archive_text(title,400) or name
-            docid,new=store_document(download_url,name,data,document_title,body,np)
+            docid,new=store_document(canonical_document_url(url),name,data,document_title,body,np)
             return {
                 "id":docid,"filename":name,"title":document_title,
                 "url":url,"download_url":download_url,
@@ -1905,8 +1941,13 @@ async def fuzz_indexed_hosts(req: IndexedFuzzRequest):
 
             # Feed all archive-indexed URLs and all institutional roots back into
             # the same host/path plan, with no fixed global probe budget by default.
+            # Re-seed from existing locally indexed source URLs, not only
+            # the currently visible search results and archive index response.
+            local_seeds=local_index_seed_urls(req.extensions)
             merged_urls=list(req.seed_urls)
+            merged_urls.extend(local_seeds)
             merged_urls.extend(item["url"] for item in candidates)
+            job["stats"]["local_index_seeds"]=len(local_seeds)
             expanded=req.model_copy(update={
                 "seed_urls":list(dict.fromkeys(merged_urls)),
                 "institution_domains":domains,
