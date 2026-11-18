@@ -22,7 +22,7 @@ DB = ROOT / "catalog.sqlite3"
 ROOT.mkdir(parents=True, exist_ok=True); FILES.mkdir(parents=True, exist_ok=True)
 UA = "CosmicPDFLab/1.0 (+local research crawler)"
 app = FastAPI(title="Cosmic PDF Lab Worker", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["https://cosmicindustries.github.io","http://127.0.0.1:5500","http://localhost:5500"], allow_methods=["*"], allow_headers=["*"])
 jobs: dict[str, dict] = {}
 job_tasks: dict[str, asyncio.Task] = {}
 robots_cache: dict[str, RobotFileParser] = {}
@@ -166,7 +166,7 @@ async def crawl(jobid, cfg: CrawlRequest):
     root=urlparse(start).hostname
     queue=deque([(start,0)]); visited=set(); found=set(); stored=0; pages_seen=0
     limits=httpx.Limits(max_connections=8,max_keepalive_connections=4)
-    async with httpx.AsyncClient(follow_redirects=True,limits=limits,headers={"User-Agent":UA}) as client:
+    async with httpx.AsyncClient(follow_redirects=False,limits=limits,headers={"User-Agent":UA}) as client:
       while queue and pages_seen<cfg.max_pages and len(found)<cfg.max_files:
         url,level=queue.popleft(); url=urldefrag(url)[0]
         if url in visited: continue
@@ -178,7 +178,13 @@ async def crawl(jobid, cfg: CrawlRequest):
             j["stats"]["robots_blocked"]+=1; continue
         try:
             async with client.stream("GET",url,timeout=20) as response:
+                if 300 <= response.status_code < 400 and response.headers.get("location"):
+                    target=urljoin(url,response.headers["location"])
+                    if valid_http(target) and domain_allowed(urlparse(target).hostname,root,cfg.allow_domains,cfg.same_domain):
+                        queue.append((target,level))
+                    continue
                 if response.status_code!=200: continue
+                if not valid_http(str(response.url)): continue
                 ctype=response.headers.get("content-type","").lower()
                 length=int(response.headers.get("content-length","0") or 0)
                 if length>cfg.max_bytes: continue
@@ -197,10 +203,14 @@ async def crawl(jobid, cfg: CrawlRequest):
                     except Exception as e:
                         j["stats"]["parse_errors"]+=1; log(f"PDF parse failed: {name}: {e}"); continue
                     if not query_matches(body,cfg.content_query): continue
-                    docid,new=store_pdf(url,name,data,name,body,np)
-                    stored+=int(new); j["stats"]["matches"]+=1
+                    if cfg.download_matches:
+                        docid,new=store_pdf(url,name,data,name,body,np)
+                        stored+=int(new)
+                    else:
+                        docid,new=None,False
+                    j["stats"]["matches"]+=1
                     j["results"].append({"id":docid,"filename":name,"url":url,"pages":np,"bytes":len(data),"sha256":hashlib.sha256(data).hexdigest(),"new":new,"snippets":[x for x in pagematches if query_matches(x["text"],cfg.content_query)][:8]})
-                    log(("Stored " if new else "Already catalogued ")+name)
+                    log((("Stored " if new else "Already catalogued ") if cfg.download_matches else "Matched (download disabled) ")+name)
                 elif "text/html" in ctype and level<cfg.depth:
                     data=await response.aread()
                     if len(data)>cfg.max_bytes: continue
