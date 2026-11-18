@@ -367,37 +367,72 @@ async def discover_wildcard(req: WildcardDiscoveryRequest):
     pattern=req.url_pattern.strip()
     matcher=url_matcher(pattern,req.match_mode)
     query_patterns=cdx_query_candidates(pattern,req.match_mode)
-    async with httpx.AsyncClient(timeout=httpx.Timeout(18.0,connect=8.0),headers={"User-Agent":UA}) as client:
+    async with httpx.AsyncClient(timeout=httpx.Timeout(60.0,connect=12.0),headers={"User-Agent":UA}) as client:
         info=await client.get("https://index.commoncrawl.org/collinfo.json")
         info.raise_for_status()
         collections=info.json()[:req.indexes]
-        results=[]; seen=set(); errors=[]; queried=[]
+        results=[]; seen=set(); errors=[]; queried=[]; pages_fetched=0
+        async def cdx_get(endpoint, params):
+            # Common Crawl asks clients to be serial and polite. Retry transient gateway
+            # failures with backoff; never fan out concurrent queries to the public index.
+            last_error=None
+            for attempt in range(3):
+                try:
+                    response=await client.get(endpoint,params=params,timeout=60.0)
+                    if response.status_code in (429,500,502,503,504):
+                        last_error=RuntimeError("HTTP "+str(response.status_code))
+                        if attempt<2: await asyncio.sleep(2 ** (attempt+1))
+                        continue
+                    response.raise_for_status()
+                    return response
+                except (httpx.TimeoutException,httpx.TransportError) as exc:
+                    last_error=exc
+                    if attempt<2: await asyncio.sleep(2 ** (attempt+1))
+            raise RuntimeError("Common Crawl query failed after retries: "+str(last_error)[:140])
         for collection in collections:
             endpoint=collection.get("cdx-api")
             if not endpoint: continue
             for cdx_pattern in query_patterns:
                 if len(results)>=req.max_results: break
                 try:
-                    r=await client.get(endpoint,params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey","limit":str(min(req.max_results,300))},timeout=18.0)
-                    if r.status_code==404: continue
-                    r.raise_for_status()
-                    queried.append(collection.get("id","index")+":"+cdx_pattern)
-                    for line in r.text.splitlines():
-                        try: item=json.loads(line)
-                        except Exception: continue
-                        url=item.get("url","")
-                        if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
-                        if not matcher.search(url): continue
-                        seen.add(url)
-                        results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
+                    # Ask the ZipNum index how many pages exist, then retrieve pages
+                    # serially. pageSize is compressed index blocks per page, not URL rows.
+                    meta=await cdx_get(endpoint,{"url":cdx_pattern,"showNumPages":"true","pageSize":"1","filter":"status:200"})
+                    try:
+                        page_info=meta.json()
+                        total_pages=max(1,int(page_info.get("pages",1)))
+                    except Exception:
+                        total_pages=1
+                    # Bound work per pattern/index. User's max_results is the output cap;
+                    # page traversal lets us move past the first block instead of silently
+                    # stopping at the first 300 records.
+                    for page_no in range(min(total_pages,50)):
                         if len(results)>=req.max_results: break
+                        params={"url":cdx_pattern,"output":"json","filter":"status:200","collapse":"urlkey",
+                                "pageSize":"1","page":str(page_no),"limit":str(min(req.max_results,2000)),
+                                "fl":"url,timestamp,mime,status"}
+                        response=await cdx_get(endpoint,params)
+                        pages_fetched+=1
+                        queried.append(collection.get("id","index")+":"+cdx_pattern+"#"+str(page_no))
+                        for line in response.text.splitlines():
+                            try: item=json.loads(line)
+                            except Exception: continue
+                            url=item.get("url","")
+                            if not url or url in seen or not re.match(r"^https?://",url,re.I): continue
+                            if not matcher.search(url): continue
+                            seen.add(url)
+                            results.append({"url":url,"timestamp":item.get("timestamp"),"mime":item.get("mime"),"status":item.get("status"),"collection":collection.get("id")})
+                            if len(results)>=req.max_results: break
+                        # Respect the public index service's request-rate guidance.
+                        if page_no+1<min(total_pages,50) and len(results)<req.max_results:
+                            await asyncio.sleep(1.0)
                 except Exception as e:
-                    errors.append(collection.get("id","index")+" "+cdx_pattern+": "+str(e)[:150])
+                    errors.append(collection.get("id","index")+" "+cdx_pattern+": "+str(e)[:180])
             if len(results)>=req.max_results: break
         pages_crawled=0
         if req.recursive and req.recursive_depth>0 and len(results)<req.max_results:
             pages_crawled=await recursive_url_discovery(client,[x["url"] for x in results],matcher,req,results,seen,errors)
-    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,"queries_succeeded":queried,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"partial":bool(errors),"source":"Common Crawl URL index + bounded live recursive crawl" if req.recursive else "Common Crawl URL index; captures may be historical"}
+    return {"pattern":pattern,"match_mode":req.match_mode,"cdx_patterns":query_patterns,"queries_succeeded":queried,"pages_fetched":pages_fetched,"results":results,"count":len(results),"indexes_checked":len(collections),"pages_crawled":pages_crawled,"errors":errors,"partial":bool(errors),"source":"Paginated Common Crawl CDX URL index + bounded live recursive crawl" if req.recursive else "Paginated Common Crawl CDX URL index; captures may be historical"}
 @app.post("/api/import-urls")
 async def import_discovered_urls(req: ImportURLsRequest):
     results=[]; errors=[]
