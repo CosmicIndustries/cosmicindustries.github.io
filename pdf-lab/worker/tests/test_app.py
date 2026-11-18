@@ -98,6 +98,24 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertEqual(rows[0]["url"], "https://example.edu/report.pdf")
         self.assertEqual(rows[1]["mime"], "application/pdf")
 
+    def test_soft_404_classifier_detects_generic_200_html_fallback(self):
+        baseline = worker.response_fingerprint(
+            200, {"content-type": "text/html; charset=UTF-8", "content-length": "4182"}
+        )
+        self.assertTrue(worker.is_soft_404_response(
+            200, {"content-type": "text/html", "content-length": "4182"}, baseline
+        ))
+        self.assertFalse(worker.is_soft_404_response(
+            200, {"content-type": "application/pdf", "content-length": "4182"}, baseline
+        ))
+        self.assertFalse(worker.is_soft_404_response(
+            404, {"content-type": "text/html", "content-length": "4182"}, baseline
+        ))
+
+    def test_pdf_parser_rejects_html_before_pypdf(self):
+        with self.assertRaisesRegex(ValueError, "missing %PDF-"):
+            worker.extract_pdf(b"<!DOCTYPE html><html>not a PDF</html>")
+
     def test_index_fuzz_plan_distributes_budget_across_hosts(self):
         req = worker.IndexedFuzzRequest(
             seed_urls=[
@@ -116,6 +134,15 @@ class PDFLabCoreTests(unittest.TestCase):
         self.assertTrue(any(url == "https://one.example.edu/docs/docs/" for url in urls))
         self.assertTrue(any(url == "https://one.example.edu/docs/manual.pdf" for url in urls))
         self.assertFalse(any("/docs/.pdf" in url for url in urls))
+
+    def test_index_fuzz_plan_includes_original_seed_urls(self):
+        seed = "https://example.edu/docs/aviation-handbook.pdf"
+        req = worker.IndexedFuzzRequest(
+            seed_urls=[seed], paths=["manual"], extensions=["pdf"], max_probes=5
+        )
+        with patch.object(worker, "valid_http", return_value=True):
+            plan = worker.build_index_fuzz_plan(req)
+        self.assertIn((seed, "https://example.edu", seed), plan["probe_jobs"])
 
     def test_index_fuzz_job_plan_rejects_empty_seed_list(self):
         req = worker.IndexedFuzzRequest(seed_urls=[])
