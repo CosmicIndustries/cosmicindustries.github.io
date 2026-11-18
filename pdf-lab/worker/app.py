@@ -55,7 +55,7 @@ def _roman_value(value):
 def derive_document_metadata(url, filename, title, text=""):
     """Extract a document series and explicit year/chapter/part/edition markers."""
     host=(urlparse(url).hostname or "").lower().removeprefix("www.")
-    raw=" ".join([str(title or ""),Path(filename).stem]).strip()
+    raw=str(title or "").strip() or Path(filename).stem
     year_match=re.search(r"(?<!\d)(?:19|20)\d{2}(?!\d)",raw)
     year=int(year_match.group(0)) if year_match else None
 
@@ -726,7 +726,7 @@ async def recursive_url_discovery(client, seeds, matcher, req, results, seen, er
         if root not in roots: roots.append(root)
         if len(roots)>=5: break
     queue=deque((root,0) for root in roots); visited=set(); pages=0
-    while queue and pages<req.max_pages and len(results)<req.max_results:
+    while queue and (not req.max_pages or pages<req.max_pages) and (not req.max_results or len(results)<req.max_results):
         url,depth=queue.popleft()
         if url in visited or depth>req.recursive_depth: continue
         visited.add(url)
@@ -746,7 +746,7 @@ async def recursive_url_discovery(client, seeds, matcher, req, results, seen, er
                 if matcher.search(target):
                     if target not in seen:
                         seen.add(target); results.append({"url":target,"timestamp":None,"mime":None,"status":"live-crawl","collection":"recursive-live"})
-                        if len(results)>=req.max_results: break
+                        if req.max_results and len(results)>=req.max_results: break
                 elif depth<req.recursive_depth and "?" not in target:
                     if target not in visited and not urlparse(target).path.lower().endswith((".jpg",".png",".gif",".zip",".mp4")):
                         queue.append((target,depth+1))
@@ -1020,7 +1020,7 @@ async def arquivo_discovery(client, pattern, mode, matcher, max_results, errors)
 async def discover_wildcard(req: WildcardDiscoveryRequest):
     pattern=req.url_pattern.strip()
     matcher=url_matcher(pattern,req.match_mode)
-    result_limit=req.max_results or 10000
+    result_limit=req.max_results if req.max_results>0 else float("inf")
     try:
         query_patterns=cdx_query_candidates(pattern,req.match_mode)
     except ValueError as exc:
@@ -1574,8 +1574,8 @@ def is_soft_404_response(status, headers, baseline):
 
 def build_index_fuzz_plan(req: IndexedFuzzRequest):
     """Validate seeds and create a bounded, evenly distributed probe plan."""
-    if not req.seed_urls:
-        raise HTTPException(400,"Supply URL candidates from an index search first.")
+    if not req.seed_urls and not req.institution_domains:
+        raise HTTPException(400,"Supply indexed URLs or at least one institution domain.")
     origins={}
     invalid=0
     combined_seeds=list(req.seed_urls)
