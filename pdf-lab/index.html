@@ -59,13 +59,13 @@ async function pollFuzz(jobId){
  try{
   const d=await api('/api/fuzz-indexes/'+encodeURIComponent(jobId));
   const s=d.stats||{};
-  showStatus('Indexed-host fuzzer '+d.status+' · '+(s.finished||0)+'/'+(s.planned||0)+' probes · '+(s.found||0)+' paths · '+(s.pdfs||0)+' verified PDFs · '+(s.errors||0)+' errors · '+(s.robots_blocked||0)+' robots blocked');
+  showStatus('Indexed-host fuzzer '+d.status+' · '+(s.finished||0)+'/'+(s.planned||0)+' probes · '+(s.found||0)+' paths · '+(s.pdfs||0)+' verified PDFs · '+(s.soft_404s||0)+' soft-404 pages filtered · '+(s.errors||0)+' errors · '+(s.robots_blocked||0)+' robots blocked');
   if(['queued','running'].includes(d.status)){
    setTimeout(()=>pollFuzz(jobId),900);return;
   }
   if(d.status==='completed'){
    pathMatches=d.results||[];renderFuzzResults(pathMatches);
-   showStatus('Indexed-host fuzzing complete · '+s.hosts_checked+' hosts · '+s.seeds_used+' seeds · '+s.tested+'/'+s.planned+' requests tested · '+s.found+' HTTP paths found · '+(s.pdfs||0)+' PDFs signature-verified · '+s.errors+' errors · '+s.robots_blocked+' robots blocked. Only verified PDFs are preselected.');
+   showStatus('Indexed-host fuzzing complete · '+s.hosts_checked+' hosts · '+s.seeds_used+' seeds · '+s.tested+'/'+s.planned+' requests tested · '+s.found+' HTTP paths found · '+(s.pdfs||0)+' PDFs signature-verified · '+(s.soft_404s||0)+' soft-404 pages filtered · '+s.errors+' errors · '+s.robots_blocked+' robots blocked. Exact indexed seed URLs were tested first; only verified PDFs are preselected.');
   }else{
    showStatus('Indexed-host fuzzer failed: '+(d.error||'unknown worker error'));
   }
