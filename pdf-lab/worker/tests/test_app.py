@@ -206,6 +206,11 @@ class PDFLabCoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing %PDF-"):
             worker.extract_pdf(b"<!DOCTYPE html><html>not a PDF</html>")
 
+    def test_indexed_fuzzer_defaults_include_all_supported_document_types(self):
+        req = worker.IndexedFuzzRequest(seed_urls=[], institution_domains=["mit.edu"])
+        self.assertEqual(set(req.extensions), set(worker.SUPPORTED_FORMATS))
+        self.assertTrue({"pdf", "pptx", "ppt", "docx", "doc", "xlsx", "xls", "odp", "odt", "ods"}.issubset(set(req.extensions)))
+
     def test_institution_seeds_include_mit_uga_and_middle_georgia(self):
         self.assertIn("mit.edu", worker.INSTITUTION_DOMAIN_SEEDS)
         self.assertIn("uga.edu", worker.INSTITUTION_DOMAIN_SEEDS)
