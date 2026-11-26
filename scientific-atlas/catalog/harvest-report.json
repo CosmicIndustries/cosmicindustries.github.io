@@ -1,13 +1,18 @@
 {
-  "harvested_at": "2026-11-25T17:25:16Z",
-  "records_seen": 9100,
-  "records_written": 9100,
+  "harvested_at": "2026-11-26T17:05:12Z",
+  "records_seen": 6100,
+  "records_written": 6100,
   "duplicates_removed": 0,
-  "errors": [],
+  "errors": [
+    {
+      "source": "usgs-sciencebase-data-releases",
+      "error": "<HTTPError 403: 'Forbidden'>",
+      "time": "2026-11-26T17:05:10Z"
+    }
+  ],
   "sources": [
     "datacite-datasets",
     "nasa-cmr-collections",
-    "noaa-ncei-search",
-    "usgs-sciencebase-data-releases"
+    "noaa-ncei-search"
   ]
 }
