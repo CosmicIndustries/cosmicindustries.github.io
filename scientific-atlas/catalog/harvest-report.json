@@ -1,5 +1,5 @@
 {
-  "harvested_at": "2026-11-26T17:05:12Z",
+  "harvested_at": "2026-11-27T16:49:27Z",
   "records_seen": 6100,
   "records_written": 6100,
   "duplicates_removed": 0,
@@ -7,7 +7,7 @@
     {
       "source": "usgs-sciencebase-data-releases",
       "error": "<HTTPError 403: 'Forbidden'>",
-      "time": "2026-11-26T17:05:10Z"
+      "time": "2026-11-27T16:49:25Z"
     }
   ],
   "sources": [
